@@ -1,0 +1,10 @@
+# Build directories
+build/*
+public/*
+**/node_modules/*
+
+# misc
+**/jsconfig.json
+
+# eslintrc
+**/.eslintrc.*
