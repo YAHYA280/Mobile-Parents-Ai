@@ -1,18 +1,22 @@
+import type { NavigationProp } from "@react-navigation/native";
+import type {
+  ViewStyle,
+  TextStyle,
+  ImageStyle,
+  ImageSourcePropType} from "react-native";
+
 import React from "react";
+import { Image } from "expo-image";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  ImageSourcePropType,
-  ViewStyle,
-  TextStyle,
-  ImageStyle,
+  TouchableOpacity
 } from "react-native";
-import { SIZES, COLORS, icons } from "../constants";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+
 import { useTheme } from "../theme/ThemeProvider";
-import { Image } from "expo-image";
+import { SIZES, icons, COLORS } from "../constants";
 
 interface HeaderProps {
   title: string;

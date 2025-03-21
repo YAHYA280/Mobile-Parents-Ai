@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
-import { FONTS, COLORS, SIZES } from "../constants";
+
+import { FONTS, SIZES, COLORS } from "../constants";
 
 export const commonStyles = StyleSheet.create({
   header: {

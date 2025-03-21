@@ -1,8 +1,9 @@
 import { Tabs } from "expo-router";
-import { View, Text, Platform } from "react-native";
 import { Image } from "expo-image";
-import { COLORS, icons, FONTS, SIZES } from "../../constants";
 import { useTheme } from "@/theme/ThemeProvider";
+import { View, Text, Platform } from "react-native";
+
+import { icons, FONTS, SIZES, COLORS } from "../../constants";
 
 const TabLayout = () => {
   const { dark } = useTheme();

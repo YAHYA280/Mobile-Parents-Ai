@@ -1,10 +1,12 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import React from 'react';
-import { callData } from '../data';
-import { COLORS, icons } from '../constants';
 import { useNavigation } from '@react-navigation/native';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+
+import { callData } from '../data';
+import { icons, COLORS } from '../constants';
 import { useTheme } from '../theme/ThemeProvider';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 // Define the type for call item
 interface CallItem {

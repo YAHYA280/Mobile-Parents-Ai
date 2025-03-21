@@ -1,32 +1,25 @@
-import { useNavigation } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
+import { useNavigation } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import ProgressBar from "@/components/ProgressBar";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
-  StyleSheet,
   Alert,
-  TouchableOpacity,
-  ScrollView,
-  Linking,
   Image,
-  TouchableWithoutFeedback,
   Modal,
-  Animated,
+  Linking,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
 
 import Header from "../components/Header";
 import Button from "../components/Button";
 import { useTheme } from "../theme/ThemeProvider";
-import { COLORS, illustrations, SIZES } from "../constants";
-import ProgressBar from "@/components/ProgressBar";
-import {
-  FadeIn,
-  FadeOut,
-  SlideInUp,
-  SlideOutDown,
-} from "react-native-reanimated";
+import { SIZES, COLORS, illustrations } from "../constants";
 
 type Nav = {
   navigate: (value: string) => void;

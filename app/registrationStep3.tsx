@@ -1,21 +1,20 @@
 import { useNavigation } from "expo-router";
+import ProgressBar from "@/components/ProgressBar";
+import React, { useRef, useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
-  StyleSheet,
-  TextInput,
   Alert,
+  TextInput,
+  StyleSheet,
   TouchableOpacity,
-  Keyboard,
 } from "react-native";
 
 import Header from "../components/Header";
 import Button from "../components/Button";
+import { SIZES, COLORS } from "../constants";
 import { useTheme } from "../theme/ThemeProvider";
-import { COLORS, SIZES, FONTS } from "../constants";
-import ProgressBar from "@/components/ProgressBar";
 
 type Nav = {
   navigate: (value: string) => void;

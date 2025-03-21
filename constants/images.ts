@@ -1,3 +1,4 @@
+const logo = require("../assets/images/logo.png");
 // const educate1 = require("../assets/images/educate1.png");
 const educate2 = require("../assets/images/educate2.png");
 // const educate3 = require("../assets/images/educate3.png");
@@ -10,8 +11,6 @@ const educate4 = require("../assets/images/educate4.png");
 // const educate10 = require("../assets/images/educate10.png");
 // const educate11 = require("../assets/images/educate11.png");
 const ornament = require("../assets/images/ornament.png");
-const logo = require("../assets/images/logo.png");
-
 // const user1 = require("../assets/images/users/user1.jpeg");
 // const user2 = require("../assets/images/users/user2.jpeg");
 // const user3 = require("../assets/images/users/user3.jpeg");

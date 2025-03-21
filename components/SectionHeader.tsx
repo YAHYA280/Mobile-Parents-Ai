@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React from 'react';
-import { COLORS, SIZES } from '../constants';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+
+import { SIZES, COLORS } from '../constants';
 import { useTheme } from '../theme/ThemeProvider';
 
 interface SectionHeaderProps {

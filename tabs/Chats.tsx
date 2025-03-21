@@ -1,10 +1,13 @@
-import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, ImageSourcePropType } from 'react-native';
+import type { ImageSourcePropType } from 'react-native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import React from 'react';
-import { messsagesData } from '../data';
-import { COLORS, SIZES } from '../constants';
 import { useNavigation } from '@react-navigation/native';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+
+import { messsagesData } from '../data';
+import { SIZES, COLORS } from '../constants';
 import { useTheme } from '../theme/ThemeProvider';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 // Define the type for message item
 interface MessageItem {

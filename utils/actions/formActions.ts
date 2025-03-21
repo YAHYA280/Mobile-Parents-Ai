@@ -1,11 +1,11 @@
 import {
-  validateString,
-  validateEmail,
-  validatePassword,
-  validateNumber,
-  validateCreditCardNumber,
-  validateExpiryDate,
   validateCVV,
+  validateEmail,
+  validateString,
+  validateNumber,
+  validatePassword,
+  validateExpiryDate,
+  validateCreditCardNumber,
 } from "../ValidationConstraints";
 
 export const validateInput = (
@@ -32,13 +32,13 @@ export const validateInput = (
     inputId === "addressLine2"
   ) {
     return validateString(inputId, inputValue);
-  } else if (
+  } if (
     inputId === "email" ||
     inputId === "currentEmail" ||
     inputId === "newEmail"
   ) {
     return validateEmail(inputId, inputValue);
-  } else if (
+  } if (
     inputId === "password" ||
     inputId === "confirmPassword" ||
     inputId === "currentPassword" ||
@@ -46,15 +46,15 @@ export const validateInput = (
     inputId === "confirmNewPassword"
   ) {
     return validatePassword(inputId, inputValue);
-  } else if (inputId === "resetToken") {
+  } if (inputId === "resetToken") {
     return validateString(inputId, inputValue);
-  } else if (inputId === "places") {
+  } if (inputId === "places") {
     return validateNumber(inputId, inputValue);
-  } else if (inputId === "creditCardNumber") {
+  } if (inputId === "creditCardNumber") {
     return validateCreditCardNumber(inputId, inputValue);
-  } else if (inputId === "creditCardExpiryDate") {
+  } if (inputId === "creditCardExpiryDate") {
     return validateExpiryDate(inputId, inputValue);
-  } else if (inputId === "cvv") {
+  } if (inputId === "cvv") {
     return validateCVV(inputId, inputValue);
   }
 };

@@ -1,22 +1,25 @@
-import CourseCard from "@/components/CourseCard";
-import SectionHeader from "@/components/SectionHeader";
-import { COLORS, icons, images, SIZES } from "@/constants";
-import { banners, category, mostPopularCourses, topMentors } from "@/data";
-import { useTheme } from "@/theme/ThemeProvider";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import type {
+  ListRenderItemInfo} from "react-native";
+import type { NavigationProp} from "@react-navigation/native";
+
 import React, { useState } from "react";
+import CourseCard from "@/components/CourseCard";
+import { useTheme } from "@/theme/ThemeProvider";
+import SectionHeader from "@/components/SectionHeader";
+import { useNavigation } from "@react-navigation/native";
+import { icons, SIZES, COLORS, images } from "@/constants";
+import { ScrollView } from "react-native-virtualized-view";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { banners, category, topMentors, mostPopularCourses } from "@/data";
 import {
   View,
   Text,
-  StyleSheet,
   Image,
-  TouchableOpacity,
-  TextInput,
   FlatList,
-  ListRenderItemInfo,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-virtualized-view";
 
 interface Banner {
   id: string;
