@@ -1,13 +1,20 @@
-import type { ImageSourcePropType } from 'react-native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { ImageSourcePropType } from "react-native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
-import { messsagesData } from '../data';
-import { SIZES, COLORS } from '../constants';
-import { useTheme } from '../theme/ThemeProvider';
+import { messsagesData } from "../data";
+import { SIZES, COLORS } from "../constants";
+import { useTheme } from "../theme/ThemeProvider";
 
 // Define the type for message item
 interface MessageItem {
@@ -27,11 +34,17 @@ const Chats: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const { colors, dark } = useTheme();
 
-  const renderItem = ({ item, index }: { item: MessageItem; index: number }) => (
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: MessageItem;
+    index: number;
+  }) => (
     <TouchableOpacity
       key={index}
       onPress={() =>
-        navigation.navigate('chat', {
+        navigation.navigate("chat", {
           userName: item.fullName,
         })
       }
@@ -42,10 +55,10 @@ const Chats: React.FC = () => {
         },
         index % 2 !== 0
           ? {
-            backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite,
-            borderBottomWidth: dark ? 0 : 1,
-            borderTopWidth: dark ? 0 : 0,
-          }
+              backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite,
+              borderBottomWidth: dark ? 0 : 1,
+              borderTopWidth: dark ? 0 : 0,
+            }
           : null,
       ]}
     >
@@ -54,9 +67,13 @@ const Chats: React.FC = () => {
           <View style={styles.onlineIndicator} />
         )}
 
-        <Image source={item.userImg} resizeMode="contain" style={styles.userImage} />
+        <Image
+          source={item.userImg}
+          resizeMode="contain"
+          style={styles.userImage}
+        />
       </View>
-      <View style={{ flexDirection: 'row', width: SIZES.width - 104 }}>
+      <View style={{ flexDirection: "row", width: SIZES.width - 104 }}>
         <View style={[styles.userInfoContainer]}>
           <Text
             style={[
@@ -72,9 +89,9 @@ const Chats: React.FC = () => {
         </View>
         <View
           style={{
-            position: 'absolute',
+            position: "absolute",
             right: 4,
-            alignItems: 'center',
+            alignItems: "center",
           }}
         >
           <Text
@@ -94,13 +111,17 @@ const Chats: React.FC = () => {
                   width: 20,
                   height: 20,
                   borderRadius: 999,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: item.messageInQueue ? COLORS.primary : 'transparent',
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: item.messageInQueue
+                    ? COLORS.primary
+                    : "transparent",
                   marginTop: 12,
                 }}
               >
-                <Text style={[styles.messageInQueue]}>{`${item.messageInQueue}`}</Text>
+                <Text
+                  style={[styles.messageInQueue]}
+                >{`${item.messageInQueue}`}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -122,60 +143,68 @@ const Chats: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  // eslint-disable-next-line react-native/no-unused-styles
   iconBtnContainer: {
     height: 40,
     width: 40,
     borderRadius: 999,
     backgroundColor: COLORS.white,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
+  // eslint-disable-next-line react-native/no-unused-styles
   notiContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: 16,
     width: 16,
     borderRadius: 999,
     backgroundColor: "red",
-    position: 'absolute',
+    position: "absolute",
     top: 1,
     right: 1,
     zIndex: 999,
   },
+  // eslint-disable-next-line react-native/no-unused-styles
   notiText: {
     fontSize: 10,
     color: COLORS.white,
-    fontFamily: 'medium',
+    fontFamily: "medium",
   },
+  // eslint-disable-next-line react-native/no-unused-styles
   headerTitle: {
     fontSize: 22,
-    fontFamily: 'bold',
+    fontFamily: "bold",
     color: COLORS.black,
   },
+  // eslint-disable-next-line react-native/no-unused-styles
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.white,
     height: 50,
     marginVertical: 22,
     paddingHorizontal: 12,
     borderRadius: 20,
   },
+  // eslint-disable-next-line react-native/no-unused-styles
   searchInput: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     marginHorizontal: 12,
   },
+  // eslint-disable-next-line react-native/no-unused-styles
   flatListContainer: {
     paddingBottom: 100,
   },
   userContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
     borderBottomColor: COLORS.secondaryWhite,
     borderBottomWidth: 1,
   },
+  // eslint-disable-next-line react-native/no-unused-styles
   oddBackground: {
     backgroundColor: COLORS.tertiaryWhite,
   },
@@ -190,7 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     borderColor: COLORS.white,
     borderWidth: 2,
-    position: 'absolute',
+    position: "absolute",
     top: 14,
     right: 2,
     zIndex: 1000,
@@ -201,25 +230,25 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   userInfoContainer: {
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   userName: {
     fontSize: 14,
     color: COLORS.black,
-    fontFamily: 'bold',
+    fontFamily: "bold",
     marginBottom: 4,
   },
   lastSeen: {
     fontSize: 14,
-    color: 'gray',
+    color: "gray",
   },
   lastMessageTime: {
     fontSize: 12,
-    fontFamily: 'regular',
+    fontFamily: "regular",
   },
   messageInQueue: {
     fontSize: 12,
-    fontFamily: 'regular',
+    fontFamily: "regular",
     color: COLORS.white,
   },
 });

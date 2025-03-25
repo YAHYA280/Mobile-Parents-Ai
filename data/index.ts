@@ -17,7 +17,7 @@ export const friends = [
     id: "3",
     name: "Chantal Shelburne",
     phoneNumber: "+1-400-100-1009",
-    avatar: images.user3,
+    avatar: images.user7,
   },
   {
     id: "4",

@@ -7,7 +7,6 @@ import Button from '../components/Button';
 import { useTheme } from '../theme/ThemeProvider';
 import { icons, COLORS, images } from '../constants';
 
-// Define the Child type
 interface Child {
   id: string;
   name: string;
@@ -16,10 +15,9 @@ interface Child {
   progress: number;
   timeSpent: string;
   isActive: boolean;
-  avatar: any; // You might want to use a more specific type than 'any' here
+  avatar: any; 
 }
 
-// Mock data for the children list
 const mockChildren: Child[] = [
   {
     id: '1',

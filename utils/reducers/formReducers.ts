@@ -11,14 +11,9 @@ export const reducer = (state: any, action: any) => {
     [inputId]: validationResult,
   };
 
-  let updatedFormIsValid = true;
-
-  for (const key in updatedValidities) {
-    if (updatedValidities[key] !== undefined) {
-      updatedFormIsValid = false;
-      break;
-    }
-  }
+  const updatedFormIsValid = Object.values(updatedValidities).every(
+    (value) => value === undefined
+  );
 
   return {
     inputValues: updatedValues,

@@ -32,13 +32,15 @@ export const validateInput = (
     inputId === "addressLine2"
   ) {
     return validateString(inputId, inputValue);
-  } if (
+  }
+  if (
     inputId === "email" ||
     inputId === "currentEmail" ||
     inputId === "newEmail"
   ) {
     return validateEmail(inputId, inputValue);
-  } if (
+  }
+  if (
     inputId === "password" ||
     inputId === "confirmPassword" ||
     inputId === "currentPassword" ||
@@ -46,15 +48,21 @@ export const validateInput = (
     inputId === "confirmNewPassword"
   ) {
     return validatePassword(inputId, inputValue);
-  } if (inputId === "resetToken") {
+  }
+  if (inputId === "resetToken") {
     return validateString(inputId, inputValue);
-  } if (inputId === "places") {
+  }
+  if (inputId === "places") {
     return validateNumber(inputId, inputValue);
-  } if (inputId === "creditCardNumber") {
+  }
+  if (inputId === "creditCardNumber") {
     return validateCreditCardNumber(inputId, inputValue);
-  } if (inputId === "creditCardExpiryDate") {
+  }
+  if (inputId === "creditCardExpiryDate") {
     return validateExpiryDate(inputId, inputValue);
-  } if (inputId === "cvv") {
+  }
+  if (inputId === "cvv") {
     return validateCVV(inputId, inputValue);
   }
+  return undefined;
 };

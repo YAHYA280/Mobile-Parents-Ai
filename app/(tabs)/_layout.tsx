@@ -5,6 +5,53 @@ import { View, Text, Platform } from "react-native";
 
 import { icons, FONTS, SIZES, COLORS } from "../../constants";
 
+// Create a reusable tab icon component to avoid repetition
+interface TabIconProps {
+  focused: boolean;
+  icon: any;
+  outlineIcon: any;
+  label: string;
+  dark: boolean;
+}
+
+const TabIcon = ({ focused, icon, outlineIcon, label, dark }: TabIconProps) => {
+  return (
+    <View
+      style={{
+        alignItems: "center",
+        paddingTop: 16,
+        width: SIZES.width / 4,
+      }}
+    >
+      <Image
+        source={focused ? icon : outlineIcon}
+        contentFit="contain"
+        style={{
+          width: 24,
+          height: 24,
+          tintColor: focused
+            ? COLORS.primary
+            : dark
+              ? COLORS.gray3
+              : COLORS.gray3,
+        }}
+      />
+      <Text
+        style={{
+          ...FONTS.body4,
+          color: focused
+            ? COLORS.primary
+            : dark
+              ? COLORS.gray3
+              : COLORS.gray3,
+        }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+};
+
 const TabLayout = () => {
   const { dark } = useTheme();
 
@@ -28,174 +75,60 @@ const TabLayout = () => {
         name="index"
         options={{
           title: "",
-          tabBarIcon: ({ focused }: { focused: boolean }) => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: 16,
-                  width: SIZES.width / 4,
-                }}
-              >
-                <Image
-                  source={focused ? icons.home : icons.home2Outline}
-                  contentFit="contain"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    tintColor: focused
-                      ? COLORS.primary
-                      : dark
-                        ? COLORS.gray3
-                        : COLORS.gray3,
-                  }}
-                />
-                <Text
-                  style={{
-                    ...FONTS.body4,
-                    color: focused
-                      ? COLORS.primary
-                      : dark
-                        ? COLORS.gray3
-                        : COLORS.gray3,
-                  }}
-                >
-                  Home
-                </Text>
-              </View>
-            );
-          },
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.home}
+              outlineIcon={icons.home2Outline}
+              label="Home"
+              dark={dark}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="inbox"
         options={{
           title: "",
-          tabBarIcon: ({ focused }: { focused: boolean }) => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: 16,
-                  width: SIZES.width / 4,
-                }}
-              >
-                <Image
-                  source={
-                    focused ? icons.chatBubble2 : icons.chatBubble2Outline
-                  }
-                  contentFit="contain"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    tintColor: focused
-                      ? COLORS.primary
-                      : dark
-                        ? COLORS.gray3
-                        : COLORS.gray3,
-                  }}
-                />
-                <Text
-                  style={{
-                    ...FONTS.body4,
-                    color: focused
-                      ? COLORS.primary
-                      : dark
-                        ? COLORS.gray3
-                        : COLORS.gray3,
-                  }}
-                >
-                  Inbox
-                </Text>
-              </View>
-            );
-          },
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.chatBubble2}
+              outlineIcon={icons.chatBubble2Outline}
+              label="Inbox"
+              dark={dark}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="transactions"
         options={{
           title: "",
-          tabBarIcon: ({ focused }: { focused: boolean }) => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: 16,
-                  width: SIZES.width / 4,
-                }}
-              >
-                <Image
-                  source={focused ? icons.cart : icons.cartOutline}
-                  contentFit="contain"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    tintColor: focused
-                      ? COLORS.primary
-                      : dark
-                        ? COLORS.gray3
-                        : COLORS.gray3,
-                  }}
-                />
-                <Text
-                  style={{
-                    ...FONTS.body4,
-                    color: focused
-                      ? COLORS.primary
-                      : dark
-                        ? COLORS.gray3
-                        : COLORS.gray3,
-                  }}
-                >
-                  Transactions
-                </Text>
-              </View>
-            );
-          },
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.cart}
+              outlineIcon={icons.cartOutline}
+              label="Transactions"
+              dark={dark}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: "",
-          tabBarIcon: ({ focused }: { focused: boolean }) => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: 16,
-                  width: SIZES.width / 4,
-                }}
-              >
-                <Image
-                  source={focused ? icons.user : icons.userOutline}
-                  contentFit="contain"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    tintColor: focused
-                      ? COLORS.primary
-                      : dark
-                        ? COLORS.gray3
-                        : COLORS.gray3,
-                  }}
-                />
-                <Text
-                  style={{
-                    ...FONTS.body4,
-                    color: focused
-                      ? COLORS.primary
-                      : dark
-                        ? COLORS.gray3
-                        : COLORS.gray3,
-                  }}
-                >
-                  Profile
-                </Text>
-              </View>
-            );
-          },
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.user}
+              outlineIcon={icons.userOutline}
+              label="Profile"
+              dark={dark}
+            />
+          ),
         }}
       />
     </Tabs>

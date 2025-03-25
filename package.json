@@ -11,7 +11,8 @@
     "test": "jest --watchAll",
     "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" --ignore-path .gitignore",
     "lint:fix": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" --ignore-path .gitignore",
-    "lint-expo": "expo lint"
+    "lint-expo": "expo lint",
+    "type-check": "tsc --noEmit"
   },
   "jest": {
     "preset": "jest-expo"
@@ -20,7 +21,7 @@
     "@expo/vector-icons": "^14.0.2",
     "@kichiyaki/react-native-barcode-generator": "^0.6.7",
     "@ptomasroos/react-native-multi-slider": "^2.2.2",
-    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-picker/picker": "2.9.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.16",
@@ -35,7 +36,7 @@
     "expo-document-picker": "~13.0.3",
     "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",
-    "expo-image": "~2.0.4",
+    "expo-image": "~2.0.6",
     "expo-image-picker": "~16.0.4",
     "expo-linear-gradient": "~14.0.2",
     "expo-linking": "~7.0.5",

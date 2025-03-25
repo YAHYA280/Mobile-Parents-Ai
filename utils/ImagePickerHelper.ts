@@ -14,6 +14,8 @@ export const launchImagePicker = async (): Promise<string | undefined> => {
   if (!result.canceled) {
     return result.assets[0].uri;
   }
+  // Explicitly return undefined if the user cancels
+  return undefined;
 };
 
 const checkMediaPermissions = async (): Promise<void> => {
@@ -21,9 +23,8 @@ const checkMediaPermissions = async (): Promise<void> => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      return Promise.reject("We need permission to access your photos");
+      // Throw an Error instead of rejecting with a string
+      throw new Error("We need permission to access your photos");
     }
   }
-
-  return Promise.resolve();
 };

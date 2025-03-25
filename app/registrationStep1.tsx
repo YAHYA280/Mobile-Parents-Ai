@@ -45,9 +45,66 @@ type Nav = {
   navigate: (value: string) => void;
 };
 
+// Render countries codes modal
+const RenderAreasCodesModal = ({
+  modalVisible,
+  setModalVisible,
+  areas,
+  setSelectedArea,
+}: any) => {
+  const renderItem = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={{ padding: 10, flexDirection: "row" }}
+      onPress={() => {
+        setSelectedArea(item);
+        setModalVisible(false);
+      }}
+    >
+      <Image
+        source={{ uri: item.flag }}
+        contentFit="contain"
+        style={{ height: 30, width: 30, marginRight: 10 }}
+      />
+      <Text style={{ fontSize: 16, color: "#fff" }}>{item.item}</Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <Modal animationType="slide" transparent visible={modalVisible}>
+      <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <View
+            style={{
+              height: SIZES.height,
+              width: SIZES.width,
+              backgroundColor: COLORS.primary,
+              borderRadius: 12,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={styles.closeBtn}
+            >
+              <Ionicons name="close-outline" size={24} color={COLORS.primary} />
+            </TouchableOpacity>
+            <FlatList
+              data={areas}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.code}
+              style={{ padding: 20, marginBottom: 20 }}
+            />
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
+  );
+};
+
 const RegistrationStep1 = () => {
   const { navigate } = useNavigation<Nav>();
-  const [error, setError] = useState();
+  const [error] = useState();
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState<any>(null);
@@ -83,7 +140,7 @@ const RegistrationStep1 = () => {
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let result = "";
     const charactersLength = characters.length;
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i += 1) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     setCaptchaCode(result);
@@ -111,71 +168,6 @@ const RegistrationStep1 = () => {
         }
       });
   }, []);
-
-  // Render countries codes modal
-  function RenderAreasCodesModal() {
-    const renderItem = ({ item }: { item: any }) => (
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          flexDirection: "row",
-        }}
-        onPress={() => {
-          setSelectedArea(item), setModalVisible(false);
-        }}
-      >
-        <Image
-          source={{ uri: item.flag }}
-          contentFit="contain"
-          style={{
-            height: 30,
-            width: 30,
-            marginRight: 10,
-          }}
-        />
-        <Text style={{ fontSize: 16, color: "#fff" }}>{item.item}</Text>
-      </TouchableOpacity>
-    );
-    return (
-      <Modal animationType="slide" transparent visible={modalVisible}>
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
-            <View
-              style={{
-                height: SIZES.height,
-                width: SIZES.width,
-                backgroundColor: COLORS.primary,
-                borderRadius: 12,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                style={styles.closeBtn}
-              >
-                <Ionicons
-                  name="close-outline"
-                  size={24}
-                  color={COLORS.primary}
-                />
-              </TouchableOpacity>
-              <FlatList
-                data={areas}
-                renderItem={renderItem}
-                horizontal={false}
-                keyExtractor={(item) => item.code}
-                style={{
-                  padding: 20,
-                  marginBottom: 20,
-                }}
-              />
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    );
-  }
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
@@ -315,7 +307,12 @@ const RegistrationStep1 = () => {
           </View>
         </ScrollView>
       </View>
-      {RenderAreasCodesModal()}
+      <RenderAreasCodesModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        areas={areas}
+        setSelectedArea={setSelectedArea}
+      />
       <View style={styles.bottomContainer}>
         <Button
           title="Suivant"

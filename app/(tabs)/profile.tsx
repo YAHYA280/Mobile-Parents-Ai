@@ -20,6 +20,28 @@ const Profile = () => {
   const refRBSheet = useRef<any>(null);
   const { dark, colors, setScheme } = useTheme();
   const { navigate } = useNavigation<Nav>();
+  
+  // Move these state variables to the component level instead of inside render functions
+  const [profileImage, setProfileImage] = useState(images.user7);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const pickImage = async () => {
+    try {
+      const tempUri = await launchImagePicker();
+      if (!tempUri) return;
+      setProfileImage({ uri: tempUri });
+    } catch (error) {
+      // Handle error properly instead of empty block
+      console.log("Error picking image:", error);
+    }
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => !prev);
+    
+    const newScheme = dark ? "light" : "dark";
+    setScheme(newScheme);
+  };
   /**
    * render header
    */
@@ -58,26 +80,15 @@ const Profile = () => {
       </TouchableOpacity>
     );
   };
+  
   /**
    * render user profile
    */
   const renderProfile = () => {
-    const [image, setImage] = useState(images.user1);
-
-    const pickImage = async () => {
-      try {
-        const tempUri = await launchImagePicker();
-
-        if (!tempUri) return;
-
-        // Set the image
-        setImage({ uri: tempUri });
-      } catch (error) {}
-    };
     return (
       <View style={styles.profileContainer}>
         <View>
-          <Image source={image} contentFit="cover" style={styles.avatar} />
+          <Image source={profileImage} contentFit="cover" style={styles.avatar} />
           <TouchableOpacity onPress={pickImage} style={styles.picContainer}>
             <MaterialIcons name="edit" size={16} color={COLORS.white} />
           </TouchableOpacity>
@@ -101,17 +112,11 @@ const Profile = () => {
       </View>
     );
   };
+  
   /**
    * Render Settings
    */
   const renderSettings = () => {
-    const [isDarkMode, setIsDarkMode] = useState(false);
-
-    const toggleDarkMode = () => {
-      setIsDarkMode((prev) => !prev);
-      dark ? setScheme("light") : setScheme("dark");
-    };
-
     return (
       <View style={styles.settingsContainer}>
         <SettingsItem
@@ -128,6 +133,12 @@ const Profile = () => {
           icon={icons.userOutline}
           name="Edit Profile"
           onPress={() => navigate("editprofile")}
+        />
+        {/* Added Children Management Link */}
+        <SettingsItem
+          icon={icons.userOutline} 
+          name="Mes Enfants"
+          onPress={() => navigate("listeenfants")}
         />
         <SettingsItem
           icon={icons.bell2}

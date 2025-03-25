@@ -33,13 +33,17 @@ const RegistrationStep3 = () => {
   useEffect(() => {
     if (remainingTime > 0 && !canResend) {
       const timer = setTimeout(() => {
-        setRemainingTime(remainingTime - 1);
+        setRemainingTime((prev) => prev - 1); // Utiliser une fonction pour éviter des problèmes d'état
       }, 1000);
-      return () => clearTimeout(timer);
+
+      return () => clearTimeout(timer); // Retourner une fonction de nettoyage
     }
+
     if (remainingTime === 0 && !canResend) {
       setCanResend(true);
     }
+
+    return undefined;
   }, [remainingTime, canResend]);
 
   const handleCodeChange = (text: string, index: number) => {
@@ -114,7 +118,9 @@ const RegistrationStep3 = () => {
               .map((_, index) => (
                 <TextInput
                   key={index}
-                  ref={(ref) => (inputRefs.current[index] = ref)}
+                  ref={(ref) => {
+                    inputRefs.current[index] = ref;
+                  }}
                   style={[
                     styles.codeInput,
                     {

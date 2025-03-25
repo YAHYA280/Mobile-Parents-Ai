@@ -5,6 +5,7 @@ module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
   extends: ["airbnb", "airbnb-typescript", "airbnb/hooks", "prettier"],
+  ignorePatterns: ["scripts/"],
   plugins: [
     "react",
     "react-native",
