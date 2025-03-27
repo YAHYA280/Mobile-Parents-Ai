@@ -45,7 +45,7 @@ const mockChildren: Child[] = [
     progress: 65,
     timeSpent: "8h45",
     isActive: false,
-    avatar: images.user7,
+    avatar: images.user3,
   },
   {
     id: "3",
@@ -55,7 +55,7 @@ const mockChildren: Child[] = [
     progress: 40,
     timeSpent: "5h20",
     isActive: true,
-    avatar: images.user7,
+    avatar: images.user5,
   },
 ];
 
@@ -199,11 +199,12 @@ const ListeEnfantsScreen = () => {
         <View style={styles.cardHeader}>
           <View style={styles.avatarContainer}>
             <Image source={item.avatar} style={styles.avatar} />
+            {item.isActive && <View style={styles.statusDot} />}
           </View>
 
           <View style={styles.infoContainer}>
             <View style={styles.nameContainer}>
-              {item.isActive && <View style={styles.statusDot} />}
+              
               <Text
                 style={[
                   styles.childName,
@@ -435,7 +436,12 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: COLORS.greeen,
-    marginRight: 8,
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    borderWidth: 2,
+    borderColor:  COLORS.white, // Ensure contrast
+    zIndex: 10,
   },
   childName: {
     fontSize: 18,
