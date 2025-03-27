@@ -134,32 +134,9 @@ const RegistrationStep2 = () => {
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header title="Inscription" />
         <ProgressBar currentStep={1} steps={["1", "2", "3", "4", "5"]} />{" "}
-        <Text style={styles.stepTitle}>Adresse et Sécurité</Text>
+        <Text style={styles.stepTitle}>Informations de connexion</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View>
-            {/* Address Information Section */}
-            <Text style={styles.sectionTitle}>Informations d&apos;adresse</Text>
-
-            <Input
-              id="city"
-              onInputChanged={inputChangedHandler}
-              errorText={formState.inputValidities.city}
-              placeholder="Ville"
-              placeholderTextColor={COLORS.gray}
-              value={formState.inputValues.city}
-            />
-
-            <Input
-              id="address"
-              onInputChanged={inputChangedHandler}
-              errorText={formState.inputValidities.address}
-              placeholder="Adresse complète"
-              placeholderTextColor={COLORS.gray}
-              value={formState.inputValues.address}
-              multiline
-              numberOfLines={2}
-            />
-
             {/* Email Section */}
             <Text style={styles.sectionTitle}>Informations de contact</Text>
 

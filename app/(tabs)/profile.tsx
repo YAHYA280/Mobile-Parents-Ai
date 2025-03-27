@@ -504,11 +504,6 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     paddingHorizontal: 16,
   },
-  cancelButton: {
-    width: (SIZES.width - 32) / 2 - 8,
-    backgroundColor: COLORS.tansparentPrimary,
-    borderRadius: 32,
-  },
   logoutButton: {
     width: (SIZES.width - 32) / 2 - 8,
     backgroundColor: COLORS.primary,

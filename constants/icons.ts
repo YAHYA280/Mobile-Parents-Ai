@@ -1,6 +1,8 @@
 const bag = require("../assets/icons/bag.png");
 const rss = require("../assets/icons/rss.png");
 const box = require("../assets/icons/box.png");
+const visa = require("../assets/icons/visa.png");
+const amex = require("../assets/icons/amex.png");
 const bell = require("../assets/icons/bell.png");
 const call = require("../assets/icons/call.png");
 const chat = require("../assets/icons/chat.png");
@@ -20,6 +22,7 @@ const cast = require("../assets/icons/cast.png");
 const cart = require("../assets/icons/cart.png");
 const time = require("../assets/icons/time.png");
 const down = require("../assets/icons/down.png");
+const globe = require("../assets/icons/globe.png");
 const email = require("../assets/icons/email.png");
 const graph = require("../assets/icons/graph.png");
 const heart = require("../assets/icons/heart.png");
@@ -42,6 +45,7 @@ const star4 = require("../assets/icons/star4.png");
 const users = require("../assets/icons/users.png");
 const figma = require("../assets/icons/figma.png");
 const check = require("../assets/icons/check.png");
+const laptop = require("../assets/icons/laptop.png");
 const folder = require("../assets/icons/folder.png");
 const logout = require("../assets/icons/logout.png");
 const search = require("../assets/icons/search.png");
@@ -60,6 +64,7 @@ const users2 = require("../assets/icons/users2.png");
 const heart2 = require("../assets/icons/heart2.png");
 const heart3 = require("../assets/icons/heart3.png");
 const heart4 = require("../assets/icons/heart4.png");
+const android = require("../assets/icons/android.png");
 const explore = require("../assets/icons/explore.png");
 const padlock = require("../assets/icons/padlock.png");
 const wallet2 = require("../assets/icons/wallet2.png");
@@ -170,6 +175,7 @@ const shieldOutline = require("../assets/icons/shield-outline.png");
 const ticketOutline = require("../assets/icons/ticket-outline.png");
 const walletOutline = require("../assets/icons/wallet-outline.png");
 const heart2Outline = require("../assets/icons/heart2_outline.png");
+const emptyContent = require("../assets/icons/empty/ic-content.png");
 const arrowUpSquare = require("../assets/icons/arrow-up-square.png");
 const cancelSquare2 = require("../assets/icons/cancel-square-2.png");
 const exploreOutline = require("../assets/icons/explore-outline.png");
@@ -200,6 +206,11 @@ const voiceCommandOutline = require("../assets/icons/voice-command-outline.png")
 const lockedComputerOutline = require("../assets/icons/locked-computer-outline.png");
 
 export default {
+  android,
+  amex,
+  globe,
+  laptop,
+  visa,
   addFileOutline,
   addFile,
   arrowBack,
@@ -318,6 +329,7 @@ export default {
   share,
   shareOutline,
   internet,
+  emptyContent,
   internetOutline,
   downSquare,
   downSquare2,

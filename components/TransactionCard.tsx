@@ -2,6 +2,7 @@ import type { ImageSourcePropType } from "react-native";
 
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
+import { translateTransactionStatus } from "@/utils/translation";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
 import { SIZES, COLORS } from "../constants";
@@ -12,12 +13,16 @@ interface TransactionCardProps {
   name: string;
   image: ImageSourcePropType;
   status: string;
+  selected?: boolean;
+  isSelectionMode?: boolean;
 }
 
 const TransactionCard: React.FC<TransactionCardProps> = ({
   name,
   image,
   status,
+  selected = false,
+  isSelectionMode = false,
 }) => {
   const navigation = useNavigation();
   const { colors, dark } = useTheme();
@@ -27,29 +32,49 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
       style={[
         styles.container,
         { backgroundColor: dark ? COLORS.black : COLORS.white },
+        // Adjust the width when in selection mode to prevent content from being cut off
+        isSelectionMode && styles.containerWithSelection,
+        // Optionally add a visual indication for selected items
+        selected && styles.selectedContainer,
       ]}
     >
       <View style={styles.viewLeft}>
         <Image source={image} resizeMode="cover" style={styles.image} />
-        <View style={styles.infoContainer}>
+        <View
+          style={[
+            styles.infoContainer,
+            // Adjust the width when in selection mode to prevent content from being cut off
+            isSelectionMode && styles.infoContainerSelected,
+          ]}
+        >
           <Text
             style={[
               styles.name,
               { color: dark ? COLORS.white : COLORS.greyscale900 },
             ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
           >
             {name}
           </Text>
-          <TouchableOpacity style={styles.statusBtn}>
-            <Text style={styles.status}>{status}</Text>
+          <TouchableOpacity
+            style={[
+              styles.statusBtn,
+              // Adjust the width when in selection mode to prevent content from being cut off
+              isSelectionMode && styles.statusBtnSelected,
+            ]}
+          >
+            <Text style={styles.status}>
+              {translateTransactionStatus(status)}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
       <TouchableOpacity
-        onPress={() => navigation.navigate("ereceipt" as never)} // 'as never' helps with type-safety
+        onPress={() => navigation.navigate("ereceipt" as never)}
         style={styles.btn}
       >
-        <Text style={styles.btnText}>E-Receipt</Text>
+        <Text style={styles.btnText}>E-Reçu</Text>
       </TouchableOpacity>
     </View>
   );
@@ -74,6 +99,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
+  // Adjust width when in selection mode to account for the selection indicator
+  containerWithSelection: {
+    width: SIZES.width - 60, // Adjusting width to account for the selection indicator (32px padding + ~44px for indicator)
+  },
+  // Optional: visual indication for selected items
+  selectedContainer: {
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
   viewLeft: {
     flexDirection: "row",
     alignItems: "center",
@@ -89,6 +123,11 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 22,
   },
+  infoContainerSelected: {
+    marginLeft: 13,
+    flex: 1,
+    marginRight: 13,
+  },
   name: {
     fontSize: 16,
     fontFamily: "bold",
@@ -102,7 +141,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.tansparentPrimary,
     justifyContent: "center",
     alignItems: "center",
-    width: 64,
+    minWidth: 64,
+  },
+  statusBtnSelected: {
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: COLORS.tansparentPrimary,
+    justifyContent: "center",
+    alignItems: "center",
+    minWidth: 64,
   },
   status: {
     fontSize: 12,

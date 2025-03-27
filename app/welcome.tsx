@@ -29,16 +29,28 @@ const Welcome = () => {
           accompagnez-le vers la réussite.
         </Text>
 
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", marginTop: 7 }}>
           <Text
             style={[
               styles.loginTitle,
-              {
-                color: dark ? COLORS.white : "black",
-              },
+              { color: dark ? COLORS.white : "black" },
             ]}
           >
-            Vous avez déjà un compte ?{" "}
+            Vous avez déjà un compte ?
+          </Text>
+          <TouchableOpacity onPress={() => navigate("login")}>
+            <Text style={styles.loginSubtitle}>Se connecter</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ flexDirection: "row", marginTop: 8 }}>
+          <Text
+            style={[
+              styles.loginTitle,
+              { color: dark ? COLORS.white : "black" },
+            ]}
+          >
+            Nouvel utilisateur ?
           </Text>
           <TouchableOpacity onPress={() => navigate("registrationStep1")}>
             <Text style={styles.loginSubtitle}>S&apos;inscrire</Text>
@@ -113,6 +125,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "semiBold",
     color: COLORS.primary,
+    marginLeft: 4,
   },
 
   bottomContainer: {

@@ -1,6 +1,5 @@
-import type {
-  ListRenderItemInfo} from "react-native";
-import type { NavigationProp} from "@react-navigation/native";
+import type { ListRenderItemInfo } from "react-native";
+import type { NavigationProp } from "@react-navigation/native";
 
 import React, { useState } from "react";
 import CourseCard from "@/components/CourseCard";
@@ -10,15 +9,14 @@ import { useNavigation } from "@react-navigation/native";
 import { icons, SIZES, COLORS, images } from "@/constants";
 import { ScrollView } from "react-native-virtualized-view";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { banners, category, topMentors, mostPopularCourses } from "@/data";
+import { banners, CATEGORIES, mostPopularCourses } from "@/data";
 import {
   View,
   Text,
   Image,
   FlatList,
-  TextInput,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 
 interface Banner {
@@ -29,25 +27,6 @@ interface Banner {
   bottomSubtitle: string;
 }
 
-interface Mentor {
-  id: string;
-  avatar: any;
-  firstName: string;
-}
-
-interface Course {
-  id: string;
-  name: string;
-  image: any;
-  category: string;
-  price: string;
-  isOnDiscount: boolean;
-  oldPrice: string;
-  rating: number;
-  numStudents: number;
-  categoryId: string;
-}
-
 interface HomeProps {
   navigation: any;
 }
@@ -56,7 +35,9 @@ const Home: React.FC<HomeProps> = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const { colors, dark } = useTheme();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(["1"]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([
+    "all",
+  ]);
 
   const renderBannerItem = ({ item }: ListRenderItemInfo<Banner>) => (
     <View style={styles.bannerContainer}>
@@ -75,6 +56,7 @@ const Home: React.FC<HomeProps> = () => {
   );
 
   const keyExtractor = (item: { id: string }) => item.id;
+  const keyExtractorCategory = (item: { value: string }) => item.value;
 
   const handleEndReached = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
@@ -96,7 +78,6 @@ const Home: React.FC<HomeProps> = () => {
           style={styles.userIcon}
         />
         <View style={styles.viewNameContainer}>
-          <Text style={styles.greeeting}>Good Morning👋</Text>
           <Text
             style={[
               styles.title,
@@ -118,56 +99,9 @@ const Home: React.FC<HomeProps> = () => {
             ]}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("mybookmark")}>
-          <Image
-            source={icons.bookmarkOutline}
-            resizeMode="contain"
-            style={[
-              styles.bookmarkIcon,
-              { tintColor: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
-          />
-        </TouchableOpacity>
       </View>
     </View>
   );
-
-  const renderSearchBar = () => {
-    const handleInputFocus = () => {
-      navigation.navigate("search");
-    };
-
-    return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate("search")}
-        style={[
-          styles.searchBarContainer,
-          { backgroundColor: dark ? COLORS.dark2 : COLORS.secondaryWhite },
-        ]}
-      >
-        <TouchableOpacity>
-          <Image
-            source={icons.search2}
-            resizeMode="contain"
-            style={styles.searchIcon}
-          />
-        </TouchableOpacity>
-        <TextInput
-          placeholder="Search"
-          placeholderTextColor={COLORS.gray}
-          style={styles.searchInput}
-          onFocus={handleInputFocus}
-        />
-        <TouchableOpacity>
-          <Image
-            source={icons.filter}
-            resizeMode="contain"
-            style={styles.filterIcon}
-          />
-        </TouchableOpacity>
-      </TouchableOpacity>
-    );
-  };
 
   const renderBanner = () => (
     <View style={styles.bannerItemContainer}>
@@ -193,71 +127,49 @@ const Home: React.FC<HomeProps> = () => {
     </View>
   );
 
-  const renderTopMentors = () => {
-    const renderItem = ({ item }: ListRenderItemInfo<Mentor>) => (
-      <TouchableOpacity
-        onPress={() => navigation.navigate("mentorprofile")}
-        style={styles.mentorContainer}
-        key={item.id}
-      >
-        <Image
-          source={item.avatar}
-          resizeMode="cover"
-          style={styles.userAvatar}
-        />
-        <Text
-          style={[
-            styles.firstName,
-            { color: dark ? COLORS.white : COLORS.greyscale900 },
-          ]}
-        >
-          {item.firstName}
-        </Text>
-      </TouchableOpacity>
-    );
-
-    return (
-      <View>
-        <SectionHeader
-          title="Top Mentors"
-          subtitle="See All"
-          onPress={() => navigation.navigate("topmentors")}
-        />
-        <FlatList
-          data={topMentors}
-          keyExtractor={keyExtractor}
-          horizontal
-          renderItem={renderItem}
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
-    );
-  };
-
   const renderPopularCourses = () => {
-    const filteredCourses = mostPopularCourses.filter(
-      (course) =>
-        selectedCategories.includes("1") ||
-        selectedCategories.includes(course.categoryId)
-    );
+    const filteredCourses = mostPopularCourses.filter((course) => {
+      if (selectedCategories.includes("all")) {
+        return true;
+      }
+      return selectedCategories.includes(course.category);
+    });
 
     const toggleCategory = (categoryId: string) => {
+      if (categoryId === "all") {
+        if (!selectedCategories.includes("all")) {
+          setSelectedCategories(["all"]);
+        }
+        return;
+      }
+
       const updatedCategories = [...selectedCategories];
+
+      const allIndex = updatedCategories.indexOf("all");
+      if (allIndex !== -1) {
+        updatedCategories.splice(allIndex, 1);
+      }
+
       const index = updatedCategories.indexOf(categoryId);
       if (index === -1) {
         updatedCategories.push(categoryId);
       } else {
         updatedCategories.splice(index, 1);
+
+        if (updatedCategories.length === 0) {
+          updatedCategories.push("all");
+        }
       }
+
       setSelectedCategories(updatedCategories);
     };
 
     const renderCategoryItem = ({
       item,
-    }: ListRenderItemInfo<{ id: string; name: string }>) => (
+    }: ListRenderItemInfo<{ value: string; label: string }>) => (
       <TouchableOpacity
         style={{
-          backgroundColor: selectedCategories.includes(item.id)
+          backgroundColor: selectedCategories.includes(item.value)
             ? COLORS.primary
             : "transparent",
           padding: 10,
@@ -267,51 +179,62 @@ const Home: React.FC<HomeProps> = () => {
           borderRadius: 24,
           marginRight: 12,
         }}
-        onPress={() => toggleCategory(item.id)}
+        onPress={() => toggleCategory(item.value)}
       >
         <Text
           style={{
-            color: selectedCategories.includes(item.id)
+            color: selectedCategories.includes(item.value)
               ? COLORS.white
               : COLORS.primary,
           }}
         >
-          {item.name}
+          {item.label}
         </Text>
       </TouchableOpacity>
     );
 
     return (
-      <View>
+      <View style={{ paddingBottom: 40 }}>
         <SectionHeader
-          title="Popular Courses"
-          subtitle="See All"
+          title="Cours populaires"
+          subtitle="Voir tout"
           onPress={() => navigation.navigate("mostpopularcourses")}
         />
         <FlatList
-          data={category}
-          keyExtractor={keyExtractor}
+          data={CATEGORIES}
+          keyExtractor={keyExtractorCategory}
           showsHorizontalScrollIndicator={false}
           horizontal
           renderItem={renderCategoryItem}
         />
-        <FlatList
-          data={filteredCourses}
-          keyExtractor={keyExtractor}
-          renderItem={({ item }) => (
-            <CourseCard
-              name={item.name}
-              image={item.image}
-              category={item.category}
-              price={item.price}
-              isOnDiscount={item.isOnDiscount}
-              oldPrice={item.oldPrice}
-              rating={item.rating}
-              numStudents={item.numStudents}
-              onPress={() => navigation.navigate("coursedetailsmore")}
-            />
-          )}
-        />
+        {filteredCourses.length > 0 ? (
+          <FlatList
+            data={filteredCourses}
+            keyExtractor={keyExtractor}
+            renderItem={({ item }) => (
+              <CourseCard
+                name={item.name}
+                image={item.image}
+                category={
+                  CATEGORIES.find((cat) => cat.value === item.category)
+                    ?.label || item.category
+                }
+                price={item.price}
+                isOnDiscount={item.isOnDiscount}
+                oldPrice={item.oldPrice}
+                rating={item.rating}
+                numStudents={item.numStudents}
+                onPress={() => navigation.navigate("coursedetailsmore")}
+              />
+            )}
+          />
+        ) : (
+          <View style={{ padding: 20, alignItems: "center" }}>
+            <Text style={{ fontFamily: "medium", color: COLORS.gray }}>
+              Aucun cours disponible dans cette catégorie
+            </Text>
+          </View>
+        )}
       </View>
     );
   };
@@ -319,10 +242,11 @@ const Home: React.FC<HomeProps> = () => {
     <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         {renderHeader()}
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {renderSearchBar()}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ marginTop: 22 }}
+        >
           {renderBanner()}
-          {renderTopMentors()}
           {renderPopularCourses()}
         </ScrollView>
       </View>
@@ -355,12 +279,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  greeeting: {
-    fontSize: 12,
-    fontFamily: "regular",
-    color: "gray",
-    marginBottom: 4,
-  },
   title: {
     fontSize: 20,
     fontFamily: "bold",
@@ -378,37 +296,6 @@ const styles = StyleSheet.create({
     width: 24,
     tintColor: COLORS.black,
     marginRight: 8,
-  },
-  bookmarkIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.black,
-  },
-  searchBarContainer: {
-    width: SIZES.width - 32,
-    backgroundColor: COLORS.secondaryWhite,
-    padding: 16,
-    borderRadius: 12,
-    height: 52,
-    marginVertical: 16,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  searchIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.gray,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    fontFamily: "regular",
-    marginHorizontal: 8,
-  },
-  filterIcon: {
-    width: 24,
-    height: 24,
-    tintColor: COLORS.primary,
   },
   bannerContainer: {
     width: SIZES.width - 32,
@@ -452,21 +339,6 @@ const styles = StyleSheet.create({
     fontFamily: "medium",
     color: COLORS.white,
     marginTop: 4,
-  },
-  mentorContainer: {
-    marginRight: 10,
-    alignItems: "center",
-  },
-  userAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 999,
-  },
-  firstName: {
-    fontSize: 16,
-    fontFamily: "semiBold",
-    color: COLORS.dark2,
-    marginTop: 6,
   },
   bannerItemContainer: {
     width: "100%",

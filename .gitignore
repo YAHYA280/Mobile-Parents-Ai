@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+# Ignore IDE settings
+.vscode/
+
 # Expo
 .expo/
 dist/

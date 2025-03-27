@@ -71,6 +71,12 @@ export default function RootLayout() {
         <Stack.Screen name="listeenfants" />
         <Stack.Screen name="addchild" />
         <Stack.Screen name="editchild" />
+        <Stack.Screen name="abonnementcatalogue" />
+        <Stack.Screen name="planDetails" />
+        <Stack.Screen name="childaccount" />
+        <Stack.Screen name="childpreferences" />
+        <Stack.Screen name="addobjective" />
+        <Stack.Screen name="editobjective" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

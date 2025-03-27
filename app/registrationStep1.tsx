@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useNavigation } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import ProgressBar from "@/components/ProgressBar";
-import { Feather, Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useReducer, useCallback } from "react";
 import {
@@ -30,13 +30,11 @@ const initialState = {
     fullName: "",
     cin: "",
     phoneNumber: "",
-    captcha: "",
   },
   inputValidities: {
     fullName: false,
     cin: false,
     phoneNumber: false,
-    captcha: false,
   },
   formIsValid: false,
 };
@@ -65,7 +63,7 @@ const RenderAreasCodesModal = ({
         contentFit="contain"
         style={{ height: 30, width: 30, marginRight: 10 }}
       />
-      <Text style={{ fontSize: 16, color: "#fff" }}>{item.item}</Text>
+      <Text style={{ fontSize: 16, color: "#000" }}>{item.item}</Text>
     </TouchableOpacity>
   );
 
@@ -110,7 +108,6 @@ const RegistrationStep1 = () => {
   const [selectedArea, setSelectedArea] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const { colors, dark } = useTheme();
-  const [captchaCode, setCaptchaCode] = useState("");
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
@@ -129,22 +126,6 @@ const RegistrationStep1 = () => {
       Alert.alert("An error occured", error);
     }
   }, [error]);
-
-  // Generate CAPTCHA code
-  useEffect(() => {
-    generateCaptcha();
-  }, []);
-
-  const generateCaptcha = () => {
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    const charactersLength = characters.length;
-    for (let i = 0; i < 6; i += 1) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    setCaptchaCode(result);
-  };
 
   // Fetch country codes from restcountries API
   useEffect(() => {
@@ -285,25 +266,27 @@ const RegistrationStep1 = () => {
               />
             </View>
 
-            {/* CAPTCHA */}
-            <View style={styles.captchaContainer}>
-              <View style={styles.captchaBox}>
-                <Text style={styles.captchaText}>{captchaCode}</Text>
-                <TouchableOpacity
-                  onPress={generateCaptcha}
-                  style={styles.refreshButton}
-                >
-                  <Feather name="refresh-cw" size={20} color={COLORS.primary} />
-                </TouchableOpacity>
-              </View>
-              <Input
-                id="captcha"
-                onInputChanged={inputChangedHandler}
-                errorText={formState.inputValidities.captcha}
-                placeholder="Entrez le code CAPTCHA"
-                placeholderTextColor={COLORS.gray}
-              />
-            </View>
+            {/* Address Information Section */}
+            <Input
+              id="city"
+              onInputChanged={inputChangedHandler}
+              errorText={formState.inputValidities.city}
+              placeholder="Ville"
+              placeholderTextColor={COLORS.gray}
+              value={formState.inputValues.city}
+            />
+
+            <Input
+              id="address"
+              onInputChanged={inputChangedHandler}
+              errorText={formState.inputValidities.address}
+              placeholder="Adresse complète"
+              placeholderTextColor={COLORS.gray}
+              value={formState.inputValues.address}
+              multiline
+              numberOfLines={2}
+            />
+            <View style={{ height: 100 }} />
           </View>
         </ScrollView>
       </View>
@@ -386,28 +369,6 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 14,
     color: "#111",
-  },
-  captchaContainer: {
-    marginVertical: 12,
-  },
-  captchaBox: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-  },
-  captchaText: {
-    fontSize: 20,
-    fontFamily: "monospace",
-    letterSpacing: 5,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  refreshButton: {
-    padding: 8,
   },
   bottomContainer: {
     position: "absolute",

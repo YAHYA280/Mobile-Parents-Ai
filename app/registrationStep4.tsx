@@ -36,9 +36,10 @@ const RegistrationStep4 = () => {
 
   const [frontDocument, setFrontDocument] = useState<DocumentType | null>(null);
   const [backDocument, setBackDocument] = useState<DocumentType | null>(null);
+  const [autreDocument, setAutreDocument] = useState<DocumentType | null>(null);
 
   // Function to pick a document from the device
-  const pickDocument = async (side: "front" | "back") => {
+  const pickDocument = async (side: "front" | "back" | "additional") => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: ["image/jpeg", "image/png", "application/pdf"],
@@ -83,10 +84,17 @@ const RegistrationStep4 = () => {
           type: document.mimeType || "image/jpeg",
           size: document.size || 0,
         });
-      } else {
+      } else if (side === "back") {
         setBackDocument({
           uri: document.uri,
           name: document.name || "document_verso.jpg",
+          type: document.mimeType || "image/jpeg",
+          size: document.size || 0,
+        });
+      } else {
+        setAutreDocument({
+          uri: document.uri,
+          name: document.name || "document_autre.jpg",
           type: document.mimeType || "image/jpeg",
           size: document.size || 0,
         });
@@ -101,11 +109,13 @@ const RegistrationStep4 = () => {
   };
 
   // Function to remove a document
-  const removeDocument = (side: "front" | "back") => {
+  const removeDocument = (side: "front" | "back" | "additional") => {
     if (side === "front") {
       setFrontDocument(null);
-    } else {
+    } else if (side === "back") {
       setBackDocument(null);
+    } else {
+      setAutreDocument(null);
     }
   };
 
@@ -124,14 +134,18 @@ const RegistrationStep4 = () => {
 
   // Render document upload area
   const renderDocumentUploadArea = (
-    side: "front" | "back",
+    side: "front" | "back" | "additional",
     document: DocumentType | null
   ) => {
-    const title = side === "front" ? "Recto de la CIN" : "Verso de la CIN";
+    const titles: Record<string, string> = {
+      front: "Recto de la carte d'identité",
+      back: "Verso de la carte d'identité",
+      additional: "Carte de séjour, permis ou passeport",
+    };
 
     return (
       <View style={styles.uploadSection}>
-        <Text style={styles.uploadTitle}>{title}</Text>
+        <Text style={styles.uploadTitle}>{titles[side]}</Text>
 
         {!document ? (
           <TouchableOpacity
@@ -191,11 +205,12 @@ const RegistrationStep4 = () => {
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={styles.instructions}>
             Veuillez télécharger une copie recto/verso de votre Carte
-            d&apos;Identité Nationale (CIN).
+            d&apos;Identité.
           </Text>
 
           {renderDocumentUploadArea("front", frontDocument)}
           {renderDocumentUploadArea("back", backDocument)}
+          {renderDocumentUploadArea("additional", autreDocument)}
 
           <View style={styles.securityNote}>
             <MaterialIcons name="security" size={20} color={COLORS.primary} />

@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import { Image } from "expo-image";
+import { Paths } from "@/navigation";
 import { useTheme } from "@/theme/ThemeProvider";
 import { View, Text, Platform } from "react-native";
 
@@ -39,11 +40,7 @@ const TabIcon = ({ focused, icon, outlineIcon, label, dark }: TabIconProps) => {
       <Text
         style={{
           ...FONTS.body4,
-          color: focused
-            ? COLORS.primary
-            : dark
-              ? COLORS.gray3
-              : COLORS.gray3,
+          color: focused ? COLORS.primary : dark ? COLORS.gray3 : COLORS.gray3,
         }}
       >
         {label}
@@ -72,7 +69,7 @@ const TabLayout = () => {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name={Paths.Index}
         options={{
           title: "",
           tabBarIcon: ({ focused }) => (
@@ -87,22 +84,22 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="inbox"
+        name={Paths.Enfant}
         options={{
           title: "",
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}
-              icon={icons.chatBubble2}
-              outlineIcon={icons.chatBubble2Outline}
-              label="Inbox"
+              icon={icons.users}
+              outlineIcon={icons.users}
+              label="Enfant"
               dark={dark}
             />
           ),
         }}
       />
       <Tabs.Screen
-        name="transactions"
+        name={Paths.Transactions}
         options={{
           title: "",
           tabBarIcon: ({ focused }) => (
@@ -117,7 +114,22 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name={Paths.Support}
+        options={{
+          title: "",
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.chat}
+              outlineIcon={icons.chatOutline}
+              label="Support"
+              dark={dark}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name={Paths.Profile}
         options={{
           title: "",
           tabBarIcon: ({ focused }) => (
