@@ -1,23 +1,25 @@
 import { Image } from "expo-image";
 import React, { useState } from "react";
-import { useRouter, useLocalSearchParams } from "expo-router";
 import Header from "@/components/Header";
 import Button from "@/components/Button";
+import { useNavigation } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
 import ObjectiveCard from "@/components/ObjectiveCard";
 import { SIZES, icons, COLORS, images } from "@/constants";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
   Alert,
   Modal,
+  TextInput,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
 } from "react-native";
-import { useNavigation } from "expo-router";
+
+import SubjectsManager from "../Enfants/SubjectsManager";
 
 // --------------------------------------------------
 // Mock Data
@@ -41,18 +43,34 @@ const mockChildrenData = [
   },
   {
     id: "2",
-    name: "Anne-Sophie Durand",
+    name: "Marie Laurent",
     age: 10,
     grade: "CM2",
-    avatar: images.user8,
+    avatar: images.user3,
     isActive: false,
-    timeSpent: "8h15",
-    totalProgress: 60,
+    timeSpent: "8h45",
+    totalProgress: 65,
     subjectProgress: {
       math: 70,
       french: 55,
       science: 62,
       history: 50,
+    },
+  },
+  {
+    id: "3",
+    name: "Lucas Martin",
+    age: 6,
+    grade: "CP",
+    avatar: images.user5,
+    isActive: true,
+    timeSpent: "5h20",
+    totalProgress: 40,
+    subjectProgress: {
+      math: 50,
+      french: 40,
+      science: 35,
+      history: 30,
     },
   },
 ];
@@ -128,6 +146,7 @@ const ChildAccount = () => {
   // 2. Get the childId from the route params:
   const params = useLocalSearchParams();
   const childId = (params.id as string) || "1";
+  const childIdNumber = parseInt(params.id as string, 10) || 1;
 
   // 3. Find the correct child's data:
   const childData = mockChildrenData.find((child) => child.id === childId);
@@ -135,7 +154,9 @@ const ChildAccount = () => {
   // 4. If no child is found, return early *after* calling all hooks:
   if (!childData) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
         <Header title="Enfant introuvable" />
         <View style={{ padding: 16 }}>
           <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
@@ -181,7 +202,12 @@ const ChildAccount = () => {
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
           ]}
         >
-          <Text style={[styles.modalTitle, { color: dark ? COLORS.white : COLORS.black }]}>
+          <Text
+            style={[
+              styles.modalTitle,
+              { color: dark ? COLORS.white : COLORS.black },
+            ]}
+          >
             Paramètres du Compte Enfant
           </Text>
 
@@ -190,12 +216,18 @@ const ChildAccount = () => {
             style={styles.modalOption}
             onPress={() => {
               setShowSettingsModal(false);
-              router.push({ pathname: "/childpreferences/[id]", params: { id: childId } });
+              router.push({
+                pathname: "/childpreferences/[id]",
+                params: { id: childId },
+              });
             }}
           >
             <Image source={icons.settings} style={styles.modalIcon} />
             <Text
-              style={[styles.modalOptionText, { color: dark ? COLORS.white : COLORS.black }]}
+              style={[
+                styles.modalOptionText,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
             >
               Préférences et restrictions
             </Text>
@@ -206,12 +238,18 @@ const ChildAccount = () => {
             style={styles.modalOption}
             onPress={() => {
               setShowSettingsModal(false);
-              router.push({ pathname: "/addobjective/[id]", params: { id: childId } });
+              router.push({
+                pathname: "/addobjective/[id]",
+                params: { id: childId },
+              });
             }}
           >
             <Image source={icons.plus} style={styles.modalIcon} />
             <Text
-              style={[styles.modalOptionText, { color: dark ? COLORS.white : COLORS.black }]}
+              style={[
+                styles.modalOptionText,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
             >
               Ajouter un objectif
             </Text>
@@ -224,7 +262,10 @@ const ChildAccount = () => {
               handleDeleteAccount();
             }}
           >
-            <Image source={icons.trash} style={[styles.modalIcon, { tintColor: COLORS.error }]} />
+            <Image
+              source={icons.trash}
+              style={[styles.modalIcon, { tintColor: COLORS.error }]}
+            />
             <Text style={[styles.modalOptionText, { color: COLORS.error }]}>
               Supprimer le compte
             </Text>
@@ -232,6 +273,7 @@ const ChildAccount = () => {
 
           <Button
             title="Fermer"
+            textColor={COLORS.white}
             onPress={() => setShowSettingsModal(false)}
             style={styles.closeButton}
           />
@@ -292,7 +334,9 @@ const ChildAccount = () => {
   // Main Render
   // --------------------------------------------------
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       {/* Header + Settings button */}
       <View style={styles.header}>
         <Header title={childData.name} />
@@ -304,7 +348,10 @@ const ChildAccount = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Child Info */}
         <View style={styles.profileSection}>
           <View style={styles.avatarContainer}>
@@ -312,7 +359,12 @@ const ChildAccount = () => {
             {childData.isActive && <View style={styles.statusDot} />}
           </View>
           <View style={styles.profileInfo}>
-            <Text style={[styles.childDetails, { color: dark ? COLORS.white : COLORS.black }]}>
+            <Text
+              style={[
+                styles.childDetails,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
               {childData.age} ans • {childData.grade}
             </Text>
             <View style={styles.timeSpentContainer}>
@@ -331,7 +383,12 @@ const ChildAccount = () => {
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
           ]}
         >
-          <Text style={[styles.sectionTitle, { color: dark ? COLORS.white : COLORS.black }]}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: dark ? COLORS.white : COLORS.black },
+            ]}
+          >
             Progrès global
           </Text>
 
@@ -355,39 +412,17 @@ const ChildAccount = () => {
           <TouchableOpacity
             style={styles.exportButton}
             onPress={() =>
-              Alert.alert("Export", "Cette fonctionnalité sera bientôt disponible")
+              Alert.alert(
+                "Export",
+                "Cette fonctionnalité sera bientôt disponible"
+              )
             }
           >
             <Image source={icons.download} style={styles.exportIcon} />
             <Text style={styles.exportText}>Exporter les statistiques</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Progress by subject */}
-        <View
-          style={[
-            styles.section,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
-        >
-          <Text style={[styles.sectionTitle, { color: dark ? COLORS.white : COLORS.black }]}>
-            Progrès par matière
-          </Text>
-
-          {Object.entries(childData.subjectProgress).map(([subject, progress]) => (
-            <View key={subject} style={styles.subjectProgressContainer}>
-              <View style={styles.progressRow}>
-                <Text style={styles.progressLabel}>
-                  {subject.charAt(0).toUpperCase() + subject.slice(1)}
-                </Text>
-                <Text style={[styles.progressValue, { color: getProgressColor(progress) }]}>
-                  {progress}%
-                </Text>
-              </View>
-              <ProgressBar progress={progress} color={getProgressColor(progress)} />
-            </View>
-          ))}
-        </View>
+        <SubjectsManager childId={childIdNumber} />
 
         {/* Objectives */}
         <View
@@ -396,7 +431,12 @@ const ChildAccount = () => {
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
           ]}
         >
-          <Text style={[styles.sectionTitle, { color: dark ? COLORS.white : COLORS.black }]}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: dark ? COLORS.white : COLORS.black },
+            ]}
+          >
             Objectifs d’apprentissage
           </Text>
 
@@ -450,7 +490,12 @@ const ChildAccount = () => {
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
           ]}
         >
-          <Text style={[styles.sectionTitle, { color: dark ? COLORS.white : COLORS.black }]}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: dark ? COLORS.white : COLORS.black },
+            ]}
+          >
             Envoyer un message de soutien
           </Text>
 
@@ -466,13 +511,18 @@ const ChildAccount = () => {
             value={message}
             placeholder="Écris ton message ici..."
             multiline
-            placeholderTextColor={dark ? COLORS.greyscale400 : COLORS.grayscale400}
+            placeholderTextColor={
+              dark ? COLORS.greyscale400 : COLORS.grayscale400
+            }
           />
 
           <Button
             title="Envoyer"
             onPress={() => {
-              Alert.alert("Message envoyé", "Ton message a été envoyé à l'enfant !");
+              Alert.alert(
+                "Message envoyé",
+                "Ton message a été envoyé à l'enfant !"
+              );
               setMessage("");
             }}
             style={styles.addObjectiveButton}
@@ -504,6 +554,7 @@ const styles = StyleSheet.create({
   },
   settingsButton: {
     padding: 8,
+    left: -19,
     borderRadius: 20,
     backgroundColor: COLORS.primary,
   },
@@ -624,9 +675,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.primary,
     fontFamily: "medium",
-  },
-  subjectProgressContainer: {
-    marginBottom: 16,
   },
   addObjectiveButton: {
     marginTop: 16,

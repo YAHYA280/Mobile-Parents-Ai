@@ -101,6 +101,17 @@ const SelectPaymentMethods = () => {
                   marginTop: 12,
                 }}
               />
+              <Button
+                title="Gérer mon abonnement"
+                onPress={() => {
+                  setModalVisible(false);
+                  navigation.navigate("subscriptionManagerChildren");
+                }}
+                style={{
+                  width: "100%",
+                  marginTop: 12,
+                }}
+              />
             </View>
           </View>
         </TouchableWithoutFeedback>

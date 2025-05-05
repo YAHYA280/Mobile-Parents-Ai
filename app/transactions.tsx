@@ -2,8 +2,10 @@ import type { ListRenderItemInfo } from "react-native";
 import type { TransactionStatus } from "@/utils/translation";
 import type { TRANSACTION } from "@/contexts/type/transaction";
 
+import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/theme/ThemeProvider";
-import { icons, COLORS, images } from "@/constants";
+import { icons, FONTS, COLORS } from "@/constants";
+import { useNavigation } from "@react-navigation/native";
 import React, { useRef, useState, useEffect } from "react";
 import { ScrollView } from "react-native-virtualized-view";
 import TransactionCard from "@/components/TransactionCard";
@@ -27,6 +29,7 @@ import {
 
 const Transactions = () => {
   const { dark, colors } = useTheme();
+  const navigation = useNavigation();
   const [transactions, setTransactions] =
     useState<TRANSACTION[]>(initialTransactions);
   const [filteredTransactions, setFilteredTransactions] =
@@ -321,11 +324,13 @@ const Transactions = () => {
       ) : (
         <>
           <View style={styles.headerLeft}>
-            <Image
-              source={images.logo}
-              resizeMode="contain"
-              style={styles.logo}
-            />
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+              <Feather
+                name="arrow-left"
+                size={24}
+                color={dark ? COLORS.white : COLORS.black}
+              />
+            </TouchableOpacity>
             <Text
               style={[
                 styles.headerTitle,
@@ -583,9 +588,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
   },
   selectionHeaderContainer: {
     flexDirection: "row",
@@ -630,15 +636,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  logo: {
-    height: 32,
-    width: 32,
+  backButton: {
+    padding: 4,
+    marginRight: 16,
   },
   headerTitle: {
-    fontSize: 24,
-    fontFamily: "bold",
+    ...FONTS.h2,
     color: COLORS.black,
-    marginLeft: 16,
   },
   headerRight: {
     flexDirection: "row",
@@ -781,7 +785,6 @@ const styles = StyleSheet.create({
     fontFamily: "bold",
     color: COLORS.primary,
   },
-  // Ajoutez ce style dans votre StyleSheet
   statusFilterContainer: {
     paddingHorizontal: 16,
     paddingTop: 16,

@@ -31,7 +31,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   onPress,
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const { colors, dark } = useTheme();
+  const {dark } = useTheme();
 
   return (
     <TouchableOpacity
@@ -83,7 +83,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <View style={styles.ratingContainer}>
           <FontAwesome name="star-half-empty" size={20} color="orange" />
           <Text style={styles.rating}> {rating}</Text>
-          <Text style={styles.numStudents}> | {numStudents} students</Text>
+          <Text style={styles.numStudents}> | {numStudents} étudiants</Text>
         </View>
       </View>
     </TouchableOpacity>

@@ -1,7 +1,6 @@
 export const Paths = {
-  Transactions: "transactions",
   Support: "support",
   Enfant: "enfant",
-  Profile: "profile",
+  Profil: "profile",
   Index: "index",
 };

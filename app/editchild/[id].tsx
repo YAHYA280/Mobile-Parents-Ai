@@ -12,7 +12,12 @@ import { validateInput } from "@/utils/actions/formActions";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { launchImagePicker } from "@/utils/ImagePickerHelper";
 import { useNavigation, useLocalSearchParams } from "expo-router";
-import React, { useState, useEffect, useReducer, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useReducer,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
@@ -25,15 +30,36 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
-// Mock data for the child being edited
-const mockChildData = {
-  id: "1",
-  name: "Thomas Dubois",
-  age: 8,
-  grade: "CE2",
-  avatar: images.user7,
-};
+// --------------------------------------------------
+// Mock Data (similar to "ChildAccount" snippet)
+// --------------------------------------------------
+const mockChildrenData = [
+  {
+    id: "1",
+    name: "Thomas Dubois",
+    age: 8,
+    grade: "CE2",
+    avatar: images.user7,
+  },
+  {
+    id: "2",
+    name: "Marie Laurent",
+    age: 10,
+    grade: "CM2",
+    avatar: images.user3,
+  },
+  {
+    id: "3",
+    name: "Lucas Martin",
+    age: 6,
+    grade: "CP",
+    avatar: images.user5,
+  },
+];
 
+// --------------------------------------------------
+// Initial Form State
+// --------------------------------------------------
 const initialFormState = {
   inputValues: {
     fullName: "",
@@ -43,10 +69,12 @@ const initialFormState = {
     fullName: undefined,
     age: undefined,
   },
-  formIsValid: true, // Initially true since we're loading existing valid data
+  formIsValid: true,
 };
 
+// --------------------------------------------------
 // Grade level options
+// --------------------------------------------------
 const gradeOptions = [
   { label: "CP", value: "CP" },
   { label: "CE1", value: "CE1" },
@@ -55,10 +83,16 @@ const gradeOptions = [
   { label: "CM2", value: "CM2" },
 ];
 
+// --------------------------------------------------
+// EditChildScreen
+// --------------------------------------------------
 const EditChildScreen = () => {
+  // 1) Always call Hooks unconditionally, at the top:
   const { colors, dark } = useTheme();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
+
+  // Form and state hooks:
   const [formState, dispatchFormState] = useReducer(reducer, initialFormState);
   const [selectedGrade, setSelectedGrade] = useState("");
   const [image, setImage] = useState<any>(null);
@@ -66,41 +100,54 @@ const EditChildScreen = () => {
   const [hasChanges, setHasChanges] = useState(false);
   const [showDiscardModal, setShowDiscardModal] = useState(false);
 
-  // In a real app, you would fetch child data using the id from params
-  const childId = params.id || "1";
+  // 2) Get childId from params:
+  const childId = (params.id as string) || "1";
 
-  // Load mock data when component mounts
+  // 3) Find the matching child's data:
+  const childData = mockChildrenData.find((child) => child.id === childId);
+
+  // --------------------------------------------------
+  // Effects
+  // --------------------------------------------------
   useEffect(() => {
-    // Set initial form values
+    // If there's no childData, do nothing – but still call this effect
+    if (!childData) return;
+
+    // Initialize form from childData
     dispatchFormState({
       inputId: "fullName",
       validationResult: undefined,
-      inputValue: mockChildData.name,
+      inputValue: childData.name,
     });
-
     dispatchFormState({
       inputId: "age",
       validationResult: undefined,
-      inputValue: String(mockChildData.age),
+      inputValue: String(childData.age),
     });
+    setSelectedGrade(childData.grade);
+    setImage(childData.avatar);
+  }, [childData]);
 
-    setSelectedGrade(mockChildData.grade);
-    setImage(mockChildData.avatar);
-  }, []);
-
-  // Monitor for changes
   useEffect(() => {
-    const nameChanged = formState.inputValues.fullName !== mockChildData.name;
-    const ageChanged = formState.inputValues.age !== String(mockChildData.age);
-    const gradeChanged = selectedGrade !== mockChildData.grade;
-    const imageChanged = image !== mockChildData.avatar;
+    // If there's no childData, do nothing – but still call this effect
+    if (!childData) return;
+
+    const nameChanged =
+      formState.inputValues.fullName !== childData.name;
+    const ageChanged =
+      formState.inputValues.age !== String(childData.age);
+    const gradeChanged = selectedGrade !== childData.grade;
+    const imageChanged = image !== childData.avatar;
 
     setHasChanges(nameChanged || ageChanged || gradeChanged || imageChanged);
-  }, [formState.inputValues, selectedGrade, image]);
+  }, [childData, formState.inputValues, selectedGrade, image]);
 
+  // --------------------------------------------------
+  // Handlers (useCallback called unconditionally)
+  // --------------------------------------------------
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
-      // Additional validation for age field to ensure it's a valid number
+      // Extra validation for the 'age' field
       if (inputId === "age") {
         const ageValue = parseInt(inputValue, 10);
         if (Number.isNaN(ageValue) || ageValue <= 0 || ageValue > 18) {
@@ -112,7 +159,6 @@ const EditChildScreen = () => {
           return;
         }
       }
-
       const result = validateInput(inputId, inputValue);
       dispatchFormState({
         inputId,
@@ -154,10 +200,9 @@ const EditChildScreen = () => {
       );
       return;
     }
-
     setIsSubmitting(true);
 
-    // Simulate API call
+    // Simulate saving
     setTimeout(() => {
       setIsSubmitting(false);
       Alert.alert("Succès", "Informations mises à jour avec succès", [
@@ -166,7 +211,29 @@ const EditChildScreen = () => {
     }, 1000);
   };
 
-  // Discard changes modal
+  // --------------------------------------------------
+  // If there's no child data, conditionally render
+  // "not found" UI – but *only after* all Hooks
+  // have been called above.
+  // --------------------------------------------------
+  if (!childData) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <Header title="Enfant introuvable" />
+        <View style={{ padding: 16 }}>
+          <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+            Désolé, aucune donnée trouvée pour cet enfant.
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // --------------------------------------------------
+  // Modals
+  // --------------------------------------------------
   const renderDiscardModal = () => (
     <Modal
       transparent
@@ -231,7 +298,9 @@ const EditChildScreen = () => {
     </Modal>
   );
 
-  // Dynamic styles that depend on the theme
+  // --------------------------------------------------
+  // Render
+  // --------------------------------------------------
   const dynamicStyles = {
     cancelButton: {
       flex: 1,
@@ -349,17 +418,15 @@ const EditChildScreen = () => {
                   },
                 }}
                 useNativeAndroidPickerStyle={false}
-                Icon={() => {
-                  return (
-                    <Image
-                      source={icons.down}
-                      style={[
-                        styles.dropdownIcon,
-                        { tintColor: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    />
-                  );
-                }}
+                Icon={() => (
+                  <Image
+                    source={icons.down}
+                    style={[
+                      styles.dropdownIcon,
+                      { tintColor: dark ? COLORS.white : COLORS.black },
+                    ]}
+                  />
+                )}
               />
             </View>
           </View>
@@ -387,6 +454,9 @@ const EditChildScreen = () => {
   );
 };
 
+// --------------------------------------------------
+// Styles
+// --------------------------------------------------
 interface Styles {
   container: ViewStyle;
   keyboardContainer: ViewStyle;

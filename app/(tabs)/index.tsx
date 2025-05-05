@@ -1,15 +1,15 @@
 import type { ListRenderItemInfo } from "react-native";
 import type { NavigationProp } from "@react-navigation/native";
 
-import React, { useState } from "react";
-import CourseCard from "@/components/CourseCard";
+import { banners } from "@/data";
 import { useTheme } from "@/theme/ThemeProvider";
+import React, { useState, useEffect } from "react";
 import SectionHeader from "@/components/SectionHeader";
 import { useNavigation } from "@react-navigation/native";
 import { icons, SIZES, COLORS, images } from "@/constants";
 import { ScrollView } from "react-native-virtualized-view";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { banners, CATEGORIES, mostPopularCourses } from "@/data";
+import AbonnementCatalogueList from "@/components/AbonnementCatalogueList";
 import {
   View,
   Text,
@@ -18,6 +18,13 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+
+import type {
+  CataloguePlan} from "../services/mocksApi/abonnementApiMock";
+
+import {
+  getCatalogues,
+} from "../services/mocksApi/abonnementApiMock";
 
 interface Banner {
   id: string;
@@ -38,6 +45,11 @@ const Home: React.FC<HomeProps> = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([
     "all",
   ]);
+  const [catalogues, setCatalogues] = useState<CataloguePlan[]>([]);
+
+  useEffect(() => {
+    getCatalogues().then(setCatalogues);
+  }, []);
 
   const renderBannerItem = ({ item }: ListRenderItemInfo<Banner>) => (
     <View style={styles.bannerContainer}>
@@ -128,116 +140,18 @@ const Home: React.FC<HomeProps> = () => {
   );
 
   const renderPopularCourses = () => {
-    const filteredCourses = mostPopularCourses.filter((course) => {
-      if (selectedCategories.includes("all")) {
-        return true;
-      }
-      return selectedCategories.includes(course.category);
-    });
-
-    const toggleCategory = (categoryId: string) => {
-      if (categoryId === "all") {
-        if (!selectedCategories.includes("all")) {
-          setSelectedCategories(["all"]);
-        }
-        return;
-      }
-
-      const updatedCategories = [...selectedCategories];
-
-      const allIndex = updatedCategories.indexOf("all");
-      if (allIndex !== -1) {
-        updatedCategories.splice(allIndex, 1);
-      }
-
-      const index = updatedCategories.indexOf(categoryId);
-      if (index === -1) {
-        updatedCategories.push(categoryId);
-      } else {
-        updatedCategories.splice(index, 1);
-
-        if (updatedCategories.length === 0) {
-          updatedCategories.push("all");
-        }
-      }
-
-      setSelectedCategories(updatedCategories);
-    };
-
-    const renderCategoryItem = ({
-      item,
-    }: ListRenderItemInfo<{ value: string; label: string }>) => (
-      <TouchableOpacity
-        style={{
-          backgroundColor: selectedCategories.includes(item.value)
-            ? COLORS.primary
-            : "transparent",
-          padding: 10,
-          marginVertical: 5,
-          borderColor: COLORS.primary,
-          borderWidth: 1.3,
-          borderRadius: 24,
-          marginRight: 12,
-        }}
-        onPress={() => toggleCategory(item.value)}
-      >
-        <Text
-          style={{
-            color: selectedCategories.includes(item.value)
-              ? COLORS.white
-              : COLORS.primary,
-          }}
-        >
-          {item.label}
-        </Text>
-      </TouchableOpacity>
-    );
-
     return (
       <View style={{ paddingBottom: 40 }}>
         <SectionHeader
           title="Cours populaires"
           subtitle="Voir tout"
-          onPress={() => navigation.navigate("mostpopularcourses")}
+          onPress={() => navigation.navigate("abonnementcatalogue")}
         />
-        <FlatList
-          data={CATEGORIES}
-          keyExtractor={keyExtractorCategory}
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          renderItem={renderCategoryItem}
-        />
-        {filteredCourses.length > 0 ? (
-          <FlatList
-            data={filteredCourses}
-            keyExtractor={keyExtractor}
-            renderItem={({ item }) => (
-              <CourseCard
-                name={item.name}
-                image={item.image}
-                category={
-                  CATEGORIES.find((cat) => cat.value === item.category)
-                    ?.label || item.category
-                }
-                price={item.price}
-                isOnDiscount={item.isOnDiscount}
-                oldPrice={item.oldPrice}
-                rating={item.rating}
-                numStudents={item.numStudents}
-                onPress={() => navigation.navigate("coursedetailsmore")}
-              />
-            )}
-          />
-        ) : (
-          <View style={{ padding: 20, alignItems: "center" }}>
-            <Text style={{ fontFamily: "medium", color: COLORS.gray }}>
-              Aucun cours disponible dans cette catégorie
-            </Text>
-          </View>
-        )}
+        <AbonnementCatalogueList data={catalogues} limit={2} />
       </View>
     );
   };
+
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>

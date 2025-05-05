@@ -1,53 +1,38 @@
+import type { NavigationProp } from "@react-navigation/native";
+
 import { Image } from "expo-image";
 import React, { useRef } from "react";
 import Button from "@/components/Button";
+import { useNavigation } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
+import { SIZES, icons, COLORS } from "@/constants";
 import RBSheet from "react-native-raw-bottom-sheet";
-import { SIZES, icons, COLORS, images } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+
 
 const Support = () => {
   const refRBSheet = useRef<any>(null);
   const { dark, colors } = useTheme();
-  /**
-   * render header
-   */
-  const renderHeader = () => {
-    return (
-      <TouchableOpacity style={styles.headerContainer}>
-        <View style={styles.headerLeft}>
+  const navigation = useNavigation<NavigationProp<any>>();
+  
+
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
+      <View style={[styles.viewRight, { marginLeft: 'auto' }]}>
+        <TouchableOpacity onPress={() => navigation.navigate("notifications")}>
           <Image
-            source={images.logo}
-            contentFit="contain"
-            style={styles.logo}
-          />
-          <Text
+            source={icons.notificationBell2}
+            resizeMode="contain"
             style={[
-              styles.headerTitle,
-              {
-                color: dark ? COLORS.white : COLORS.greyscale900,
-              },
-            ]}
-          >
-            Profile
-          </Text>
-        </View>
-        <TouchableOpacity>
-          <Image
-            source={icons.moreCircle}
-            contentFit="contain"
-            style={[
-              styles.headerIcon,
-              {
-                tintColor: dark ? COLORS.secondaryWhite : COLORS.greyscale900,
-              },
+              styles.bellIcon,
+              { tintColor: dark ? COLORS.white : COLORS.greyscale900 },
             ]}
           />
         </TouchableOpacity>
-      </TouchableOpacity>
-    );
-  };
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
@@ -133,26 +118,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  logo: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.primary,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontFamily: "bold",
-    color: COLORS.greyscale900,
-    marginLeft: 12,
-  },
-  headerIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.greyscale900,
-  },
   bottomContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -185,6 +150,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.grayscale200,
     marginTop: 12,
   },
+    viewRight: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    bellIcon: {
+      height: 24,
+      width: 24,
+      tintColor: COLORS.black,
+      marginRight: 8,
+    },
 });
 
 export default Support;

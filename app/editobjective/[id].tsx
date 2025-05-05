@@ -21,7 +21,6 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
-// Options pour les matières
 const subjectOptions = [
   { label: "Mathématiques", value: "math" },
   { label: "Français", value: "french" },
@@ -31,21 +30,19 @@ const subjectOptions = [
   { label: "Anglais", value: "english" },
 ];
 
-// Options pour les priorités
 const priorityOptions = [
   { label: "Basse", value: "low" },
   { label: "Moyenne", value: "medium" },
   { label: "Élevée", value: "high" },
 ];
 
-// Options pour les statuts
 const statusOptions = [
   { label: "Non commencé", value: "not_started" },
   { label: "En cours", value: "in_progress" },
   { label: "Atteint", value: "completed" },
 ];
 
-// Exemple d'objectif existant pour la démo
+// Example objective data
 const existingObjective = {
   id: "1",
   title: "Obtenir une moyenne de 80% en mathématiques",
@@ -56,6 +53,9 @@ const existingObjective = {
   status: "in_progress",
   startDate: new Date("2025-02-26T12:26:00"),
   endDate: new Date("2025-02-27T00:00:00"),
+
+  // Optional message, if it was previously set for demonstration
+  kidMessage: "Félicitations ! Tu as atteint ton objectif en mathématiques !",
 };
 
 const EditObjectiveScreen = () => {
@@ -63,11 +63,11 @@ const EditObjectiveScreen = () => {
   const navigation = useNavigation();
   const params = useLocalSearchParams();
 
-  // Dans une vraie application, vous récupéreriez l'objectif à partir de l'ID
+  // Get the objective ID from route params (for demonstration we just use the existing one)
   const objectiveId = (params.id as string) || "1";
-  const objective = existingObjective; // Simuler la récupération des données
+  const objective = existingObjective; // Simulating data fetching by ID
 
-  // États pour les champs du formulaire
+  // States for form fields
   const [title, setTitle] = useState(objective.title);
   const [description, setDescription] = useState(objective.description);
   const [subject, setSubject] = useState<string | null>(objective.subject);
@@ -76,19 +76,22 @@ const EditObjectiveScreen = () => {
     objective.status
   );
 
-  // États pour les dates
+  // Date states
   const [startDate, setStartDate] = useState(objective.startDate);
   const [endDate, setEndDate] = useState(objective.endDate);
 
-  // États pour les pickers de date
+  // Date picker visibility
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
-  // État pour suivre les modifications
+  // ** New State: Optional message for the kid **
+  const [kidMessage, setKidMessage] = useState(objective.kidMessage || "");
+
+  // Tracking form changes
   const [hasChanges, setHasChanges] = useState(false);
   const [showDiscardModal, setShowDiscardModal] = useState(false);
 
-  // Vérifier s'il y a des modifications
+  // Check for unsaved changes
   useEffect(() => {
     const titleChanged = title !== objective.title;
     const descriptionChanged = description !== objective.description;
@@ -98,6 +101,7 @@ const EditObjectiveScreen = () => {
     const startDateChanged =
       startDate.getTime() !== objective.startDate.getTime();
     const endDateChanged = endDate.getTime() !== objective.endDate.getTime();
+    const kidMessageChanged = kidMessage !== (objective.kidMessage || "");
 
     setHasChanges(
       titleChanged ||
@@ -106,7 +110,8 @@ const EditObjectiveScreen = () => {
         priorityChanged ||
         statusChanged ||
         startDateChanged ||
-        endDateChanged
+        endDateChanged ||
+        kidMessageChanged
     );
   }, [
     title,
@@ -116,6 +121,7 @@ const EditObjectiveScreen = () => {
     initialStatus,
     startDate,
     endDate,
+    kidMessage,
     objective.title,
     objective.description,
     objective.subject,
@@ -123,38 +129,48 @@ const EditObjectiveScreen = () => {
     objective.status,
     objective.startDate,
     objective.endDate,
+    objective.kidMessage,
   ]);
 
-  // Format de date pour l'affichage
+  // For date display
   const formatDate = (date: Date): string => {
-    return `${date.toLocaleDateString()} ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    return `${date.toLocaleDateString()} ${date
+      .getHours()
+      .toString()
+      .padStart(2, "0")}:${date
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`;
   };
 
-  // Gestionnaires pour les pickers de date
+  // Start date picker handler
   const onStartDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || startDate;
     setShowStartDatePicker(Platform.OS === "ios");
     setStartDate(currentDate);
 
-    // Si la date de début est après la date de fin, ajuster la date de fin
+    // If start date is after end date, adjust end date
     if (currentDate > endDate) {
-      setEndDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000)); // Un jour plus tard
+      setEndDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000)); 
     }
   };
 
+  // End date picker handler
   const onEndDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || endDate;
     setShowEndDatePicker(Platform.OS === "ios");
 
-    // Empêcher de définir une date de fin avant la date de début
     if (currentDate >= startDate) {
       setEndDate(currentDate);
     } else {
-      Alert.alert("Erreur", "La date de fin doit être après la date de début.");
+      Alert.alert(
+        "Erreur",
+        "La date de fin doit être après la date de début."
+      );
     }
   };
 
-  // Gestion du retour
+  // Back button handler
   const handleBack = () => {
     if (hasChanges) {
       setShowDiscardModal(true);
@@ -163,7 +179,7 @@ const EditObjectiveScreen = () => {
     }
   };
 
-  // Validation du formulaire
+  // Validate form fields
   const validateForm = (): boolean => {
     if (!title.trim()) {
       Alert.alert("Champ requis", "Veuillez entrer un titre pour l'objectif.");
@@ -183,17 +199,19 @@ const EditObjectiveScreen = () => {
     return true;
   };
 
-  // Sauvegarde de l'objectif
+  // Save objective
   const saveObjective = () => {
     if (validateForm()) {
-      // Dans une vraie application, vous enverriez ces données à une API
+      // In a real app, you would send these updated values to an API
       Alert.alert("Succès", "L'objectif a été mis à jour avec succès", [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
+      // You might do something with `kidMessage` here, such as storing it for display
+      // whenever the kid finishes the objective.
     }
   };
 
-  // Modal pour abandonner les modifications
+  // Discard changes modal
   const renderDiscardModal = () => (
     <Modal
       transparent
@@ -273,7 +291,7 @@ const EditObjectiveScreen = () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.formContainer}>
-            {/* Titre de l'objectif */}
+            {/* Objective Title */}
             <View style={styles.inputGroup}>
               <Text
                 style={[
@@ -287,7 +305,9 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.textInput,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}
@@ -298,7 +318,7 @@ const EditObjectiveScreen = () => {
               />
             </View>
 
-            {/* Description de l'objectif */}
+            {/* Description */}
             <View style={styles.inputGroup}>
               <Text
                 style={[
@@ -313,7 +333,9 @@ const EditObjectiveScreen = () => {
                   styles.textInput,
                   styles.textArea,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}
@@ -327,7 +349,7 @@ const EditObjectiveScreen = () => {
               />
             </View>
 
-            {/* Matière */}
+            {/* Subject */}
             <View style={styles.inputGroup}>
               <Text
                 style={[
@@ -341,7 +363,9 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -390,7 +414,7 @@ const EditObjectiveScreen = () => {
               </View>
             </View>
 
-            {/* Priorité */}
+            {/* Priority */}
             <View style={styles.inputGroup}>
               <Text
                 style={[
@@ -404,7 +428,9 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -453,7 +479,7 @@ const EditObjectiveScreen = () => {
               </View>
             </View>
 
-            {/* Date de début */}
+            {/* Start Date */}
             <View style={styles.inputGroup}>
               <Text
                 style={[
@@ -467,7 +493,9 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.dateButton,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setShowStartDatePicker(true)}
@@ -484,7 +512,6 @@ const EditObjectiveScreen = () => {
                   }}
                 />
               </TouchableOpacity>
-
               {showStartDatePicker && (
                 <DateTimePicker
                   value={startDate}
@@ -496,7 +523,7 @@ const EditObjectiveScreen = () => {
               )}
             </View>
 
-            {/* Date de fin */}
+            {/* End Date */}
             <View style={styles.inputGroup}>
               <Text
                 style={[
@@ -510,7 +537,9 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.dateButton,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setShowEndDatePicker(true)}
@@ -527,7 +556,6 @@ const EditObjectiveScreen = () => {
                   }}
                 />
               </TouchableOpacity>
-
               {showEndDatePicker && (
                 <DateTimePicker
                   value={endDate}
@@ -535,13 +563,12 @@ const EditObjectiveScreen = () => {
                   display="default"
                   onChange={onEndDateChange}
                   minimumDate={startDate}
-                  // Conditionally include is24Hour only on Android
                   {...(Platform.OS === "android" ? { is24Hour: true } : {})}
                 />
               )}
             </View>
 
-            {/* Statut initial */}
+            {/* Status */}
             <View style={styles.inputGroup}>
               <Text
                 style={[
@@ -555,7 +582,9 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -600,9 +629,41 @@ const EditObjectiveScreen = () => {
                 />
               </View>
             </View>
+
+            {/* OPTIONAL MESSAGE FOR THE KID */}
+            <View style={styles.inputGroup}>
+              <Text
+                style={[
+                  styles.label,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Message pour l&apos;enfant (optionnel)
+              </Text>
+              <TextInput
+                style={[
+                  styles.textInput,
+                  styles.textArea,
+                  {
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
+                    color: dark ? COLORS.white : COLORS.black,
+                  },
+                ]}
+                value={kidMessage}
+                onChangeText={setKidMessage}
+                placeholder="Félicitations ! Tu as ... (exemple)"
+                placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
+            </View>
           </View>
         </ScrollView>
 
+        {/* Buttons */}
         <View style={styles.buttonContainer}>
           <Button
             title="Annuler"
@@ -694,7 +755,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginLeft: 8,
-    backgroundColor: COLORS.greeen,
+    backgroundColor: COLORS.greeen, // Or your chosen color
     borderColor: COLORS.greeen,
   },
   modalOverlay: {

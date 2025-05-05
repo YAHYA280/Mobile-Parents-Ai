@@ -1,11 +1,12 @@
 import { Image } from "expo-image";
 import React, { useState } from "react";
+import { useRouter } from "expo-router";
 import Button from "@/components/Button";
 import { useNavigation } from "expo-router";
+import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/theme/ThemeProvider";
 import { icons, COLORS, images } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -67,6 +68,7 @@ const ListeEnfantsScreen = () => {
   const { colors, dark } = useTheme();
   const router = useRouter();
   const navigation = useNavigation<Nav>();
+  const navigationBack = useNavigation();
   const [children, setChildren] = useState<Child[]>(mockChildren);
   const [childToDelete, setChildToDelete] = useState<Child | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -78,13 +80,16 @@ const ListeEnfantsScreen = () => {
     });
   };
 
+  const handleGoBack = () => {
+    navigationBack.goBack();
+  };
+
   const handleDeleteChild = (child: Child) => {
     setChildToDelete(child);
     setShowDeleteModal(true);
   };
 
   function handleEditChild(childId: string) {
-    // If you have app/editchild/[id].tsx
     router.push({
       pathname: "/editchild/[id]",
       params: { id: childId },
@@ -155,9 +160,10 @@ const ListeEnfantsScreen = () => {
                 styles.modalButton,
                 {
                   backgroundColor: COLORS.error,
-                  borderColor: COLORS.error,
+                  borderColor: COLORS.black2,
                 },
               ]}
+              textColor={COLORS.white}
               onPress={confirmDeleteChild}
             />
           </View>
@@ -269,24 +275,24 @@ const ListeEnfantsScreen = () => {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuIconContainer}>
-          <Image
-            source={icons.menu}
+        <View style={styles.headerLeft}>
+          <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+            <Feather
+              name="arrow-left"
+              size={24}
+              color={dark ? COLORS.white : COLORS.black}
+            />
+          </TouchableOpacity>
+          
+          <Text
             style={[
-              styles.menuIcon,
-              { tintColor: dark ? COLORS.white : COLORS.black },
+              styles.headerTitle,
+              { color: dark ? COLORS.white : COLORS.black },
             ]}
-          />
-        </TouchableOpacity>
-
-        <Text
-          style={[
-            styles.headerTitle,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
-          Mes Enfants
-        </Text>
+          >
+            Mes Enfants
+          </Text>
+        </View>
 
         <TouchableOpacity
           style={styles.addButtonContainer}
@@ -340,23 +346,27 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 20,
   },
-  menuIconContainer: {
-    padding: 8,
-  },
-  menuIcon: {
-    width: 24,
-    height: 24,
-    tintColor: COLORS.black,
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: 22,
     fontFamily: "bold",
     color: COLORS.black,
   },
+  backButton: {
+    padding: 4,
+    marginRight: 16,
+  },
   addButtonContainer: {
     backgroundColor: COLORS.primary,
     padding: 8,
     borderRadius: 20,
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
   addIcon: {
     width: 20,
@@ -416,8 +426,9 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    overflow: "hidden",
+    overflow: "visible",
     marginRight: 16,
+    position: "relative",
   },
   avatar: {
     width: "100%",
@@ -432,16 +443,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     backgroundColor: COLORS.greeen,
     position: "absolute",
     bottom: 5,
-    right: 5,
+    right: 0,
     borderWidth: 2,
-    borderColor:  COLORS.white, // Ensure contrast
-    zIndex: 10,
+    borderColor: COLORS.white, 
+    zIndex: 15,
+    elevation: 3, 
   },
   childName: {
     fontSize: 18,

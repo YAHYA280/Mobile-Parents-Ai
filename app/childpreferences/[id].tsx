@@ -10,16 +10,22 @@ import {
   Text,
   Alert,
   Switch,
+  Keyboard,
   TextInput,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
 
+// --------------------------------------------------
+// Updated Type
+// --------------------------------------------------
 type DayId = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
-type ContentId = "learning" | "chatbot" | "exercises" | "games" | "videos";
+type ContentId = "learning" | "chatbot" | "challenge" | "recherche";
 
+// --------------------------------------------------
 // Jours de la semaine
+// --------------------------------------------------
 const daysOfWeek: { id: DayId; label: string }[] = [
   { id: "mon", label: "Lun" },
   { id: "tue", label: "Mar" },
@@ -30,18 +36,24 @@ const daysOfWeek: { id: DayId; label: string }[] = [
   { id: "sun", label: "Dim" },
 ];
 
+// --------------------------------------------------
+// Sections de contenu (mis à jour)
+// --------------------------------------------------
 const contentSections: { id: ContentId; label: string }[] = [
   { id: "learning", label: "J'apprends" },
-  { id: "chatbot", label: "ChatBot Accueil" },
-  { id: "exercises", label: "Exercices" },
-  { id: "games", label: "Jeux éducatifs" },
-  { id: "videos", label: "Vidéos" },
+  { id: "chatbot", label: "Assistant d'accueil" },
+  { id: "challenge", label: "Challenge" },
+  { id: "recherche", label: "Recherche" },
 ];
 
+// --------------------------------------------------
+// ChildPreferencesScreen
+// --------------------------------------------------
 const ChildPreferencesScreen = () => {
   const { colors, dark } = useTheme();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
+
   // Dans une vraie application, vous récupéreriez ces préférences depuis une API
   const childId = (params.id as string) || "1";
 
@@ -66,16 +78,24 @@ const ChildPreferencesScreen = () => {
     sun: false,
   });
 
-  // États pour les restrictions de contenu
+  // --------------------------------------------------
+  // Nouveau Record pour correspondre aux ID "challenge" & "recherche"
+  // --------------------------------------------------
   const [contentRestrictions, setContentRestrictions] = useState<
     Record<ContentId, boolean>
   >({
     learning: false,
     chatbot: false,
-    exercises: false,
-    games: true,
-    videos: true,
+    challenge: false, // remplace "exercises"
+    recherche: true, // remplace "games"
   });
+
+  // --------------------------------------------------
+  // Ajout d'une liste de mots interdits
+  // --------------------------------------------------
+  const [restrictedWords, setRestrictedWords] = useState<string[]>([]);
+  const [newRestrictedWord, setNewRestrictedWord] = useState("");
+
   // Fonction pour basculer l'état d'un jour
   const toggleDay = (dayId: DayId) => {
     setAllowedDays((prev) => ({
@@ -127,10 +147,27 @@ const ChildPreferencesScreen = () => {
     setEndMinute(validateTimeInput(value, 59));
   };
 
+  // --------------------------------------------------
+  // Gestionnaires pour les mots interdits
+  // --------------------------------------------------
+  const handleAddRestrictedWord = () => {
+    const trimmedWord = newRestrictedWord.trim();
+    if (trimmedWord.length > 0) {
+      setRestrictedWords((prev) => [...prev, trimmedWord]);
+      setNewRestrictedWord("");
+      Keyboard.dismiss();
+    }
+  };
+
+  const handleRemoveRestrictedWord = (index: number) => {
+    setRestrictedWords((prev) => prev.filter((_, i) => i !== index));
+  };
+
   // Fonction pour sauvegarder les préférences
   const savePreferences = () => {
     // Dans une vraie application, vous enverriez ces données à une API
-    Alert.alert("Succès", "Les préférences ont été enregistrées avec succès", [
+    // et incluriez "restrictedWords" pour gérer les mots interdits.
+    Alert.alert("Succès", "Les préférences ont été enregistrées avec succès.", [
       { text: "OK", onPress: () => navigation.goBack() },
     ]);
   };
@@ -364,7 +401,7 @@ const ChildPreferencesScreen = () => {
                 key={day.id}
                 style={[
                   styles.dayButton,
-                  allowedDays[day.id as keyof typeof allowedDays]
+                  allowedDays[day.id]
                     ? { backgroundColor: COLORS.primary }
                     : {
                         backgroundColor: dark
@@ -417,11 +454,7 @@ const ChildPreferencesScreen = () => {
                 {section.label}
               </Text>
               <Switch
-                value={
-                  contentRestrictions[
-                    section.id as keyof typeof contentRestrictions
-                  ]
-                }
+                value={contentRestrictions[section.id]}
                 onValueChange={() => toggleContentRestriction(section.id)}
                 trackColor={{
                   false: COLORS.greyscale300,
@@ -432,6 +465,85 @@ const ChildPreferencesScreen = () => {
               />
             </View>
           ))}
+        </View>
+
+        {/* Section Mots interdits */}
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+          ]}
+        >
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: dark ? COLORS.white : COLORS.black },
+            ]}
+          >
+            Mots interdits
+          </Text>
+          <Text
+            style={[
+              styles.restrictionDescription,
+              { color: dark ? COLORS.greyscale300 : COLORS.gray },
+            ]}
+          >
+            Saisissez les mots que vous souhaitez bloquer. Tapez le mot puis
+            appuyez sur &quot;Ajouter&quot;.
+          </Text>
+
+          {/* Input pour un nouveau mot interdit */}
+          <View style={styles.addRestrictedWordContainer}>
+            <TextInput
+              style={[
+                styles.restrictedWordInput,
+                {
+                  backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
+                  color: dark ? COLORS.white : COLORS.black,
+                },
+              ]}
+              placeholder="Ajouter un mot interdit..."
+              placeholderTextColor={dark ? COLORS.greyscale300 : COLORS.gray}
+              value={newRestrictedWord}
+              onChangeText={setNewRestrictedWord}
+              onSubmitEditing={handleAddRestrictedWord}
+              returnKeyType="done"
+            />
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={handleAddRestrictedWord}
+            >
+              <Text style={styles.addButtonText}>Ajouter</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Liste des mots interdits (tags) */}
+          <View style={styles.tagsContainer}>
+            {restrictedWords.map((word, index) => (
+              <TouchableOpacity
+                key={`${word}-${index}`}
+                style={[
+                  styles.tag,
+                  {
+                    backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                  },
+                ]}
+                onPress={() => handleRemoveRestrictedWord(index)}
+              >
+                <Text
+                  style={[
+                    styles.tagText,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  {word}
+                </Text>
+                <Text style={[styles.tagRemoveSymbol, { color: COLORS.error }]}>
+                  ×
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </ScrollView>
 
@@ -448,6 +560,9 @@ const ChildPreferencesScreen = () => {
   );
 };
 
+// --------------------------------------------------
+// Styles
+// --------------------------------------------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -561,6 +676,55 @@ const styles = StyleSheet.create({
   applyButton: {
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
+  },
+  // Section Mots Interdits
+  addRestrictedWordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  restrictedWordInput: {
+    flex: 1,
+    height: 40,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    fontFamily: "regular",
+    marginRight: 8,
+  },
+  addButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  addButtonText: {
+    color: COLORS.white,
+    fontFamily: "bold",
+    fontSize: 14,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  tag: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  tagText: {
+    fontFamily: "medium",
+    fontSize: 14,
+    marginRight: 4,
+  },
+  tagRemoveSymbol: {
+    fontFamily: "bold",
+    fontSize: 16,
+    marginLeft: 2,
   },
 });
 

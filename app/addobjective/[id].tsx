@@ -55,42 +55,49 @@ const AddObjectiveScreen = () => {
   const [description, setDescription] = useState("");
   const [subject, setSubject] = useState<string | null>(null);
   const [priority, setPriority] = useState<string | null>(null);
-  const [initialStatus, setInitialStatus] = useState<string | null>(
-    "not_started"
-  );
+  const [initialStatus, setInitialStatus] = useState<string | null>("not_started");
 
   // États pour les dates
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-  ); // Une semaine plus tard par défaut
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // +1 semaine par défaut
+  );
 
   // États pour les pickers de date
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
+  // **Nouvel état : message optionnel pour l'enfant**
+  const [kidMessage, setKidMessage] = useState("");
+
   // Format de date pour l'affichage
   const formatDate = (date: Date): string => {
-    return `${date.toLocaleDateString()} ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    return `${date.toLocaleDateString()} ${date
+      .getHours()
+      .toString()
+      .padStart(2, "0")}:${date
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`;
   };
 
-  // Gestionnaires pour les pickers de date
+  // Gestionnaires de changement de date (date de début)
   const onStartDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || startDate;
     setShowStartDatePicker(Platform.OS === "ios");
     setStartDate(currentDate);
 
-    // Si la date de début est après la date de fin, ajuster la date de fin
+    // Ajuster la date de fin si la date de début dépasse la date de fin
     if (currentDate > endDate) {
-      setEndDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000)); // Un jour plus tard
+      setEndDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000)); 
     }
   };
 
+  // Gestionnaires de changement de date (date de fin)
   const onEndDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || endDate;
     setShowEndDatePicker(Platform.OS === "ios");
 
-    // Empêcher de définir une date de fin avant la date de début
     if (currentDate >= startDate) {
       setEndDate(currentDate);
     } else {
@@ -104,24 +111,21 @@ const AddObjectiveScreen = () => {
       Alert.alert("Champ requis", "Veuillez entrer un titre pour l'objectif.");
       return false;
     }
-
     if (!subject) {
       Alert.alert("Champ requis", "Veuillez sélectionner une matière.");
       return false;
     }
-
     if (!priority) {
       Alert.alert("Champ requis", "Veuillez sélectionner une priorité.");
       return false;
     }
-
-    return true;
+    return true; // kidMessage est optionnel
   };
 
   // Sauvegarde de l'objectif
   const saveObjective = () => {
     if (validateForm()) {
-      // Dans une vraie application, vous enverriez ces données à une API
+      // Dans une vraie application, vous enverriez tous ces champs (dont kidMessage) à votre API / backend
       Alert.alert("Succès", "L'objectif a été créé avec succès", [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
@@ -157,7 +161,9 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.textInput,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}
@@ -183,7 +189,9 @@ const AddObjectiveScreen = () => {
                   styles.textInput,
                   styles.textArea,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}
@@ -211,7 +219,9 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -244,18 +254,16 @@ const AddObjectiveScreen = () => {
                     },
                   }}
                   useNativeAndroidPickerStyle={false}
-                  Icon={() => {
-                    return (
-                      <Image
-                        source={icons.down}
-                        style={{
-                          width: 18,
-                          height: 18,
-                          tintColor: dark ? COLORS.white : COLORS.black,
-                        }}
-                      />
-                    );
-                  }}
+                  Icon={() => (
+                    <Image
+                      source={icons.down}
+                      style={{
+                        width: 18,
+                        height: 18,
+                        tintColor: dark ? COLORS.white : COLORS.black,
+                      }}
+                    />
+                  )}
                 />
               </View>
             </View>
@@ -274,7 +282,9 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -307,18 +317,16 @@ const AddObjectiveScreen = () => {
                     },
                   }}
                   useNativeAndroidPickerStyle={false}
-                  Icon={() => {
-                    return (
-                      <Image
-                        source={icons.down}
-                        style={{
-                          width: 18,
-                          height: 18,
-                          tintColor: dark ? COLORS.white : COLORS.black,
-                        }}
-                      />
-                    );
-                  }}
+                  Icon={() => (
+                    <Image
+                      source={icons.down}
+                      style={{
+                        width: 18,
+                        height: 18,
+                        tintColor: dark ? COLORS.white : COLORS.black,
+                      }}
+                    />
+                  )}
                 />
               </View>
             </View>
@@ -337,7 +345,9 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.dateButton,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setShowStartDatePicker(true)}
@@ -361,7 +371,6 @@ const AddObjectiveScreen = () => {
                   mode="datetime"
                   display="default"
                   onChange={onStartDateChange}
-                  // Conditionally include is24Hour only on Android
                   {...(Platform.OS === "android" ? { is24Hour: true } : {})}
                 />
               )}
@@ -381,7 +390,9 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.dateButton,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setShowEndDatePicker(true)}
@@ -406,7 +417,6 @@ const AddObjectiveScreen = () => {
                   display="default"
                   onChange={onEndDateChange}
                   minimumDate={startDate}
-                  // Conditionally include is24Hour only on Android
                   {...(Platform.OS === "android" ? { is24Hour: true } : {})}
                 />
               )}
@@ -426,7 +436,9 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -456,24 +468,54 @@ const AddObjectiveScreen = () => {
                     },
                   }}
                   useNativeAndroidPickerStyle={false}
-                  Icon={() => {
-                    return (
-                      <Image
-                        source={icons.down}
-                        style={{
-                          width: 18,
-                          height: 18,
-                          tintColor: dark ? COLORS.white : COLORS.black,
-                        }}
-                      />
-                    );
-                  }}
+                  Icon={() => (
+                    <Image
+                      source={icons.down}
+                      style={{
+                        width: 18,
+                        height: 18,
+                        tintColor: dark ? COLORS.white : COLORS.black,
+                      }}
+                    />
+                  )}
                 />
               </View>
+            </View>
+
+            {/* Message pour l'enfant (optionnel) */}
+            <View style={styles.inputGroup}>
+              <Text
+                style={[
+                  styles.label,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Message pour l&apos;enfant (optionnel)
+              </Text>
+              <TextInput
+                style={[
+                  styles.textInput,
+                  styles.textArea,
+                  {
+                    backgroundColor: dark
+                      ? COLORS.dark2
+                      : COLORS.greyscale100,
+                    color: dark ? COLORS.white : COLORS.black,
+                  },
+                ]}
+                value={kidMessage}
+                onChangeText={setKidMessage}
+                placeholder="Entrez un message de félicitations ou d'encouragement..."
+                placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
             </View>
           </View>
         </ScrollView>
 
+        {/* Buttons */}
         <View style={styles.buttonContainer}>
           <Button
             title="Annuler"
@@ -563,7 +605,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginLeft: 8,
-    backgroundColor: COLORS.greeen,
+    backgroundColor: COLORS.greeen, 
     borderColor: COLORS.greeen,
   },
 });

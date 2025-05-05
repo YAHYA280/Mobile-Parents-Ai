@@ -1,20 +1,59 @@
-image: node:18
+include:
+  - project: 'marketing-confort/template-ci'
+    ref: main
+    file: 'expo/verify.yml'
+  - project: 'marketing-confort/template-ci'
+    ref: main
+    file: 'expo/build-publish.yml'
+  - project: 'marketing-confort/template-ci'
+    ref: main
+    file: 'validate-front-changes.yml'
+  - project: 'marketing-confort/template-ci'
+    ref: main
+    file: 'staging-version-management.yml'
+  - project: 'marketing-confort/template-ci'
+    ref: main
+    file: 'default-variables.yml'
+
 
 stages:
+  - validate-changes
   - verify
+  - build-publish
+  - staging-version-management
 
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - node_modules/
+
+variables:
+  APP_NAME: 'marketingconfort/brainboost-parent-mobile'
+  MANIFEST_PROJECT_PATH: 'marketing-confort/brainboost/brainboost-k8s-manifests'
+  MANIFEST_BRANCH: 'main'
+  VERSION_FILE: 'version.txt'
+  MANIFEST_FOLDER: 'apps/parent-mobile'
+
+validate-changes:
+  extends: .validate_changes_template
+  only:
+    refs:
+      - merge_requests
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
 
 verify:
-  stage: verify
-  script:
-    - npm install
-    - npm run lint
-    - npm run type-check
-    - npx expo export --non-interactive
+  extends: .verify_template
   only:
-    - branches
-    - merge_requests
+    refs:
+      - merge_requests
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+
+build-publish:
+  extends: .build_publish_template
+  only:
+    refs:
+      - develop
+
+staging-version-management:
+  extends: .staging_version_management_template
+  only:
+    - develop
+

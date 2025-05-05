@@ -3,6 +3,9 @@ import { Dimensions } from "react-native";
 const { height, width } = Dimensions.get("window");
 
 export const COLORS = {
+  text: "#000000" ,// Ajout de la couleur text (noir dans cet exemple)
+  lightGray: "#d3d3d3" ,// Ajout de la couleur lightGray
+  red: "#ff0000" ,// Ajout de la couleur rouge
   primary: "#ff8e69",
   secondary: "#fe7862",
   tertiary: "#6C4DDA",

@@ -883,7 +883,7 @@ const SettingsSecurity = () => {
 
           <View style={styles.sectionContainer}>
             <SectionHeader
-              title="Mode de paiement"
+              title="Mes cartes"
               dark={dark}
               isOpen={openSections.paymentMode}
               onToggle={togglePaymentModeSection}

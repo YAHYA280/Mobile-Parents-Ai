@@ -84,30 +84,15 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name={Paths.Enfant}
+        name="Enfants"
         options={{
           title: "",
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}
-              icon={icons.users}
-              outlineIcon={icons.users}
+              icon={icons.childrenFilled}
+              outlineIcon={icons.childrenOutline}
               label="Enfant"
-              dark={dark}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name={Paths.Transactions}
-        options={{
-          title: "",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.cart}
-              outlineIcon={icons.cartOutline}
-              label="Transactions"
               dark={dark}
             />
           ),
@@ -129,7 +114,7 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name={Paths.Profile}
+        name={Paths.Profil}
         options={{
           title: "",
           tabBarIcon: ({ focused }) => (
@@ -137,7 +122,7 @@ const TabLayout = () => {
               focused={focused}
               icon={icons.user}
               outlineIcon={icons.userOutline}
-              label="Profile"
+              label="Profil"
               dark={dark}
             />
           ),
