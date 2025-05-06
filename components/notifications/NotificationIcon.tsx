@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants";
-import NotificationModal from "./NotificationModal";
+import NotificationModal from "../notifications/NotificationModal";
+import { getNotificationCounts } from "../notifications/NotificationData";
 
 interface NotificationIconProps {
   onPress: () => void;
@@ -13,9 +14,12 @@ interface NotificationIconProps {
 const NotificationIcon: React.FC<NotificationIconProps> = ({
   onPress,
   hasNotification = false,
-  count = 0,
+  count: propCount = 0,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Get the unread count from our notification data
+  const unreadCount = propCount || getNotificationCounts().unread;
 
   const handlePress = () => {
     if (onPress) {
@@ -29,11 +33,6 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
     setModalVisible(false);
   };
 
-  const handleMarkAllAsRead = () => {
-    // This function would typically update your notification state globally
-    console.log("Marked all notifications as read");
-  };
-
   return (
     <>
       <TouchableOpacity
@@ -43,12 +42,12 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
       >
         <Ionicons name="notifications" size={26} color={COLORS.primary} />
 
-        {hasNotification && (
+        {(hasNotification || unreadCount > 0) && (
           <View style={styles.badge}>
-            {count > 0 && (
+            {unreadCount > 0 && (
               <View style={styles.badgeCountContainer}>
                 <Text style={styles.badgeCount}>
-                  {count > 9 ? "9+" : count}
+                  {unreadCount > 9 ? "9+" : unreadCount}
                 </Text>
               </View>
             )}
@@ -56,11 +55,7 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
         )}
       </TouchableOpacity>
 
-      <NotificationModal
-        visible={modalVisible}
-        onClose={handleCloseModal}
-        onMarkAllAsRead={handleMarkAllAsRead}
-      />
+      <NotificationModal visible={modalVisible} onClose={handleCloseModal} />
     </>
   );
 };
