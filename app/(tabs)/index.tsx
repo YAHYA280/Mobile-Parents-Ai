@@ -1,282 +1,297 @@
-import type { ListRenderItemInfo } from "react-native";
-import type { NavigationProp } from "@react-navigation/native";
-
-import { banners } from "@/data";
-import { useTheme } from "@/theme/ThemeProvider";
-import React, { useState, useEffect } from "react";
-import SectionHeader from "@/components/SectionHeader";
-import { useNavigation } from "@react-navigation/native";
-import { icons, SIZES, COLORS, images } from "@/constants";
-import { ScrollView } from "react-native-virtualized-view";
+import React, { useState } from "react";
+import { Image } from "expo-image";
+import { useNavigation } from "expo-router";
+import { COLORS, images, icons } from "@/constants";
+import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AbonnementCatalogueList from "@/components/AbonnementCatalogueList";
 import {
   View,
   Text,
-  Image,
-  FlatList,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 
-import type {
-  CataloguePlan} from "../services/mocksApi/abonnementApiMock";
+// Import components
+import EnhancedHeader from "@/components/home/EnhancedHeader";
+import WelcomeCard from "@/components/home/WelcomeCard";
+import QuickActionCard from "@/components/home/QuickActionCard";
+import ChildProgressCard from "@/components/home/ChildProgressCard";
+import RecentActivityCard from "@/components/home/RecentActivityCard";
+import UpcomingHomeworkCard from "@/components/home/UpcomingHomeworkCard";
 
-import {
-  getCatalogues,
-} from "../services/mocksApi/abonnementApiMock";
+type Nav = {
+  navigate: (value: string) => void;
+};
 
-interface Banner {
-  id: string;
-  discount: string;
-  discountName: string;
-  bottomTitle: string;
-  bottomSubtitle: string;
-}
+const Index = () => {
+  const { navigate } = useNavigation<Nav>();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-interface HomeProps {
-  navigation: any;
-}
+  // Mock data for child progress
+  const childrenProgress = [
+    {
+      id: "1",
+      name: "Thomas Dubois",
+      progress: 75,
+      profileImage: images.user7,
+      lastActivity: "2 hours ago",
+      subjects: [
+        { name: "Mathématiques", progress: 80 },
+        { name: "Français", progress: 65 },
+      ],
+    },
+    {
+      id: "2",
+      name: "Marie Laurent",
+      progress: 65,
+      profileImage: images.user3,
+      lastActivity: "4 hours ago",
+      subjects: [
+        { name: "Histoire", progress: 70 },
+        { name: "Sciences", progress: 60 },
+      ],
+    },
+  ];
 
-const Home: React.FC<HomeProps> = () => {
-  const navigation = useNavigation<NavigationProp<any>>();
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const { colors, dark } = useTheme();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([
-    "all",
-  ]);
-  const [catalogues, setCatalogues] = useState<CataloguePlan[]>([]);
+  // Mock data for recent activities
+  const recentActivities = [
+    {
+      id: "1",
+      childName: "Thomas Dubois",
+      activity: "A terminé un exercice de mathématiques",
+      time: "2 hours ago",
+      score: "85%",
+    },
+    {
+      id: "2",
+      childName: "Marie Laurent",
+      activity: "A commencé le chapitre Histoire - Moyen Âge",
+      time: "4 hours ago",
+      score: null,
+    },
+  ];
 
-  useEffect(() => {
-    getCatalogues().then(setCatalogues);
-  }, []);
+  // Mock data for upcoming homework
+  const upcomingHomework = [
+    {
+      id: "1",
+      subject: "Mathématiques",
+      title: "Équations du second degré",
+      dueDate: "Demain",
+      childName: "Thomas Dubois",
+      progress: 20,
+    },
+    {
+      id: "2",
+      subject: "Français",
+      title: "Dissertation sur Victor Hugo",
+      dueDate: "3 jours",
+      childName: "Marie Laurent",
+      progress: 0,
+    },
+  ];
 
-  const renderBannerItem = ({ item }: ListRenderItemInfo<Banner>) => (
-    <View style={styles.bannerContainer}>
-      <View style={styles.bannerTopContainer}>
-        <View>
-          <Text style={styles.bannerDicount}>{item.discount} OFF</Text>
-          <Text style={styles.bannerDiscountName}>{item.discountName}</Text>
-        </View>
-        <Text style={styles.bannerDiscountNum}>{item.discount}</Text>
-      </View>
-      <View style={styles.bannerBottomContainer}>
-        <Text style={styles.bannerBottomTitle}>{item.bottomTitle}</Text>
-        <Text style={styles.bannerBottomSubtitle}>{item.bottomSubtitle}</Text>
-      </View>
-    </View>
-  );
+  // Quick actions data
+  const quickActions = [
+    {
+      id: "1",
+      title: "Devoirs",
+      icon: "book-outline",
+      color: "#4CAF50",
+      onPress: () => navigate("homework"),
+    },
+    {
+      id: "2",
+      title: "Messages",
+      icon: "chatbubble-outline",
+      color: "#2196F3",
+      onPress: () => navigate("messages"),
+    },
+    {
+      id: "3",
+      title: "Calendrier",
+      icon: "calendar-outline",
+      color: "#FF9800",
+      onPress: () => navigate("calendar"),
+    },
+    {
+      id: "4",
+      title: "Progrès",
+      icon: "trending-up-outline",
+      color: "#F44336",
+      onPress: () => navigate("progress"),
+    },
+  ];
 
-  const keyExtractor = (item: { id: string }) => item.id;
-  const keyExtractorCategory = (item: { value: string }) => item.value;
-
-  const handleEndReached = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
-  };
-
-  const renderDot = (index: number) => (
-    <View
-      style={[styles.dot, index === currentIndex ? styles.activeDot : null]}
-      key={index}
-    />
-  );
-
-  const renderHeader = () => (
-    <View style={styles.headerContainer}>
-      <View style={styles.viewLeft}>
-        <Image
-          source={images.user7}
-          resizeMode="contain"
-          style={styles.userIcon}
-        />
-        <View style={styles.viewNameContainer}>
-          <Text
-            style={[
-              styles.title,
-              { color: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
-          >
-            Andrew Ainsley
-          </Text>
-        </View>
-      </View>
-      <View style={styles.viewRight}>
-        <TouchableOpacity onPress={() => navigation.navigate("notifications")}>
-          <Image
-            source={icons.notificationBell2}
-            resizeMode="contain"
-            style={[
-              styles.bellIcon,
-              { tintColor: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  const renderBanner = () => (
-    <View style={styles.bannerItemContainer}>
-      <FlatList
-        data={banners}
-        renderItem={renderBannerItem}
-        keyExtractor={keyExtractor}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onEndReached={handleEndReached}
-        onEndReachedThreshold={0.5}
-        onMomentumScrollEnd={(event) => {
-          const newIndex = Math.round(
-            event.nativeEvent.contentOffset.x / SIZES.width
-          );
-          setCurrentIndex(newIndex);
-        }}
-      />
-      <View style={styles.dotContainer}>
-        {banners.map((_, index) => renderDot(index))}
-      </View>
-    </View>
-  );
-
-  const renderPopularCourses = () => {
-    return (
-      <View style={{ paddingBottom: 40 }}>
-        <SectionHeader
-          title="Cours populaires"
-          subtitle="Voir tout"
-          onPress={() => navigation.navigate("abonnementcatalogue")}
-        />
-        <AbonnementCatalogueList data={catalogues} limit={2} />
-      </View>
-    );
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    // Simulate data refresh
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1500);
   };
 
   return (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        {renderHeader()}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ marginTop: 22 }}
-        >
-          {renderBanner()}
-          {renderPopularCourses()}
-        </ScrollView>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <EnhancedHeader
+        userName="Andrew Ainsley"
+        userImage={images.user7}
+        onNotificationPress={() => navigate("notifications")}
+        onProfilePress={() => navigate("profile")}
+      />
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Welcome Card with App Banner */}
+        <WelcomeCard
+          userName="Andrew"
+          discount="20%"
+          discountName="SUMMER SPECIAL"
+          bottomTitle="Abonnement Premium"
+          bottomSubtitle="Accès illimité à toutes les matières"
+          onPress={() => navigate("abonnementcatalogue")}
+        />
+
+        {/* Quick Actions Grid */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Accès rapide</Text>
+          <View style={styles.quickActionsContainer}>
+            {quickActions.map((action) => (
+              <QuickActionCard
+                key={action.id}
+                title={action.title}
+                iconName={action.icon}
+                color={action.color}
+                onPress={action.onPress}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/* Children Progress Section */}
+        <View style={styles.sectionContainer}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Progrès des enfants</Text>
+            <TouchableOpacity onPress={() => navigate("Enfants")}>
+              <Text style={styles.viewAllText}>Voir tout</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.childrenCardsContainer}>
+            {childrenProgress.map((child) => (
+              <ChildProgressCard
+                key={child.id}
+                childName={child.name}
+                progress={child.progress}
+                profileImage={child.profileImage}
+                lastActivity={child.lastActivity}
+                subjects={child.subjects}
+                onPress={() => navigate(`/Enfants/home?childId=${child.id}`)}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/* Recent Activity Section */}
+        <View style={styles.sectionContainer}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Activités récentes</Text>
+            <TouchableOpacity onPress={() => navigate("activities")}>
+              <Text style={styles.viewAllText}>Voir tout</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.activitiesContainer}>
+            {recentActivities.map((activity) => (
+              <RecentActivityCard
+                key={activity.id}
+                childName={activity.childName}
+                activity={activity.activity}
+                time={activity.time}
+                score={activity.score}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/* Upcoming Homework Section */}
+        <View style={styles.sectionContainer}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Devoirs à venir</Text>
+            <TouchableOpacity onPress={() => navigate("homework")}>
+              <Text style={styles.viewAllText}>Voir tout</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.homeworkContainer}>
+            {upcomingHomework.map((homework) => (
+              <UpcomingHomeworkCard
+                key={homework.id}
+                subject={homework.subject}
+                title={homework.title}
+                dueDate={homework.dueDate}
+                childName={homework.childName}
+                progress={homework.progress}
+                onPress={() => navigate(`/homework/details?id=${homework.id}`)}
+              />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  area: {
+  safeArea: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: "#F8F9FA",
   },
-  container: {
+  scrollView: {
     flex: 1,
-    backgroundColor: COLORS.white,
-    padding: 16,
   },
-  headerContainer: {
-    flexDirection: "row",
-    width: SIZES.width - 32,
-    justifyContent: "space-between",
-    alignItems: "center",
+  scrollContent: {
+    paddingBottom: 30,
   },
-  userIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 32,
+  sectionContainer: {
+    marginTop: 20,
+    paddingHorizontal: 16,
   },
-  viewLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: "bold",
-    color: COLORS.greyscale900,
-  },
-  viewNameContainer: {
-    marginLeft: 12,
-  },
-  viewRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  bellIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.black,
-    marginRight: 8,
-  },
-  bannerContainer: {
-    width: SIZES.width - 32,
-    height: 154,
-    paddingHorizontal: 28,
-    paddingTop: 28,
-    borderRadius: 32,
-    backgroundColor: COLORS.primary,
-  },
-  bannerTopContainer: {
+  sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 12,
   },
-  bannerDicount: {
-    fontSize: 12,
-    fontFamily: "medium",
-    color: COLORS.white,
-    marginBottom: 4,
-  },
-  bannerDiscountName: {
-    fontSize: 16,
+  sectionTitle: {
+    fontSize: 18,
     fontFamily: "bold",
-    color: COLORS.white,
+    color: "#333",
   },
-  bannerDiscountNum: {
-    fontSize: 46,
-    fontFamily: "bold",
-    color: COLORS.white,
-  },
-  bannerBottomContainer: {
-    marginTop: 8,
-  },
-  bannerBottomTitle: {
+  viewAllText: {
     fontSize: 14,
+    color: COLORS.primary,
     fontFamily: "medium",
-    color: COLORS.white,
   },
-  bannerBottomSubtitle: {
-    fontSize: 14,
-    fontFamily: "medium",
-    color: COLORS.white,
-    marginTop: 4,
-  },
-  bannerItemContainer: {
-    width: "100%",
-    paddingBottom: 10,
-    backgroundColor: COLORS.primary,
-    height: 170,
-    borderRadius: 32,
-  },
-  dotContainer: {
+  quickActionsContainer: {
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     marginTop: 10,
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#ccc",
-    marginHorizontal: 5,
+  childrenCardsContainer: {
+    marginTop: 10,
   },
-  activeDot: {
-    backgroundColor: COLORS.white,
+  activitiesContainer: {
+    marginTop: 10,
+  },
+  homeworkContainer: {
+    marginTop: 10,
   },
 });
 
-export default Home;
+export default Index;
