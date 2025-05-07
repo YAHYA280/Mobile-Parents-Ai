@@ -51,8 +51,10 @@
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.4",
     "expo-system-ui": "~5.0.7",
+    "expo-updates": "~0.28.12",
     "expo-video": "~2.1.8",
     "expo-web-browser": "~14.1.6",
+    "moti": "^0.30.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
@@ -77,8 +79,7 @@
     "react-native-virtualized-view": "^1.0.0",
     "react-native-web": "^0.20.0",
     "react-native-webview": "13.13.5",
-    "zod": "^3.24.2",
-    "expo-updates": "~0.28.12"
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -1,12 +1,17 @@
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
 import { COLORS } from "@/constants";
-import { Feather } from "@expo/vector-icons";
-import styles from "@/styles/PlanDetailsStyle";
+import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/theme/ThemeProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
 import {
   Text,
   View,
@@ -16,7 +21,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  StatusBar,
+  Animated,
 } from "react-native";
+import { MotiView } from "moti";
+import { LinearGradient } from "expo-linear-gradient";
 
 import type { CataloguePlan } from "../app/services/mocksApi/abonnementApiMock";
 
@@ -66,9 +75,6 @@ type AlertConfig = {
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.85;
-const CARD_HEIGHT = 480;
-const HEADER_HEIGHT = 80;
-const BODY_HEIGHT = CARD_HEIGHT - HEADER_HEIGHT;
 
 const lightenColor = (hex: string, percent: number): string => {
   hex = hex.replace("#", "");
@@ -116,10 +122,10 @@ const formatDuration = (duration: string): string => {
     if (duration.includes("6")) {
       return "6 MOIS";
     }
-    return "MOIS";
+    return "MENSUEL";
   }
   if (duration.toLowerCase().includes("annuel")) {
-    return "AN";
+    return "ANNUEL";
   }
   return duration.substring(0, 3);
 };
@@ -130,6 +136,8 @@ const PlanDetails: React.FC = () => {
   const router = useRouter();
   const { colors, dark } = useTheme();
   const [activeDot, setActiveDot] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const [currentSubscription, setCurrentSubscription] =
     useState<CurrentSubscription>(null);
@@ -144,6 +152,14 @@ const PlanDetails: React.FC = () => {
     message: "",
     onOk: () => {},
   });
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -320,21 +336,18 @@ const PlanDetails: React.FC = () => {
   const renderHeader = useCallback(
     () => (
       <View style={styles.headerContainer}>
-        <View style={headerStyles.headerLeft}>
-          <TouchableOpacity
-            style={headerStyles.backButton}
-            onPress={handleBackPress}
-          >
-            <Feather
-              name="arrow-left"
+        <View style={styles.headerLeft}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+            <Ionicons
+              name="arrow-back"
               size={24}
               color={dark ? COLORS.white : COLORS.black}
             />
           </TouchableOpacity>
           <Text
             style={[
-              headerStyles.headerTitle,
-              { color: dark ? COLORS.white : COLORS.greyscale900 },
+              styles.headerTitle,
+              { color: dark ? COLORS.white : COLORS.black },
             ]}
           >
             Détails du Plan
@@ -345,31 +358,24 @@ const PlanDetails: React.FC = () => {
     [dark, handleBackPress]
   );
 
-  const renderCheckmark = useCallback(
-    (planColor: string) => (
-      <View style={[styles.checkmarkCircle, { backgroundColor: planColor }]}>
-        <Text style={styles.checkmarkText}>✓</Text>
-      </View>
-    ),
-    []
-  );
-
   const renderHighlightedSubtitle = useCallback(
     () => (
-      <Text
-        style={[
-          styles.headingSubtitle,
-          { color: dark ? COLORS.white : COLORS.gray3 },
-        ]}
-      >
-        {"Commencez avec "}
-        <Text style={[styles.highlightedText, { color: LOGO_COLORS.main }]}>
-          14 jours d&apos;essai gratuit
+      <Animated.View style={{ opacity: fadeAnim }}>
+        <Text
+          style={[
+            styles.headingSubtitle,
+            { color: dark ? COLORS.white : "#666" },
+          ]}
+        >
+          {"Commencez avec "}
+          <Text style={[styles.highlightedText, { color: LOGO_COLORS.main }]}>
+            14 jours d&apos;essai gratuit
+          </Text>
+          . Changez de plan à tout moment.
         </Text>
-        . Changez de plan à tout moment.
-      </Text>
+      </Animated.View>
     ),
-    [dark]
+    [dark, fadeAnim]
   );
 
   const renderPaginationDots = useCallback(
@@ -378,16 +384,29 @@ const PlanDetails: React.FC = () => {
         {Array(totalDots)
           .fill(0)
           .map((_, index) => (
-            <View
+            <TouchableOpacity
               key={index}
-              style={[
-                styles.paginationDot,
-                { backgroundColor: dark ? COLORS.gray2 : "#D1D5DB" },
-                activeDotIndex === index
-                  ? [styles.paginationDotActive, { backgroundColor: planColor }]
-                  : {},
-              ]}
-            />
+              onPress={() => {
+                scrollViewRef.current?.scrollTo({
+                  x: index * CARD_WIDTH,
+                  animated: true,
+                });
+                setActiveDot(index);
+              }}
+            >
+              <View
+                style={[
+                  styles.paginationDot,
+                  { backgroundColor: dark ? "#555" : "#D1D5DB" },
+                  activeDotIndex === index
+                    ? [
+                        styles.paginationDotActive,
+                        { backgroundColor: planColor },
+                      ]
+                    : {},
+                ]}
+              />
+            </TouchableOpacity>
           ))}
       </View>
     ),
@@ -412,14 +431,24 @@ const PlanDetails: React.FC = () => {
           {updating ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text
-              style={[
-                styles.getStartedText,
-                buttonState.disabled ? { color: "#FFFFFF80" } : {},
-              ]}
-            >
-              {buttonState.text}
-            </Text>
+            <>
+              <Text
+                style={[
+                  styles.getStartedText,
+                  buttonState.disabled ? { opacity: 0.7 } : {},
+                ]}
+              >
+                {buttonState.text}
+              </Text>
+              {!buttonState.disabled && (
+                <Ionicons
+                  name="arrow-forward"
+                  size={18}
+                  color="#FFFFFF"
+                  style={styles.buttonIcon}
+                />
+              )}
+            </>
           )}
         </TouchableOpacity>
       );
@@ -429,19 +458,26 @@ const PlanDetails: React.FC = () => {
 
   const renderFeatureItem = useCallback(
     (feature: string, index: number, planColor: string) => (
-      <View key={index} style={styles.featureRow}>
-        {renderCheckmark(planColor)}
+      <MotiView
+        key={index}
+        style={styles.featureRow}
+        from={{ opacity: 0, translateX: -20 }}
+        animate={{ opacity: 1, translateX: 0 }}
+        transition={{ delay: 300 + index * 50, type: "timing", duration: 400 }}
+      >
+        <View
+          style={[styles.checkCircle, { backgroundColor: `${planColor}15` }]}
+        >
+          <Ionicons name="checkmark" size={16} color={planColor} />
+        </View>
         <Text
-          style={[
-            styles.featureText,
-            { color: dark ? COLORS.white : "#111827" },
-          ]}
+          style={[styles.featureText, { color: dark ? COLORS.white : "#333" }]}
         >
           {feature}
         </Text>
-      </View>
+      </MotiView>
     ),
-    [renderCheckmark, dark]
+    [dark]
   );
 
   const renderPricingCard = useCallback(
@@ -451,12 +487,18 @@ const PlanDetails: React.FC = () => {
       planColor: string,
       planEmoji: string
     ) => (
-      <View key={index} style={styles.cardOuterContainer}>
+      <MotiView
+        key={index}
+        style={styles.cardOuterContainer}
+        from={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 200 + index * 100, type: "spring", damping: 15 }}
+      >
         <View style={styles.awardIconContainer}>
           <View
             style={[
               styles.awardIconCircle,
-              { backgroundColor: lightenColor(planColor, 10) },
+              { backgroundColor: `${planColor}20` },
             ]}
           >
             <Text style={styles.emojiIcon}>{planEmoji}</Text>
@@ -466,41 +508,48 @@ const PlanDetails: React.FC = () => {
         {plan.discountPercentage ? (
           <View style={styles.ribbonContainer}>
             <View style={[styles.ribbon, { backgroundColor: RIBBON_COLOR }]}>
+              <Ionicons
+                name="pricetag"
+                size={12}
+                color="#FFFFFF"
+                style={styles.ribbonIcon}
+              />
               <Text style={styles.ribbonText}>
                 {plan.discountPercentage}% OFF
               </Text>
             </View>
           </View>
-        ) : (
-          <></>
-        )}
+        ) : null}
 
         <View style={styles.planContainer}>
-          <View
-            style={[
-              styles.planHeaderSection,
-              { backgroundColor: planColor, height: HEADER_HEIGHT },
-            ]}
+          <LinearGradient
+            colors={[planColor, lightenColor(planColor, 15)]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.planHeaderSection}
           >
+            {/* Decorative elements */}
+            <View style={styles.decorativeCircle1} />
+            <View style={styles.decorativeCircle2} />
+
             <View style={styles.planHeaderContent}>
               <Text style={styles.planTypeLabel}>
-                {selectedCatalogue?.planName}
+                {formatDuration(plan.duration)}
               </Text>
               <View style={styles.planPriceContainer}>
                 <Text style={styles.planPrice}>${plan.price}</Text>
                 <Text style={styles.planPeriod}>
-                  / {formatDuration(plan.duration)}
+                  / {plan.duration.toLowerCase()}
                 </Text>
               </View>
             </View>
-          </View>
+          </LinearGradient>
 
           <View
             style={[
               styles.planBodySection,
               {
-                height: BODY_HEIGHT,
-                backgroundColor: dark ? COLORS.dark2 || "#1E1E1E" : "#FFFFFF",
+                backgroundColor: dark ? COLORS.dark2 || "#222" : "#FFFFFF",
               },
             ]}
           >
@@ -511,7 +560,7 @@ const PlanDetails: React.FC = () => {
               {plan.features.map((feature, i) =>
                 renderFeatureItem(feature, i, planColor)
               )}
-              <View style={{ height: 70 }} />
+              <View style={{ height: 80 }} />
             </ScrollView>
 
             <View style={styles.buttonPositioner}>
@@ -519,9 +568,9 @@ const PlanDetails: React.FC = () => {
             </View>
           </View>
         </View>
-      </View>
+      </MotiView>
     ),
-    [renderActionButton, renderFeatureItem, selectedCatalogue, dark]
+    [renderActionButton, renderFeatureItem, dark]
   );
 
   const renderLoadingState = useCallback(
@@ -529,6 +578,11 @@ const PlanDetails: React.FC = () => {
       <SafeAreaView
         style={[styles.area, { backgroundColor: colors.background }]}
       >
+        <StatusBar
+          barStyle={dark ? "light-content" : "dark-content"}
+          backgroundColor="transparent"
+          translucent
+        />
         <View
           style={[
             styles.container,
@@ -543,7 +597,7 @@ const PlanDetails: React.FC = () => {
           <Text
             style={[
               styles.loadingText,
-              { color: dark ? COLORS.white : COLORS.gray3 },
+              { color: dark ? COLORS.white : "#666" },
             ]}
           >
             Chargement du plan...
@@ -559,6 +613,11 @@ const PlanDetails: React.FC = () => {
       <SafeAreaView
         style={[styles.area, { backgroundColor: colors.background }]}
       >
+        <StatusBar
+          barStyle={dark ? "light-content" : "dark-content"}
+          backgroundColor="transparent"
+          translucent
+        />
         <View
           style={[
             styles.container,
@@ -569,16 +628,32 @@ const PlanDetails: React.FC = () => {
             },
           ]}
         >
-          <Text style={[styles.errorText, { color: COLORS.red || "#E53935" }]}>
-            {error || "Plan not found"}
-          </Text>
+          <View style={styles.errorIconContainer}>
+            <Ionicons name="alert-circle" size={64} color="#E11D48" />
+          </View>
+
+          <Text style={styles.errorText}>{error || "Plan not found"}</Text>
+
           <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-            <Text style={styles.backButtonText}>Return to Home</Text>
+            <LinearGradient
+              colors={[LOGO_COLORS.main, lightenColor(LOGO_COLORS.main, 10)]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.buttonGradient}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={18}
+                color="#FFFFFF"
+                style={styles.buttonIcon}
+              />
+              <Text style={styles.backButtonText}>Retour à l'accueil</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
     ),
-    [colors.background, error, handleBackPress]
+    [colors.background, error, handleBackPress, dark]
   );
 
   const renderCustomAlert = useCallback(() => {
@@ -587,16 +662,33 @@ const PlanDetails: React.FC = () => {
     return (
       <Modal visible={alertConfig.visible} transparent animationType="fade">
         <View style={styles.modalContainer}>
-          <View
+          <MotiView
             style={[
               styles.alertContainer,
               {
-                backgroundColor: dark
-                  ? COLORS.dark2 || "#1E1E1E"
-                  : COLORS.white,
+                backgroundColor: dark ? COLORS.dark2 || "#222" : COLORS.white,
               },
             ]}
+            from={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", damping: 15 }}
           >
+            <View style={styles.alertIconContainer}>
+              <Ionicons
+                name={
+                  alertConfig.title.toLowerCase().includes("erreur")
+                    ? "alert-circle"
+                    : "checkmark-circle"
+                }
+                size={48}
+                color={
+                  alertConfig.title.toLowerCase().includes("erreur")
+                    ? "#E11D48"
+                    : "#10B981"
+                }
+              />
+            </View>
+
             <Text
               style={[
                 styles.alertTitle,
@@ -605,6 +697,7 @@ const PlanDetails: React.FC = () => {
             >
               {alertConfig.title}
             </Text>
+
             <Text
               style={[
                 styles.alertMessage,
@@ -613,13 +706,14 @@ const PlanDetails: React.FC = () => {
             >
               {alertConfig.message}
             </Text>
+
             <TouchableOpacity
               style={[styles.okButton, { backgroundColor: COLORS.primary }]}
               onPress={alertConfig.onOk}
             >
               <Text style={styles.okButtonText}>OK</Text>
             </TouchableOpacity>
-          </View>
+          </MotiView>
         </View>
       </Modal>
     );
@@ -664,22 +758,44 @@ const PlanDetails: React.FC = () => {
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
+      <StatusBar
+        barStyle={dark ? "light-content" : "dark-content"}
+        backgroundColor="transparent"
+        translucent
+      />
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         {renderHeader()}
 
-        <View style={styles.headingContainer}>
-          <Text
-            style={[
-              styles.headingSubtitle,
-              { color: dark ? COLORS.white : LOGO_COLORS.darker },
-            ]}
-          >
-            CHOISISSEZ VOTRE PLAN
-          </Text>
+        <MotiView
+          style={styles.headingContainer}
+          from={{ opacity: 0, translateY: 30 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 500 }}
+        >
+          <View style={styles.planTitleContainer}>
+            <View
+              style={[
+                styles.planIconContainer,
+                { backgroundColor: `${planColor}20` },
+              ]}
+            >
+              <Text style={styles.planEmoji}>{planEmoji}</Text>
+            </View>
+            <Text
+              style={[
+                styles.planTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              {selectedCatalogue.planName}
+            </Text>
+          </View>
+
           {renderHighlightedSubtitle()}
-        </View>
+        </MotiView>
 
         <ScrollView
+          ref={scrollViewRef}
           horizontal
           pagingEnabled
           snapToInterval={CARD_WIDTH + 16}
@@ -701,20 +817,334 @@ const PlanDetails: React.FC = () => {
   );
 };
 
-// Additional styles for the header
-const headerStyles = StyleSheet.create({
+const styles = StyleSheet.create({
+  area: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    paddingTop: 16,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 12,
+  },
   headerLeft: {
     flexDirection: "row",
     alignItems: "center",
   },
   backButton: {
-    padding: 4,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.05)",
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 16,
   },
   headerTitle: {
     fontSize: 22,
     fontFamily: "bold",
-    color: COLORS.black,
+  },
+  headingContainer: {
+    paddingHorizontal: 16,
+    marginBottom: 24,
+  },
+  planTitleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  planIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  planEmoji: {
+    fontSize: 18,
+  },
+  planTitle: {
+    fontSize: 24,
+    fontFamily: "bold",
+  },
+  headingSubtitle: {
+    fontSize: 16,
+    fontFamily: "regular",
+    lineHeight: 24,
+  },
+  highlightedText: {
+    fontFamily: "semibold",
+  },
+  scrollContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  cardOuterContainer: {
+    width: CARD_WIDTH,
+    marginRight: 16,
+    position: "relative",
+  },
+  awardIconContainer: {
+    position: "absolute",
+    top: -15,
+    left: "50%",
+    marginLeft: -20,
+    zIndex: 10,
+  },
+  awardIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(254, 120, 98, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  emojiIcon: {
+    fontSize: 20,
+  },
+  ribbonContainer: {
+    position: "absolute",
+    top: 30,
+    right: -5,
+    zIndex: 10,
+  },
+  ribbon: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: RIBBON_COLOR,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    shadowColor: RIBBON_COLOR,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  ribbonIcon: {
+    marginRight: 4,
+  },
+  ribbonText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontFamily: "bold",
+  },
+  planContainer: {
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  planHeaderSection: {
+    padding: 24,
+    position: "relative",
+    overflow: "hidden",
+  },
+  decorativeCircle1: {
+    position: "absolute",
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    top: -50,
+    right: -30,
+  },
+  decorativeCircle2: {
+    position: "absolute",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    bottom: -20,
+    left: 30,
+  },
+  planHeaderContent: {
+    alignItems: "center",
+  },
+  planTypeLabel: {
+    fontSize: 16,
+    fontFamily: "semibold",
+    color: "rgba(255, 255, 255, 0.9)",
+    marginBottom: 8,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  planPriceContainer: {
+    flexDirection: "row",
+    alignItems: "baseline",
+  },
+  planPrice: {
+    fontSize: 36,
+    fontFamily: "bold",
+    color: "#FFFFFF",
+  },
+  planPeriod: {
+    fontSize: 16,
+    fontFamily: "medium",
+    color: "rgba(255, 255, 255, 0.8)",
+    marginLeft: 4,
+  },
+  planBodySection: {
+    padding: 24,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  featuresScrollView: {
+    maxHeight: 320,
+  },
+  featureRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  checkCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  featureText: {
+    fontSize: 15,
+    fontFamily: "medium",
+    flex: 1,
+  },
+  buttonPositioner: {
+    position: "absolute",
+    bottom: 24,
+    left: 24,
+    right: 24,
+  },
+  getStartedButton: {
+    height: 56,
+    borderRadius: 28,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  getStartedText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: "semibold",
+    marginRight: 8,
+  },
+  buttonIcon: {
+    marginLeft: 4,
+  },
+  buttonGradient: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 28,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 16,
+    marginBottom: 24,
+  },
+  paginationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginHorizontal: 6,
+  },
+  paginationDotActive: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  // Alert Modal
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  alertContainer: {
+    width: width - 64,
+    borderRadius: 20,
+    padding: 24,
+    alignItems: "center",
+  },
+  alertIconContainer: {
+    marginBottom: 16,
+  },
+  alertTitle: {
+    fontSize: 20,
+    fontFamily: "bold",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  alertMessage: {
+    fontSize: 16,
+    fontFamily: "regular",
+    marginBottom: 24,
+    textAlign: "center",
+    lineHeight: 24,
+  },
+  okButton: {
+    width: "100%",
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  okButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: "semibold",
+  },
+  // Loading and Error States
+  loadingText: {
+    fontSize: 16,
+    fontFamily: "medium",
+    marginTop: 16,
+  },
+  errorIconContainer: {
+    marginBottom: 24,
+  },
+  errorText: {
+    fontSize: 18,
+    fontFamily: "medium",
+    color: "#E11D48",
+    textAlign: "center",
+    marginBottom: 24,
+    paddingHorizontal: 32,
+  },
+  backButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: "semibold",
+    marginLeft: 8,
   },
 });
 

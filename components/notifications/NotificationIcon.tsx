@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants";
 import NotificationModal from "../notifications/NotificationModal";
@@ -17,9 +23,36 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
   count: propCount = 0,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [pulseAnim] = useState(new Animated.Value(1));
 
   // Get the unread count from our notification data
   const unreadCount = propCount || getNotificationCounts().unread;
+
+  // Animation for notification pulse
+  React.useEffect(() => {
+    if (unreadCount > 0) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.2,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    } else {
+      pulseAnim.setValue(1);
+    }
+
+    return () => {
+      pulseAnim.stopAnimation();
+    };
+  }, [unreadCount]);
 
   const handlePress = () => {
     if (onPress) {
@@ -33,6 +66,8 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
     setModalVisible(false);
   };
 
+  const badgeScale = unreadCount > 0 ? pulseAnim : 1;
+
   return (
     <>
       <TouchableOpacity
@@ -40,10 +75,12 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
         onPress={handlePress}
         activeOpacity={0.7}
       >
-        <Ionicons name="notifications" size={26} color={COLORS.primary} />
+        <Ionicons name="notifications" size={24} color={COLORS.primary} />
 
         {(hasNotification || unreadCount > 0) && (
-          <View style={styles.badge}>
+          <Animated.View
+            style={[styles.badge, { transform: [{ scale: badgeScale }] }]}
+          >
             {unreadCount > 0 && (
               <View style={styles.badgeCountContainer}>
                 <Text style={styles.badgeCount}>
@@ -51,7 +88,7 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
                 </Text>
               </View>
             )}
-          </View>
+          </Animated.View>
         )}
       </TouchableOpacity>
 
@@ -69,6 +106,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
+    shadowColor: "rgba(255, 142, 105, 0.5)",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   badge: {
     position: "absolute",
@@ -83,8 +125,8 @@ const styles = StyleSheet.create({
   },
   badgeCountContainer: {
     position: "absolute",
-    top: -4,
-    right: -4,
+    top: -6,
+    right: -6,
     minWidth: 18,
     height: 18,
     borderRadius: 9,
