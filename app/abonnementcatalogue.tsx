@@ -11,16 +11,16 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import { useRouter } from "expo-router"; // Import useRouter instead of useNavigation
+import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
-import { LinearGradient } from "expo-linear-gradient";
 
 // Import Custom Components
 import Header from "@/components/ui/Header";
 import BenefitsSection from "@/components/catalogue/BenefitsSection";
 import TestimonialCard from "@/components/catalogue/TestimonialCard";
+import PlanCard from "@/components/catalogue/PlanCard";
 
 // Import Types and Utilities
 import {
@@ -35,13 +35,12 @@ import {
   getAbonnementActiveByUser,
 } from "./services/mocksApi/abonnementApiMock";
 import type { CataloguePlan } from "./services/mocksApi/abonnementApiMock";
-import { lightenColor, darkenColor } from "@/utils/colorUtils";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.85;
 
 const AbonnementCatalogue: React.FC = () => {
-  const router = useRouter(); // Use router instead of navigation
+  const router = useRouter();
 
   // State
   const [catalogues, setCatalogues] = useState<CataloguePlan[]>([]);
@@ -152,7 +151,7 @@ const AbonnementCatalogue: React.FC = () => {
     );
   };
 
-  // Handle plan selection - FIXED VERSION
+  // Handle plan selection
   const handleSelectPlan = (plan: CataloguePlan) => {
     // Use router.push with proper path structure for Expo Router
     router.push({
@@ -167,112 +166,6 @@ const AbonnementCatalogue: React.FC = () => {
         features: JSON.stringify(plan.features), // Stringify the features array
       },
     });
-  };
-
-  // Render plan card
-  const renderPlanCard = ({
-    item,
-    index,
-  }: {
-    item: CataloguePlan;
-    index: number;
-  }) => {
-    const planColor = getPlanColor(item.id);
-    const isPlanSelected = item.id === currentPlanId;
-
-    return (
-      <MotiView
-        from={{ opacity: 0, translateY: 20 }}
-        animate={{ opacity: 1, translateY: 0 }}
-        transition={{ delay: index * 100, type: "spring", damping: 15 }}
-        style={[
-          styles.planCardContainer,
-          isPlanSelected && styles.selectedPlanContainer,
-        ]}
-      >
-        {item.recommended && (
-          <View style={styles.recommendedTag}>
-            <Ionicons
-              name="star"
-              size={14}
-              color="#FFF"
-              style={{ marginRight: 4 }}
-            />
-            <Text style={styles.recommendedText}>Recommandé</Text>
-          </View>
-        )}
-
-        {isPlanSelected && (
-          <View style={styles.currentPlanTag}>
-            <Ionicons
-              name="checkmark-circle"
-              size={14}
-              color="#FFF"
-              style={{ marginRight: 4 }}
-            />
-            <Text style={styles.currentPlanText}>Plan Actuel</Text>
-          </View>
-        )}
-
-        <LinearGradient
-          colors={[planColor, lightenColor(planColor, 15)]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.planCardGradient}
-        >
-          <View style={styles.planHeader}>
-            <View
-              style={[
-                styles.planIcon,
-                { backgroundColor: `${lightenColor(planColor, 30)}80` },
-              ]}
-            >
-              <Text style={styles.planEmoji}>{getPlanEmoji(item.id)}</Text>
-            </View>
-            <Text style={styles.planName}>{item.planName}</Text>
-          </View>
-
-          <View style={styles.pricingContainer}>
-            <Text style={styles.price}>${item.monthlyPrice}</Text>
-            <Text style={styles.pricePeriod}>/ mois</Text>
-          </View>
-
-          <View style={styles.planDivider} />
-
-          <View style={styles.featuresContainer}>
-            {item.features.slice(0, 3).map((feature, featureIndex) => (
-              <View key={featureIndex} style={styles.featureRow}>
-                <View
-                  style={[
-                    styles.featureIconBg,
-                    { backgroundColor: `${lightenColor(planColor, 30)}80` },
-                  ]}
-                >
-                  <Ionicons name="checkmark" size={14} color="#FFFFFF" />
-                </View>
-                <Text style={styles.featureText}>{feature}</Text>
-              </View>
-            ))}
-
-            {item.features.length > 3 && (
-              <Text style={styles.moreFeatures}>
-                +{item.features.length - 3} autres fonctionnalités
-              </Text>
-            )}
-          </View>
-
-          <TouchableOpacity
-            style={styles.viewDetailsButton}
-            onPress={() => handleSelectPlan(item)}
-          >
-            <Text style={styles.viewDetailsText}>
-              {isPlanSelected ? "Modifier mon plan" : "Voir les détails"}
-            </Text>
-            <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
-          </TouchableOpacity>
-        </LinearGradient>
-      </MotiView>
-    );
   };
 
   // Render loading state
@@ -387,7 +280,14 @@ const AbonnementCatalogue: React.FC = () => {
             <FlatList
               data={catalogues}
               keyExtractor={(item) => item.id}
-              renderItem={renderPlanCard}
+              renderItem={({ item, index }) => (
+                <PlanCard
+                  item={item}
+                  index={index}
+                  isPlanSelected={item.id === currentPlanId}
+                  onSelect={handleSelectPlan}
+                />
+              )}
               horizontal
               showsHorizontalScrollIndicator={false}
               snapToInterval={CARD_WIDTH + 20}
@@ -428,33 +328,6 @@ const AbonnementCatalogue: React.FC = () => {
       </ScrollView>
     </SafeAreaView>
   );
-};
-
-// Helper functions
-const getPlanColor = (id: string): string => {
-  switch (id) {
-    case "1":
-      return COLOORS.primary.light;
-    case "2":
-      return COLOORS.primary.main;
-    case "3":
-      return COLOORS.primary.dark;
-    default:
-      return COLOORS.primary.main;
-  }
-};
-
-const getPlanEmoji = (id: string): string => {
-  switch (id) {
-    case "1":
-      return "🎓";
-    case "2":
-      return "🏆";
-    case "3":
-      return "🚀";
-    default:
-      return "📚";
-  }
 };
 
 const styles = StyleSheet.create({
@@ -545,138 +418,6 @@ const styles = StyleSheet.create({
     width: 8,
     borderRadius: 4,
     marginHorizontal: 4,
-  },
-  planCardContainer: {
-    width: CARD_WIDTH,
-    marginHorizontal: 10,
-    borderRadius: RADIUS.lg,
-    ...SHADOWS.medium,
-    position: "relative",
-  },
-  selectedPlanContainer: {
-    borderWidth: 2,
-    borderColor: COLOORS.status.active.main,
-    transform: [{ scale: 1.03 }],
-  },
-  recommendedTag: {
-    position: "absolute",
-    top: -10,
-    right: 20,
-    backgroundColor: COLOORS.accent.blue.main,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 6,
-    borderRadius: RADIUS.md,
-    flexDirection: "row",
-    alignItems: "center",
-    zIndex: 10,
-    ...SHADOWS.small,
-  },
-  recommendedText: {
-    ...TYPOGRAPHY.caption,
-    color: "#FFFFFF",
-    fontFamily: "semibold",
-  },
-  currentPlanTag: {
-    position: "absolute",
-    top: -10,
-    left: 20,
-    backgroundColor: COLOORS.status.active.main,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 6,
-    borderRadius: RADIUS.md,
-    flexDirection: "row",
-    alignItems: "center",
-    zIndex: 10,
-    ...SHADOWS.small,
-  },
-  currentPlanText: {
-    ...TYPOGRAPHY.caption,
-    color: "#FFFFFF",
-    fontFamily: "semibold",
-  },
-  planCardGradient: {
-    borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
-    overflow: "hidden",
-  },
-  planHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: SPACING.md,
-  },
-  planIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: SPACING.md,
-  },
-  planEmoji: {
-    fontSize: 22,
-  },
-  planName: {
-    ...TYPOGRAPHY.h2,
-    color: "#FFFFFF",
-  },
-  pricingContainer: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    marginBottom: SPACING.md,
-  },
-  price: {
-    ...TYPOGRAPHY.h1,
-    color: "#FFFFFF",
-  },
-  pricePeriod: {
-    ...TYPOGRAPHY.body1,
-    color: "rgba(255, 255, 255, 0.8)",
-    marginLeft: 4,
-  },
-  planDivider: {
-    height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    marginBottom: SPACING.md,
-  },
-  featuresContainer: {
-    marginBottom: SPACING.md,
-  },
-  featureRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: SPACING.sm,
-  },
-  featureIconBg: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: SPACING.sm,
-  },
-  featureText: {
-    ...TYPOGRAPHY.body2,
-    color: "#FFFFFF",
-    flex: 1,
-  },
-  moreFeatures: {
-    ...TYPOGRAPHY.caption,
-    color: "rgba(255, 255, 255, 0.7)",
-    marginLeft: 30,
-    marginTop: 4,
-  },
-  viewDetailsButton: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.xxl,
-  },
-  viewDetailsText: {
-    ...TYPOGRAPHY.button,
-    color: "#FFFFFF",
-    marginRight: SPACING.sm,
   },
   bottomSpacer: {
     height: 40,
