@@ -17,12 +17,14 @@ import type { CataloguePlan } from "@/app/services/mocksApi/abonnementApiMock";
 interface CatalogueCardProps {
   plan: CataloguePlan;
   index: number;
+  isCurrentPlan?: boolean;
   onSelect: () => void;
 }
 
 const CatalogueCard: React.FC<CatalogueCardProps> = ({
   plan,
   index,
+  isCurrentPlan = false,
   onSelect,
 }) => {
   const planEmojis = useMemo(() => ["🎓", "🏆", "🚀"], []);
@@ -39,7 +41,10 @@ const CatalogueCard: React.FC<CatalogueCardProps> = ({
 
   return (
     <MotiView
-      style={styles.cardOuterContainer}
+      style={[
+        styles.cardOuterContainer,
+        isCurrentPlan && styles.currentPlanContainer,
+      ]}
       from={{ opacity: 0, translateY: 30 }}
       animate={{ opacity: 1, translateY: 0 }}
       transition={{
@@ -58,6 +63,18 @@ const CatalogueCard: React.FC<CatalogueCardProps> = ({
             style={styles.recommendedIcon}
           />
           <Text style={styles.recommendedText}>Recommandé</Text>
+        </View>
+      )}
+
+      {isCurrentPlan && (
+        <View style={styles.currentPlanBadge}>
+          <Ionicons
+            name="checkmark-circle"
+            size={12}
+            color="#FFFFFF"
+            style={styles.currentPlanIcon}
+          />
+          <Text style={styles.currentPlanText}>Plan Actuel</Text>
         </View>
       )}
 
@@ -121,11 +138,16 @@ const CatalogueCard: React.FC<CatalogueCardProps> = ({
         </View>
 
         <TouchableOpacity
-          style={styles.selectPlanButton}
+          style={[
+            styles.selectPlanButton,
+            isCurrentPlan && styles.currentPlanButton,
+          ]}
           onPress={onSelect}
           activeOpacity={0.9}
         >
-          <Text style={styles.selectPlanText}>Voir les détails</Text>
+          <Text style={styles.selectPlanText}>
+            {isCurrentPlan ? "Voir mon plan" : "Voir les détails"}
+          </Text>
           <Ionicons
             name="arrow-forward"
             size={18}
@@ -145,6 +167,12 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     ...SHADOWS.medium,
   },
+  currentPlanContainer: {
+    borderWidth: 2,
+    borderColor: COLOORS.status.active.main,
+    borderRadius: RADIUS.lg + 2,
+    transform: [{ scale: 1.02 }],
+  },
   recommendedBadge: {
     position: "absolute",
     top: -10,
@@ -162,6 +190,27 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   recommendedText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontFamily: "semibold",
+  },
+  currentPlanBadge: {
+    position: "absolute",
+    top: -10,
+    left: 24,
+    backgroundColor: COLOORS.status.active.main,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: RADIUS.md,
+    flexDirection: "row",
+    alignItems: "center",
+    zIndex: 10,
+    ...SHADOWS.small,
+  },
+  currentPlanIcon: {
+    marginRight: 4,
+  },
+  currentPlanText: {
     color: "#FFFFFF",
     fontSize: 12,
     fontFamily: "semibold",
@@ -271,6 +320,9 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     paddingVertical: 14,
     borderRadius: RADIUS.xxl,
+  },
+  currentPlanButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
   },
   selectPlanText: {
     ...TYPOGRAPHY.button,

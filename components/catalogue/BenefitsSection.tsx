@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MotiView } from "moti";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router"; // Import useRouter instead of useNavigation
 import { useTheme } from "@/theme/ThemeProvider";
 import {
   COLOORS,
@@ -29,6 +30,12 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
   ],
 }) => {
   const { dark } = useTheme();
+  const router = useRouter(); // Use router instead of navigation
+
+  const handleComparePlans = () => {
+    // Navigate using router.push instead of navigation.navigate
+    router.push("/plansComparison");
+  };
 
   return (
     <MotiView
@@ -80,11 +87,10 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
         ))}
       </View>
 
-      <MotiView
+      <TouchableOpacity
         style={styles.comparePlansBadge}
-        from={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 700, type: "spring", damping: 15 }}
+        activeOpacity={0.7}
+        onPress={handleComparePlans}
       >
         <Ionicons
           name="information-circle-outline"
@@ -100,7 +106,7 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
           size={14}
           color={COLOORS.accent.blue.main}
         />
-      </MotiView>
+      </TouchableOpacity>
     </MotiView>
   );
 };

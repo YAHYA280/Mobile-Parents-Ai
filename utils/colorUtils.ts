@@ -1,34 +1,65 @@
-export const lightenColor = (hex: string, percent: number): string => {
-  hex = hex.replace("#", "");
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
+/**
+ * Lightens a hex color by the specified amount
+ * @param color - Hex color code (e.g. "#FF0000")
+ * @param amount - Amount to lighten (0-100)
+ * @returns Lightened hex color
+ */
+export const lightenColor = (color: string, amount: number): string => {
+  // Remove the # if it exists
+  let hex = color.replace("#", "");
 
-  const lightenAmount = Math.floor(255 * (percent / 100));
+  // Handle shorthand hex (e.g. #FFF)
+  if (hex.length === 3) {
+    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+  }
 
-  const rNew = Math.min(r + lightenAmount, 255);
-  const gNew = Math.min(g + lightenAmount, 255);
-  const bNew = Math.min(b + lightenAmount, 255);
+  // Convert to RGB
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
 
-  return `#${rNew.toString(16).padStart(2, "0")}${gNew.toString(16).padStart(2, "0")}${bNew.toString(16).padStart(2, "0")}`;
+  // Lighten each channel
+  r = Math.min(255, Math.round(r + (255 - r) * (amount / 100)));
+  g = Math.min(255, Math.round(g + (255 - g) * (amount / 100)));
+  b = Math.min(255, Math.round(b + (255 - b) * (amount / 100)));
+
+  // Convert back to hex
+  const rHex = r.toString(16).padStart(2, "0");
+  const gHex = g.toString(16).padStart(2, "0");
+  const bHex = b.toString(16).padStart(2, "0");
+
+  return `#${rHex}${gHex}${bHex}`;
 };
 
-export const darkenColor = (hex: string, percent: number): string => {
-  hex = hex.replace("#", "");
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
+/**
+ * Darkens a hex color by the specified amount
+ * @param color - Hex color code (e.g. "#FF0000")
+ * @param amount - Amount to darken (0-100)
+ * @returns Darkened hex color
+ */
+export const darkenColor = (color: string, amount: number): string => {
+  // Remove the # if it exists
+  let hex = color.replace("#", "");
 
-  const darkenAmount = Math.floor(255 * (percent / 100));
+  // Handle shorthand hex (e.g. #FFF)
+  if (hex.length === 3) {
+    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+  }
 
-  const rNew = Math.max(r - darkenAmount, 0);
-  const gNew = Math.max(g - darkenAmount, 0);
-  const bNew = Math.max(b - darkenAmount, 0);
+  // Convert to RGB
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
 
-  return `#${rNew.toString(16).padStart(2, "0")}${gNew.toString(16).padStart(2, "0")}${bNew.toString(16).padStart(2, "0")}`;
-};
+  // Darken each channel
+  r = Math.max(0, Math.round(r * (1 - amount / 100)));
+  g = Math.max(0, Math.round(g * (1 - amount / 100)));
+  b = Math.max(0, Math.round(b * (1 - amount / 100)));
 
-export const addAlpha = (hex: string, alpha: number): string => {
-  const alpha256 = Math.round(alpha * 255);
-  return `${hex}${alpha256.toString(16).padStart(2, "0")}`;
+  // Convert back to hex
+  const rHex = r.toString(16).padStart(2, "0");
+  const gHex = g.toString(16).padStart(2, "0");
+  const bHex = b.toString(16).padStart(2, "0");
+
+  return `#${rHex}${gHex}${bHex}`;
 };

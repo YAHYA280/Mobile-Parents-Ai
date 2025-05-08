@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "@/theme/ThemeProvider";
+import { Ionicons } from "@expo/vector-icons";
 
 // Import Custom Components
 import Header from "@/components/ui/Header";
@@ -43,7 +43,7 @@ const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.85;
 
 // Types
-type PlanDetailsRouteParams = {
+type PlanDetailsParams = {
   planId: string;
   pricing: string;
   features: string;
@@ -64,10 +64,17 @@ interface PricingOption {
 }
 
 const PlanDetails: React.FC = () => {
-  const params = useLocalSearchParams<PlanDetailsRouteParams>();
-  const { planId } = params;
+  const params = useLocalSearchParams<PlanDetailsParams>();
   const router = useRouter();
-  const { colors, dark } = useTheme();
+
+  // Extract and parse parameters
+  const { planId } = params;
+  const pricingData = params.pricing
+    ? JSON.parse(params.pricing as string)
+    : null;
+  const featuresData = params.features
+    ? JSON.parse(params.features as string)
+    : [];
 
   // State
   const [activeDot, setActiveDot] = useState(0);
@@ -272,61 +279,72 @@ const PlanDetails: React.FC = () => {
   // Derived State
   const pricingOptions = useMemo<PricingOption[]>(() => {
     if (!selectedCatalogue) return [];
+
+    // We can use either the pricing data passed via params or the data from selectedCatalogue
+    const pricing = pricingData || {
+      monthlyPrice: selectedCatalogue.monthlyPrice,
+      sixMonthPrice: selectedCatalogue.sixMonthPrice,
+      yearlyPrice: selectedCatalogue.yearlyPrice,
+    };
+
+    // We can use either the features data passed via params or the data from selectedCatalogue
+    const features =
+      featuresData.length > 0 ? featuresData : selectedCatalogue.features;
+
     return [
       {
         duration: "Mensuel",
-        price: selectedCatalogue.monthlyPrice,
-        features: selectedCatalogue.features,
+        price: pricing.monthlyPrice,
+        features: features,
         apiDuration: "monthly",
       },
       {
         duration: "6 Mois",
-        price: selectedCatalogue.sixMonthPrice,
-        features: selectedCatalogue.features,
+        price: pricing.sixMonthPrice,
+        features: features,
         discountPercentage: 15,
         apiDuration: "six_months",
       },
       {
         duration: "Annuel",
-        price: selectedCatalogue.yearlyPrice,
-        features: selectedCatalogue.features,
+        price: pricing.yearlyPrice,
+        features: features,
         discountPercentage: 25,
         apiDuration: "yearly",
       },
     ];
-  }, [selectedCatalogue]);
+  }, [selectedCatalogue, pricingData, featuresData]);
 
   // Render States
   const renderLoadingState = () => (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.area}>
       <StatusBar
-        barStyle={dark ? "light-content" : "dark-content"}
+        barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
-      <View
-        style={[
-          styles.loadingContainer,
-          { backgroundColor: colors.background },
-        ]}
-      >
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLOORS.primary.main} />
       </View>
     </SafeAreaView>
   );
 
   const renderErrorState = () => (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.area}>
       <StatusBar
-        barStyle={dark ? "light-content" : "dark-content"}
+        barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
       <Header title="Détails du Plan" onBackPress={() => router.back()} />
-      <View
-        style={[styles.errorContainer, { backgroundColor: colors.background }]}
-      >
+      <View style={styles.errorContainer}>
         <View style={styles.errorContent}>
+          <Ionicons
+            name="alert-circle-outline"
+            size={60}
+            color={COLOORS.status.expired.main}
+          />
+          <Text style={styles.errorText}>{error}</Text>
           <Button
             label="Retour à l'accueil"
             leftIcon="arrow-back"
@@ -351,9 +369,9 @@ const PlanDetails: React.FC = () => {
   const planEmoji = getPlanEmoji(selectedCatalogue.id);
 
   return (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.area}>
       <StatusBar
-        barStyle={dark ? "light-content" : "dark-content"}
+        barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
@@ -369,22 +387,10 @@ const PlanDetails: React.FC = () => {
         >
           <Text style={styles.planEmoji}>{planEmoji}</Text>
         </View>
-        <Text
-          style={[
-            styles.planTitle,
-            { color: dark ? COLOORS.white : COLOORS.black },
-          ]}
-        >
-          {selectedCatalogue.planName}
-        </Text>
+        <Text style={styles.planTitle}>{selectedCatalogue.planName}</Text>
       </View>
 
-      <Text
-        style={[
-          styles.headingSubtitle,
-          { color: dark ? COLOORS.gray2 : COLOORS.gray3 },
-        ]}
-      >
+      <Text style={styles.headingSubtitle}>
         {"Commencez avec "}
         <Text style={[styles.highlightedText, { color: COLOORS.primary.main }]}>
           14 jours d&apos;essai gratuit
@@ -438,7 +444,7 @@ const PlanDetails: React.FC = () => {
             <View
               style={[
                 styles.paginationDot,
-                { backgroundColor: dark ? "#555" : "#D1D5DB" },
+                { backgroundColor: "#D1D5DB" },
                 activeDot === index
                   ? [styles.paginationDotActive, { backgroundColor: planColor }]
                   : {},
@@ -464,6 +470,7 @@ const PlanDetails: React.FC = () => {
 const styles = StyleSheet.create({
   area: {
     flex: 1,
+    backgroundColor: "#FFFFFF",
   },
   loadingContainer: {
     flex: 1,
@@ -478,6 +485,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  errorText: {
+    ...TYPOGRAPHY.body1,
+    color: COLOORS.status.expired.main,
+    textAlign: "center",
+    marginVertical: SPACING.lg,
   },
   planTitleContainer: {
     flexDirection: "row",
@@ -499,12 +512,14 @@ const styles = StyleSheet.create({
   },
   planTitle: {
     ...TYPOGRAPHY.h2,
+    color: COLOORS.black,
   },
   headingSubtitle: {
     ...TYPOGRAPHY.body1,
     lineHeight: 24,
     marginHorizontal: SPACING.md,
     marginBottom: SPACING.lg,
+    color: COLOORS.gray3,
   },
   highlightedText: {
     fontFamily: "semibold",
@@ -532,3 +547,5 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
 });
+
+export default PlanDetails;

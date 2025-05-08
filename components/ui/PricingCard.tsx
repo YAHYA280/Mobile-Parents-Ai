@@ -15,6 +15,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { COLORS, RADIUS } from "@/constants/theme";
 import { formatDuration } from "@/utils/formatUtils";
 import FeatureItem from "./FeatureItem";
+import { lightenColor } from "@/utils/colorUtils";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.85;
@@ -57,12 +58,18 @@ const PricingCard: React.FC<PricingCardProps> = ({
   const { dark } = useTheme();
   const RIBBON_COLOR = "#E53935";
 
-  function lightenColor(
-    planColor: string,
-    arg1: number
-  ): import("react-native").ColorValue {
-    throw new Error("Function not implemented.");
-  }
+  // Make sure we have a valid color to lighten
+  const getLightenedColor = (color: string, amount: number) => {
+    try {
+      return lightenColor(color, amount);
+    } catch (error) {
+      console.error("Error lightening color:", error);
+      return color; // Return original color as fallback
+    }
+  };
+
+  // Use the features from option if available, otherwise use props.features
+  const featuresToShow = option.features || features;
 
   return (
     <MotiView
@@ -100,7 +107,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
 
       <View style={styles.planContainer}>
         <LinearGradient
-          colors={[planColor, lightenColor(planColor, 15)]}
+          colors={[planColor, getLightenedColor(planColor, 15)]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.planHeaderSection}
@@ -130,12 +137,12 @@ const PricingCard: React.FC<PricingCardProps> = ({
             },
           ]}
         >
-          {features.length > 0 && (
+          {featuresToShow.length > 0 && (
             <ScrollView
               style={styles.featuresScrollView}
               showsVerticalScrollIndicator={false}
             >
-              {features.map((feature, i) => (
+              {featuresToShow.map((feature, i) => (
                 <FeatureItem
                   key={i}
                   feature={feature}
