@@ -1,166 +1,346 @@
-import React from 'react';
-import { View, Text, Image } from 'react-native';
+import React from "react";
+import { View, Text, Image, StyleSheet } from "react-native";
 
-import type { Activity } from '../../../data/Enfants/CHILDREN_DATA';
+import type { Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
-import icons  from '../../../constants/icons';
-import { COLORS } from '../../../constants/theme';
+import icons from "../../../constants/icons";
+import { COLORS } from "../../../constants/theme";
+import { Ionicons } from "@expo/vector-icons";
 
 interface StatementProps {
   activity: Activity;
   dark: boolean;
 }
 
-const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
+const EnhancedStatement: React.FC<StatementProps> = ({ activity, dark }) => {
+  // Format date for display
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   return (
-    <View style={{
-      padding: 16,
-      backgroundColor: dark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
-      borderBottomWidth: 1,
-      borderBottomColor: dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-    }}>
-      {/* Titre de l&apos;énoncé */}
-      <Text style={{
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: dark ? COLORS.white : COLORS.black,
-      marginBottom: 12,
-      textAlign: 'center'
-    }}>
-      Énoncé de l&apos;exercice
-    </Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: dark ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.05)" },
+      ]}
+    >
+      {/* Title */}
+      <Text
+        style={[styles.title, { color: dark ? COLORS.white : COLORS.black }]}
+      >
+        Énoncé de l'exercice
+      </Text>
 
-      {/* Contenu de l&apos;énoncé */}
-      <View style={{
-        backgroundColor: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 12
-      }}>
-        <Text style={{
-          fontSize: 14,
-          lineHeight: 20,
-          color: dark ? COLORS.white : COLORS.black,
-          marginBottom: 12
-        }}>
-          Voici l&apos;énoncé détaillé de l&apos;exercice. Vous pouvez remplacer ce texte par le contenu réel de l&apos;énoncé qui se trouve dans vos données.
+      {/* Content */}
+      <View
+        style={[
+          styles.contentCard,
+          {
+            backgroundColor: dark
+              ? "rgba(255,255,255,0.05)"
+              : "rgba(255,255,255,0.5)",
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.contentText,
+            { color: dark ? COLORS.white : COLORS.black },
+          ]}
+        >
+          {activity.commentaires ||
+            "L'élève a travaillé sur un exercice qui utilise l'application d'IA pour apprendre. Vous pouvez voir les détails de l'interaction dans la conversation ci-dessous."}
         </Text>
 
-        <Text style={{
-          fontSize: 14,
-          lineHeight: 20,
-          color: dark ? COLORS.white : COLORS.black,
-          marginBottom: 8
-        }}>
-          1. Lisez attentivement l&apos;ensemble de l&apos;énoncé avant de commencer.
-        </Text>
+        {activity.recommandations && activity.recommandations.length > 0 && (
+          <View style={styles.guidelineContainer}>
+            <Text
+              style={[
+                styles.guidelineTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Recommandations:
+            </Text>
 
-        <Text style={{
-          fontSize: 14,
-          lineHeight: 20,
-          color: dark ? COLORS.white : COLORS.black,
-          marginBottom: 8
-        }}>
-          2. Utilisez les outils fournis pour résoudre le problème.
-        </Text>
+            {activity.recommandations.map((guideline, index) => (
+              <View key={index} style={styles.guidelineItem}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={16}
+                  color={COLORS.primary}
+                  style={styles.guidelineIcon}
+                />
+                <Text
+                  style={[
+                    styles.guidelineText,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  {guideline}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
 
-        <Text style={{
-          fontSize: 14,
-          lineHeight: 20,
-          color: dark ? COLORS.white : COLORS.black,
-          marginBottom: 8
-        }}>
-          3. Vérifiez votre travail avant de le soumettre.
-        </Text>
-
-        <Text style={{
-          fontSize: 14,
-          fontStyle: 'italic',
-          color: dark ? COLORS.secondaryWhite : COLORS.gray3,
-          marginTop: 12
-        }}>
-          Cet exercice vise à renforcer vos compétences en résolution de problèmes.
+        <Text
+          style={[
+            styles.note,
+            { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
+          ]}
+        >
+          Cet exercice aide à développer les compétences en résolution de
+          problèmes et en réflexion critique.
         </Text>
       </View>
 
-      {/* Informations supplémentaires */}
-      <View style={{
-        backgroundColor: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-        padding: 12,
-        borderRadius: 8
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-          <Image 
-              source={icons.infoCircle} 
-              style={{ 
-              width: 14, 
-              height: 14, 
-              marginRight: 8,
-              tintColor: COLORS.primary 
-            }} 
+      {/* Details */}
+      <View
+        style={[
+          styles.detailsCard,
+          {
+            backgroundColor: dark
+              ? "rgba(255,255,255,0.05)"
+              : "rgba(255,255,255,0.5)",
+          },
+        ]}
+      >
+        <View style={styles.detailsHeader}>
+          <Ionicons
+            name="information-circle-outline"
+            size={18}
+            color={COLORS.primary}
+            style={styles.detailsIcon}
           />
-          <Text style={{
-            fontSize: 14,
-            fontWeight: 'bold',
-            color: dark ? COLORS.white : COLORS.black
-          }}>
-            Détails de l&apos;activité
+          <Text
+            style={[
+              styles.detailsTitle,
+              { color: dark ? COLORS.white : COLORS.black },
+            ]}
+          >
+            Détails de l'activité
           </Text>
         </View>
 
-        <View style={{ flexDirection: 'row', marginBottom: 6 }}>
-          <Text style={{
-            width: 80,
-            color: dark ? COLORS.secondaryWhite : COLORS.gray3,
-            fontSize: 13
-          }}>
-            Date:
-          </Text>
-          <Text style={{
-            flex: 1,
-            color: dark ? COLORS.white : COLORS.black,
-            fontSize: 13
-          }}>
-            {new Date(activity.date).toLocaleDateString('fr-FR')}
-          </Text>
-        </View>
+        <View style={styles.detailsGrid}>
+          <View style={styles.detailRow}>
+            <Text
+              style={[
+                styles.detailLabel,
+                { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
+              ]}
+            >
+              Date:
+            </Text>
+            <Text
+              style={[
+                styles.detailValue,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              {formatDate(activity.date)}
+            </Text>
+          </View>
 
-        <View style={{ flexDirection: 'row', marginBottom: 6 }}>
-          <Text style={{
-            width: 80,
-            color: dark ? COLORS.secondaryWhite : COLORS.gray3,
-            fontSize: 13
-          }}>
-            Assistant:
-          </Text>
-          <Text style={{
-            flex: 1,
-            color: dark ? COLORS.white : COLORS.black,
-            fontSize: 13
-          }}>
-            {activity.assistant || "Non spécifié"}
-          </Text>
-        </View>
+          <View style={styles.detailRow}>
+            <Text
+              style={[
+                styles.detailLabel,
+                { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
+              ]}
+            >
+              Matière:
+            </Text>
+            <Text
+              style={[
+                styles.detailValue,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              {activity.matiere || "Non spécifiée"}
+            </Text>
+          </View>
 
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{
-            width: 80,
-            color: dark ? COLORS.secondaryWhite : COLORS.gray3,
-            fontSize: 13
-          }}>
-            Durée:
-          </Text>
-          <Text style={{
-            flex: 1,
-            color: dark ? COLORS.white : COLORS.black,
-            fontSize: 13
-          }}>
-            {activity.duree || "Non spécifiée"}
-          </Text>
+          <View style={styles.detailRow}>
+            <Text
+              style={[
+                styles.detailLabel,
+                { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
+              ]}
+            >
+              Assistant:
+            </Text>
+            <Text
+              style={[
+                styles.detailValue,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              {activity.assistant || "Non spécifié"}
+            </Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text
+              style={[
+                styles.detailLabel,
+                { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
+              ]}
+            >
+              Durée:
+            </Text>
+            <Text
+              style={[
+                styles.detailValue,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              {activity.duree || "Non spécifiée"}
+            </Text>
+          </View>
+
+          {activity.score && (
+            <View style={styles.detailRow}>
+              <Text
+                style={[
+                  styles.detailLabel,
+                  { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
+                ]}
+              >
+                Score:
+              </Text>
+              <View style={styles.scoreContainer}>
+                <Ionicons
+                  name="star"
+                  size={16}
+                  color="#FFD700"
+                  style={styles.scoreIcon}
+                />
+                <Text
+                  style={[
+                    styles.scoreText,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  {activity.score}
+                </Text>
+              </View>
+            </View>
+          )}
         </View>
       </View>
     </View>
   );
 };
 
-export default Statement;
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.1)",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  contentCard: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  contentText: {
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  guidelineContainer: {
+    marginBottom: 16,
+  },
+  guidelineTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  guidelineItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+  guidelineIcon: {
+    marginRight: 8,
+    marginTop: 3,
+  },
+  guidelineText: {
+    fontSize: 14,
+    lineHeight: 20,
+    flex: 1,
+  },
+  note: {
+    fontSize: 14,
+    fontStyle: "italic",
+  },
+  detailsCard: {
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  detailsHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  detailsIcon: {
+    marginRight: 8,
+  },
+  detailsTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  detailsGrid: {
+    paddingHorizontal: 4,
+  },
+  detailRow: {
+    flexDirection: "row",
+    marginBottom: 10,
+    alignItems: "center",
+  },
+  detailLabel: {
+    width: 80,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  detailValue: {
+    flex: 1,
+    fontSize: 14,
+  },
+  scoreContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  scoreIcon: {
+    marginRight: 4,
+  },
+  scoreText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+});
+
+export default EnhancedStatement;
