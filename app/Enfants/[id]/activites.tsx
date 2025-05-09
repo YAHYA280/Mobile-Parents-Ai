@@ -1,122 +1,118 @@
 // app/Enfants/[id]/activites.tsx
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
+  StyleSheet,
+  ActivityIndicator,
   View,
   Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
+  ScrollView,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { COLORS } from "@/constants/theme";
-import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
+import { useChildren } from "@/contexts/ChildrenContext";
+import { useActivities } from "@/contexts/ActivitiesContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Activity as InterfaceActivity } from "@/types/interfaces";
+
+import Header from "@/components/ui/Header";
+import ActivitySummary from "@/components/children/ActivitiesTab/ActivitySummary";
+import RecentActivities from "@/components/children/ActivitiesTab/RecentActivities";
 
 export default function ChildActivitiesScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const childId = Number(id);
-  const [child, setChild] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { getChild, getChildSummary, loading: childLoading } = useChildren();
+  const { getChildActivities, loading: activitiesLoading } = useActivities();
+  const { dark } = useTheme();
 
-  useEffect(() => {
-    // Fetch child data
-    const foundChild = CHILDREN_DATA.find((c) => c.id === childId);
-    setChild(foundChild);
-    setLoading(false);
-  }, [childId]);
+  const child = getChild(childId);
+  const summary = getChildSummary(childId);
+  const contextActivities = getChildActivities(childId);
 
-  const handleActivityPress = (activityId: number) => {
-    router.push(`/Enfants/Historique/${activityId}?childId=${childId}`);
-  };
+  // Convert activities to the format expected by RecentActivities
+  const activities: InterfaceActivity[] = contextActivities.map((activity) => ({
+    id: activity.id,
+    activite: activity.activite,
+    date: activity.date,
+    duree: activity.duree,
+    assistant: activity.assistant,
+    matiere: activity.matiere,
+    // Ensure score is a number or undefined, not a string
+    score:
+      typeof activity.score === "string"
+        ? parseFloat(activity.score)
+        : activity.score,
+    // Add the type property which doesn't exist in the original Activity type
+    type: activity.matiere || "Autre", // Use matiere as the type if available, otherwise "Autre"
+  }));
 
-  const navigateToAllActivities = () => {
-    router.push(`/Enfants/Historique?childId=${childId}`);
-  };
+  const loading = childLoading || activitiesLoading;
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+        ]}
+      >
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Chargement...</Text>
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </SafeAreaView>
     );
   }
 
-  if (!child) {
+  if (!child || !summary) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+        ]}
+      >
+        <Header title="Activités" onBackPress={() => router.back()} />
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Enfant non trouvé</Text>
+          <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+            Enfant non trouvé
+          </Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Activités récentes</Text>
-      </View>
-
-      <TouchableOpacity
-        style={styles.viewAllButton}
-        onPress={navigateToAllActivities}
-      >
-        <Text style={styles.viewAllButtonText}>Voir tout l'historique</Text>
-        <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
-      </TouchableOpacity>
-
-      <FlatList
-        data={child.activitesRecentes}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.activityCard}
-            onPress={() => handleActivityPress(item.id)}
-          >
-            <View style={styles.activityHeader}>
-              <Text style={styles.activityTitle}>{item.activite}</Text>
-              <Text style={styles.activityDate}>
-                {new Date(item.date).toLocaleDateString("fr-FR")}
-              </Text>
-            </View>
-
-            <View style={styles.activityDetails}>
-              {item.matiere && (
-                <View style={styles.detailItem}>
-                  <Ionicons name="book-outline" size={16} color="#757575" />
-                  <Text style={styles.detailText}>{item.matiere}</Text>
-                </View>
-              )}
-
-              <View style={styles.detailItem}>
-                <Ionicons name="time-outline" size={16} color="#757575" />
-                <Text style={styles.detailText}>{item.duree}</Text>
-              </View>
-
-              {item.assistant && (
-                <View style={styles.detailItem}>
-                  <Ionicons name="person-outline" size={16} color="#757575" />
-                  <Text style={styles.detailText}>{item.assistant}</Text>
-                </View>
-              )}
-            </View>
-
-            <View style={styles.activityFooter}>
-              <Text style={styles.viewDetailsText}>Voir les détails</Text>
-              <Ionicons
-                name="chevron-forward"
-                size={16}
-                color={COLORS.primary}
-              />
-            </View>
-          </TouchableOpacity>
-        )}
-        contentContainerStyle={styles.listContent}
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+      ]}
+    >
+      <Header
+        title="Activités"
+        subtitle={child.name}
+        onBackPress={() => router.back()}
       />
+
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Activity Summary */}
+        <ActivitySummary
+          activityCount={summary.totalActivities}
+          totalDuration={summary.totalDuration}
+          lastActivityDate={summary.lastActivityDate}
+          favoriteSubject={summary.favoriteSubject}
+        />
+
+        {/* Recent Activities */}
+        <RecentActivities activities={activities} childId={childId} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -124,103 +120,22 @@ export default function ChildActivitiesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  loadingText: {
-    fontSize: 16,
-    color: "#333",
-  },
   errorContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#FF3B30",
-  },
-  header: {
-    padding: 16,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.1)",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  viewAllButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: COLORS.primary,
-    margin: 16,
-    padding: 12,
-    borderRadius: 8,
-  },
-  viewAllButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    marginRight: 8,
-  },
-  listContent: {
-    padding: 16,
-    paddingTop: 0,
-  },
-  activityCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  activityHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  activityTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-    flex: 1,
-    marginRight: 8,
-  },
-  activityDate: {
-    fontSize: 12,
-    color: "#757575",
-  },
-  activityDetails: {
-    marginBottom: 12,
-  },
-  detailItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  detailText: {
-    fontSize: 14,
-    color: "#757575",
-    marginLeft: 8,
-  },
-  activityFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  viewDetailsText: {
-    fontSize: 14,
-    color: COLORS.primary,
-    marginRight: 4,
   },
 });

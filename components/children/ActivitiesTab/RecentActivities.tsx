@@ -22,12 +22,12 @@ const RecentActivities: React.FC<RecentActivitiesProps> = ({
 
   // Navigate to activity details
   const handleActivityPress = (activityId: number | string) => {
-    router.push(`/Enfants/Historique/${activityId}?childId=${childId}`);
+    router.push(`./Enfants/Historique/${activityId}?childId=${childId}`);
   };
 
   // Navigate to all activities
   const viewAllActivities = () => {
-    router.push(`/Enfants/Historique?childId=${childId}`);
+    router.push(`./Enfants/Historique?childId=${childId}`);
   };
 
   return (

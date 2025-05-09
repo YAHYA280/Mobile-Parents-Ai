@@ -2,6 +2,6 @@
 import { Redirect } from "expo-router";
 
 export default function ChildDefaultScreen() {
-  // This automatically redirects to the apercu tab when navigating to /Enfants/[id]
-  return <Redirect href="apercu" />;
+  // Using a relative path with ./ to ensure correct typing
+  return <Redirect href="./apercu" />;
 }

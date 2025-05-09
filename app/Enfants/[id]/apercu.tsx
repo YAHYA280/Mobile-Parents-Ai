@@ -1,195 +1,155 @@
 // app/Enfants/[id]/apercu.tsx
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from "react-native";
+import { View, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { COLORS, TYPOGRAPHY } from "@/constants/theme";
-import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { COLORS } from "@/constants/theme";
+import { useChildren } from "@/contexts/ChildrenContext";
+import { useTheme } from "@/contexts/ThemeContext";
+
+import Header from "@/components/ui/Header";
+import StrengthsPanel from "@/components/children/OverviewTab/StrengthsPanel";
+import QuickStats from "@/components/children/OverviewTab/QuickStats";
+import { useRouter } from "expo-router";
 
 export default function ChildOverviewScreen() {
   const { id } = useLocalSearchParams();
+  const router = useRouter();
   const childId = Number(id);
-  const [child, setChild] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { getChild, getChildSummary, loading } = useChildren();
+  const { dark } = useTheme();
 
-  useEffect(() => {
-    // Fetch child data - in a real app, this would come from an API or context
-    const foundChild = CHILDREN_DATA.find((c) => c.id === childId);
-    setChild(foundChild);
-    setLoading(false);
-  }, [childId]);
+  const child = getChild(childId);
+  const summary = getChildSummary(childId);
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+        ]}
+      >
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Chargement...</Text>
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </SafeAreaView>
     );
   }
 
-  if (!child) {
+  if (!child || !summary) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+        ]}
+      >
+        <Header title="Aperçu" onBackPress={() => router.back()} />
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Enfant non trouvé</Text>
+          <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+            Enfant non trouvé
+          </Text>
         </View>
       </SafeAreaView>
     );
   }
+
+  // Format strengths and weaknesses
+  const strengths = child.matieresFortes.map((subject) => ({
+    subject,
+    color: "#4CAF50",
+  }));
+
+  const weaknesses = child.matieresAmeliorer.map((subject) => ({
+    subject: subject.replace(/^\?/, "").trim(),
+    color: "#FF5722",
+  }));
+
+  // Quick stats
+  const stats = [
+    {
+      label: "Activités",
+      value: summary.totalActivities,
+      icon: "list-outline",
+      color: COLORS.primary,
+    },
+    {
+      label: "Temps total",
+      value: summary.totalDuration,
+      icon: "time-outline",
+      color: "#FF9800",
+    },
+    {
+      label: "Dernière activité",
+      value: new Date(summary.lastActivityDate).toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "short",
+      }),
+      icon: "calendar-outline",
+      color: "#2196F3",
+    },
+    {
+      label: "Progrès",
+      value:
+        typeof summary.progress === "string"
+          ? summary.progress
+          : `${summary.progress}%`,
+      icon: "trending-up-outline",
+      color: "#4CAF50",
+    },
+  ];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+      ]}
+    >
+      <Header
+        title={child.name}
+        subtitle="Aperçu général"
+        onBackPress={() => router.back()}
+      />
+
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Aperçu général</Text>
-          <Text style={styles.childName}>{child.name}</Text>
-        </View>
+        {/* Progress Overview */}
+        <QuickStats stats={stats} />
 
-        {/* Progress Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Progrès Global</Text>
-          <View style={styles.progressContainer}>
-            <View style={styles.progressCircle}>
-              <Text style={styles.progressText}>{child.progress}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Strengths Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Points forts</Text>
-          <View style={styles.listContainer}>
-            {child.matieresFortes.map((matiere: string, index: number) => (
-              <View key={index} style={styles.listItem}>
-                <View style={styles.bullet} />
-                <Text style={styles.listItemText}>{matiere}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Areas to Improve Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Points à améliorer</Text>
-          <View style={styles.listContainer}>
-            {child.matieresAmeliorer.map((matiere: string, index: number) => (
-              <View key={index} style={styles.listItem}>
-                <View style={[styles.bullet, styles.improveBullet]} />
-                <Text style={styles.listItemText}>
-                  {matiere.replace(/^\?/, "").trim()}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
+        {/* Strengths and Weaknesses */}
+        <StrengthsPanel strengths={strengths} weaknesses={weaknesses} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
+import { Text } from "react-native";
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  loadingText: {
-    fontSize: 16,
-    color: "#333",
-  },
   errorContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#FF3B30",
-  },
-  header: {
-    padding: 16,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.1)",
-  },
-  headerTitle: {
-    fontSize: 14,
-    color: "#757575",
-    marginBottom: 8,
-  },
-  childName: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  section: {
-    margin: 16,
-    padding: 16,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 16,
-  },
-  progressContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-  },
-  progressCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: COLORS.primary + "20",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 8,
-    borderColor: COLORS.primary,
-  },
-  progressText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: COLORS.primary,
-  },
-  listContainer: {
-    marginTop: 8,
-  },
-  listItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  bullet: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#4CAF50",
-    marginRight: 12,
-  },
-  improveBullet: {
-    backgroundColor: "#FF3B30",
-  },
-  listItemText: {
-    fontSize: 16,
-    color: "#333",
   },
 });

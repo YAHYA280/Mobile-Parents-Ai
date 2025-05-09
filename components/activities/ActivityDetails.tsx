@@ -98,13 +98,13 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
       {/* Header with type and date */}
       <View style={styles.header}>
         <LinearGradient
-          colors={assistantTheme.colors}
+          colors={assistantTheme.colors as any}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.assistantBadge}
         >
           <Ionicons
-            name={assistantTheme.icon}
+            name={assistantTheme.icon as any}
             size={14}
             color="#FFFFFF"
             style={styles.assistantIcon}
@@ -125,12 +125,12 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
       {/* Title with subject icon */}
       <View style={styles.titleContainer}>
         <LinearGradient
-          colors={subjectTheme.colors}
+          colors={subjectTheme.colors as any}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.subjectIconContainer}
         >
-          <Ionicons name={subjectTheme.icon} size={16} color="#FFFFFF" />
+          <Ionicons name={subjectTheme.icon as any} size={16} color="#FFFFFF" />
         </LinearGradient>
 
         <Text

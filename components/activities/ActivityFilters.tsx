@@ -59,8 +59,9 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [calendarMode, setCalendarMode] = useState<"start" | "end">("start");
-  const [activeFilterType, setActiveFilterType] = useState;
-  "date" | "assistants" | "subjects" | ("difficulties" > "date");
+  const [activeFilterType, setActiveFilterType] = useState<
+    "date" | "assistants" | "subjects" | "difficulties"
+  >("date");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Format date for display

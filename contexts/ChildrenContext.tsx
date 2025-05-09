@@ -6,6 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Child, ChildSummary, ChildPerformance } from "@/types/child";
+import { Activity } from "@/types/activity";
 import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
 
 interface ChildrenContextType {
@@ -38,6 +39,18 @@ export const ChildrenProvider: React.FC<ChildrenProviderProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Convert mock data to match the expected Child type
+  const processChildData = (data: typeof CHILDREN_DATA): Child[] => {
+    return data.map((child) => ({
+      ...child,
+      // Add childId to each activity
+      activitesRecentes: child.activitesRecentes.map((activity) => ({
+        ...activity,
+        childId: child.id,
+      })) as Activity[],
+    }));
+  };
+
   // Fetch children data
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +59,9 @@ export const ChildrenProvider: React.FC<ChildrenProviderProps> = ({
         // In a real app, you would fetch from an API
         // For now, use mock data with a delay to simulate network request
         setTimeout(() => {
-          setChildren(CHILDREN_DATA);
+          // Process the data to add childId to each activity
+          const processedData = processChildData(CHILDREN_DATA);
+          setChildren(processedData);
           setLoading(false);
         }, 500);
       } catch (err) {
@@ -189,7 +204,11 @@ export const ChildrenProvider: React.FC<ChildrenProviderProps> = ({
       // In a real app, you would fetch from an API
       // For now, use mock data with a delay to simulate network request
       await new Promise((resolve) => setTimeout(resolve, 500));
-      setChildren(CHILDREN_DATA);
+
+      // Process the data to add childId to each activity
+      const processedData = processChildData(CHILDREN_DATA);
+      setChildren(processedData);
+
       setLoading(false);
     } catch (err) {
       setError("Failed to refresh children data");

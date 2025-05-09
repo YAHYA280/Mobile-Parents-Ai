@@ -3,17 +3,21 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  SafeAreaView,
-  TouchableOpacity,
   StyleSheet,
   Dimensions,
   ActivityIndicator,
-  ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+
 import { COLORS } from "@/constants/theme";
-import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
+import { useChildren } from "@/contexts/ChildrenContext";
+import { useActivities } from "@/contexts/ActivitiesContext";
+import { useTheme } from "@/contexts/ThemeContext";
+
+import Header from "@/components/ui/Header";
 
 // Mock video resources
 const VIDEO_RESOURCES = [
@@ -57,47 +61,15 @@ export default function VideoResourcesScreen() {
   const activityIdNum = Number(activityId);
   const childIdNum = Number(childId);
 
-  const [child, setChild] = useState<any>(null);
-  const [activity, setActivity] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { getChild } = useChildren();
+  const { getActivity, loading } = useActivities();
+  const { dark } = useTheme();
+
   const [selectedVideo, setSelectedVideo] = useState<any>(VIDEO_RESOURCES[0]);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  useEffect(() => {
-    const fetchData = () => {
-      try {
-        setIsLoading(true);
-
-        // Find child
-        const foundChild = CHILDREN_DATA.find((c) => c.id === childIdNum);
-        if (!foundChild) {
-          console.error("Child not found");
-          router.back();
-          return;
-        }
-
-        // Find activity
-        const foundActivity = foundChild.activitesRecentes.find(
-          (a: any) => a.id === activityIdNum
-        );
-
-        if (!foundActivity) {
-          console.error("Activity not found");
-          router.back();
-          return;
-        }
-
-        setChild(foundChild);
-        setActivity(foundActivity);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [activityIdNum, childIdNum]);
+  const child = getChild(childIdNum);
+  const activity = getActivity(activityIdNum, childIdNum);
 
   const handleBack = () => {
     router.back();
@@ -125,12 +97,25 @@ export default function VideoResourcesScreen() {
     }
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+        ]}
+      >
+        <Header title="Ressources vidéo" onBackPress={handleBack} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Chargement des ressources...</Text>
+          <Text
+            style={[
+              styles.loadingText,
+              { color: dark ? COLORS.white : "#333333" },
+            ]}
+          >
+            Chargement des ressources...
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -138,10 +123,23 @@ export default function VideoResourcesScreen() {
 
   if (!activity || !child) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+        ]}
+      >
+        <Header title="Ressources vidéo" onBackPress={handleBack} />
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={64} color="#FF3B30" />
-          <Text style={styles.errorText}>Ressources non trouvées</Text>
+          <Text
+            style={[
+              styles.errorText,
+              { color: dark ? COLORS.white : "#333333" },
+            ]}
+          >
+            Ressources non trouvées
+          </Text>
           <TouchableOpacity style={styles.errorButton} onPress={handleBack}>
             <Text style={styles.errorButtonText}>Retour</Text>
           </TouchableOpacity>
@@ -151,22 +149,29 @@ export default function VideoResourcesScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ressources vidéo</Text>
-        <View style={styles.headerRight} />
-      </View>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+      ]}
+    >
+      <Header
+        title="Ressources vidéo"
+        subtitle={activity.activite}
+        onBackPress={handleBack}
+      />
 
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
         {/* Video Player */}
-        <View style={styles.videoContainer}>
+        <View
+          style={[
+            styles.videoContainer,
+            { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
+          ]}
+        >
           <View style={styles.videoPlayer}>
             <TouchableOpacity
               style={styles.playButton}
@@ -181,13 +186,25 @@ export default function VideoResourcesScreen() {
           </View>
 
           {/* Controls */}
-          <View style={styles.videoControls}>
+          <View
+            style={[
+              styles.videoControls,
+              { backgroundColor: dark ? "rgba(255,255,255,0.05)" : "#F8F8F8" },
+            ]}
+          >
             <TouchableOpacity style={styles.controlButton}>
-              <Ionicons name="play-skip-back" size={24} color="#333333" />
+              <Ionicons
+                name="play-skip-back"
+                size={24}
+                color={dark ? COLORS.white : "#333333"}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.playPauseButton}
+              style={[
+                styles.playPauseButton,
+                { backgroundColor: COLORS.primary },
+              ]}
               onPress={togglePlayPause}
             >
               <Ionicons
@@ -198,16 +215,34 @@ export default function VideoResourcesScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.controlButton}>
-              <Ionicons name="play-skip-forward" size={24} color="#333333" />
+              <Ionicons
+                name="play-skip-forward"
+                size={24}
+                color={dark ? COLORS.white : "#333333"}
+              />
             </TouchableOpacity>
           </View>
 
           {/* Video Info */}
           <View style={styles.videoInfo}>
-            <Text style={styles.videoTitle}>{selectedVideo.title}</Text>
+            <Text
+              style={[
+                styles.videoTitle,
+                { color: dark ? COLORS.white : "#333333" },
+              ]}
+            >
+              {selectedVideo.title}
+            </Text>
 
             <View style={styles.videoMetadata}>
-              <Text style={styles.subjectText}>{selectedVideo.subject}</Text>
+              <Text
+                style={[
+                  styles.subjectText,
+                  { color: dark ? COLORS.secondaryWhite : "#757575" },
+                ]}
+              >
+                {selectedVideo.subject}
+              </Text>
               <View
                 style={[
                   styles.difficultyBadge,
@@ -228,18 +263,45 @@ export default function VideoResourcesScreen() {
               </View>
             </View>
 
-            <Text style={styles.durationText}>
+            <Text
+              style={[
+                styles.durationText,
+                { color: dark ? COLORS.secondaryWhite : "#757575" },
+              ]}
+            >
               Durée: {selectedVideo.duration}
             </Text>
 
-            <Text style={styles.videoDescription}>
+            <Text
+              style={[
+                styles.videoDescription,
+                { color: dark ? COLORS.white : "#333333" },
+              ]}
+            >
               {selectedVideo.description}
             </Text>
 
             <View style={styles.tagsContainer}>
               {selectedVideo.tags.map((tag: string, index: number) => (
-                <View key={index} style={styles.tagBadge}>
-                  <Text style={styles.tagText}>{tag}</Text>
+                <View
+                  key={index}
+                  style={[
+                    styles.tagBadge,
+                    {
+                      backgroundColor: dark
+                        ? "rgba(255,255,255,0.1)"
+                        : "rgba(0,0,0,0.05)",
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.tagText,
+                      { color: dark ? COLORS.secondaryWhite : "#757575" },
+                    ]}
+                  >
+                    {tag}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -247,14 +309,33 @@ export default function VideoResourcesScreen() {
         </View>
 
         {/* Related Videos */}
-        <View style={styles.relatedVideosContainer}>
-          <Text style={styles.relatedVideosTitle}>Vidéos connexes</Text>
+        <View
+          style={[
+            styles.relatedVideosContainer,
+            { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
+          ]}
+        >
+          <Text
+            style={[
+              styles.relatedVideosTitle,
+              { color: dark ? COLORS.white : "#333333" },
+            ]}
+          >
+            Vidéos connexes
+          </Text>
 
           {VIDEO_RESOURCES.filter((v) => v.id !== selectedVideo.id).map(
             (video) => (
               <TouchableOpacity
                 key={video.id}
-                style={styles.relatedVideoItem}
+                style={[
+                  styles.relatedVideoItem,
+                  {
+                    borderBottomColor: dark
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(0,0,0,0.05)",
+                  },
+                ]}
                 onPress={() => selectVideo(video)}
               >
                 <View style={styles.relatedVideoThumbnail}>
@@ -262,12 +343,29 @@ export default function VideoResourcesScreen() {
                 </View>
 
                 <View style={styles.relatedVideoInfo}>
-                  <Text style={styles.relatedVideoTitle}>{video.title}</Text>
+                  <Text
+                    style={[
+                      styles.relatedVideoTitle,
+                      { color: dark ? COLORS.white : "#333333" },
+                    ]}
+                  >
+                    {video.title}
+                  </Text>
                   <View style={styles.relatedVideoMetadata}>
-                    <Text style={styles.relatedVideoDuration}>
+                    <Text
+                      style={[
+                        styles.relatedVideoDuration,
+                        { color: dark ? COLORS.secondaryWhite : "#757575" },
+                      ]}
+                    >
                       {video.duration}
                     </Text>
-                    <Text style={styles.relatedVideoDifficulty}>
+                    <Text
+                      style={[
+                        styles.relatedVideoDifficulty,
+                        { color: dark ? COLORS.secondaryWhite : "#757575" },
+                      ]}
+                    >
                       {video.difficulty}
                     </Text>
                   </View>
@@ -281,10 +379,11 @@ export default function VideoResourcesScreen() {
   );
 }
 
+import { ScrollView } from "react-native";
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
   },
   loadingContainer: {
     flex: 1,
@@ -294,7 +393,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: "#333333",
   },
   errorContainer: {
     flex: 1,
@@ -304,7 +402,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 18,
-    color: "#333333",
     marginTop: 16,
     marginBottom: 24,
   },
@@ -319,37 +416,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.1)",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.05)",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333333",
-  },
-  headerRight: {
-    width: 40,
-  },
   scrollView: {
     flex: 1,
   },
   videoContainer: {
-    backgroundColor: "#FFFFFF",
     margin: 16,
     borderRadius: 12,
     overflow: "hidden",
@@ -379,13 +449,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 16,
-    backgroundColor: "#F8F8F8",
   },
   controlButton: {
     padding: 8,
   },
   playPauseButton: {
-    backgroundColor: COLORS.primary,
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -399,7 +467,6 @@ const styles = StyleSheet.create({
   videoTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333333",
     marginBottom: 8,
   },
   videoMetadata: {
@@ -409,7 +476,6 @@ const styles = StyleSheet.create({
   },
   subjectText: {
     fontSize: 14,
-    color: "#757575",
     marginRight: 12,
   },
   difficultyBadge: {
@@ -423,12 +489,10 @@ const styles = StyleSheet.create({
   },
   durationText: {
     fontSize: 14,
-    color: "#757575",
     marginBottom: 12,
   },
   videoDescription: {
     fontSize: 14,
-    color: "#333333",
     lineHeight: 20,
     marginBottom: 12,
   },
@@ -437,7 +501,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   tagBadge: {
-    backgroundColor: "rgba(0,0,0,0.05)",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -446,13 +509,11 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    color: "#757575",
   },
   relatedVideosContainer: {
     margin: 16,
     marginTop: 0,
     padding: 16,
-    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -463,14 +524,12 @@ const styles = StyleSheet.create({
   relatedVideosTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333333",
     marginBottom: 16,
   },
   relatedVideoItem: {
     flexDirection: "row",
     marginBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.05)",
     paddingBottom: 16,
   },
   relatedVideoThumbnail: {
@@ -489,7 +548,6 @@ const styles = StyleSheet.create({
   relatedVideoTitle: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#333333",
     marginBottom: 8,
   },
   relatedVideoMetadata: {
@@ -498,10 +556,8 @@ const styles = StyleSheet.create({
   },
   relatedVideoDuration: {
     fontSize: 12,
-    color: "#757575",
   },
   relatedVideoDifficulty: {
     fontSize: 12,
-    color: "#757575",
   },
 });

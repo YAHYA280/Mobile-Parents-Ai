@@ -1,22 +1,25 @@
 // app/Enfants/Historique/[activityId]/chat.tsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  ScrollView,
-  SafeAreaView,
-  TouchableOpacity,
-  TextInput,
   StyleSheet,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { COLORS } from "@/constants/theme";
-import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
+import { useChildren } from "@/contexts/ChildrenContext";
+import { useActivities } from "@/contexts/ActivitiesContext";
+import { useTheme } from "@/contexts/ThemeContext";
+
+import ChatBubble from "@/components/chat/ChatBubble";
+import ChatInput from "@/components/chat/ChatInput";
+import ConversationView from "@/components/chat/ConversationView";
+import Header from "@/components/ui/Header";
 
 // Assistant themes for colors and icons
 const ASSISTANT_THEME: Record<string, any> = {
@@ -44,70 +47,45 @@ export default function ChatScreen() {
   const activityIdNum = Number(activityId);
   const childIdNum = Number(childId);
 
-  const scrollViewRef = useRef<ScrollView>(null);
-  const [child, setChild] = useState<any>(null);
-  const [activity, setActivity] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { getChild } = useChildren();
+  const { getActivity, loading } = useActivities();
+  const { dark } = useTheme();
+
   const [showStatement, setShowStatement] = useState(false);
 
-  useEffect(() => {
-    const fetchData = () => {
-      try {
-        setIsLoading(true);
-
-        // Find child
-        const foundChild = CHILDREN_DATA.find((c) => c.id === childIdNum);
-        if (!foundChild) {
-          console.error("Child not found");
-          router.back();
-          return;
-        }
-
-        // Find activity
-        const foundActivity = foundChild.activitesRecentes.find(
-          (a: any) => a.id === activityIdNum
-        );
-
-        if (!foundActivity) {
-          console.error("Activity not found");
-          router.back();
-          return;
-        }
-
-        setChild(foundChild);
-        setActivity(foundActivity);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [activityIdNum, childIdNum]);
-
-  // Scroll to bottom when conversation changes
-  useEffect(() => {
-    if (!isLoading && activity?.conversation) {
-      // Wait for rendering to complete
-      const timer = setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading, activity?.conversation]);
+  const child = getChild(childIdNum);
+  const activity = getActivity(activityIdNum, childIdNum);
 
   const handleBack = () => {
     router.back();
   };
 
-  if (isLoading) {
+  const toggleStatement = () => {
+    setShowStatement(!showStatement);
+  };
+
+  // Get assistant theme
+  const assistantName = activity?.assistant || "Autre";
+  const assistantTheme =
+    ASSISTANT_THEME[assistantName] || ASSISTANT_THEME.Autre;
+
+  if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+        ]}
+      >
+        <Header title="Conversation" onBackPress={handleBack} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>
+          <Text
+            style={[
+              styles.loadingText,
+              { color: dark ? COLORS.white : "#333333" },
+            ]}
+          >
             Chargement de la conversation...
           </Text>
         </View>
@@ -117,10 +95,23 @@ export default function ChatScreen() {
 
   if (!activity || !child) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+        ]}
+      >
+        <Header title="Conversation" onBackPress={handleBack} />
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={64} color="#FF3B30" />
-          <Text style={styles.errorText}>Conversation introuvable</Text>
+          <Text
+            style={[
+              styles.errorText,
+              { color: dark ? COLORS.white : "#333333" },
+            ]}
+          >
+            Conversation introuvable
+          </Text>
           <TouchableOpacity style={styles.errorButton} onPress={handleBack}>
             <Text style={styles.errorButtonText}>Retour</Text>
           </TouchableOpacity>
@@ -128,11 +119,6 @@ export default function ChatScreen() {
       </SafeAreaView>
     );
   }
-
-  // Get assistant theme
-  const assistantName = activity.assistant || "Autre";
-  const assistantTheme =
-    ASSISTANT_THEME[assistantName] || ASSISTANT_THEME.Autre;
 
   // Format date
   const activityDate = new Date(activity.date);
@@ -146,16 +132,30 @@ export default function ChatScreen() {
   const conversation = activity.conversation || [];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+      ]}
+    >
       <KeyboardAvoidingView
         style={styles.keyboardAvoidingContainer}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
       >
-        {/* Header */}
-        <View style={styles.header}>
+        {/* Custom Header */}
+        <View
+          style={[
+            styles.header,
+            { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
+          ]}
+        >
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#333333" />
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={dark ? COLORS.white : "#333333"}
+            />
           </TouchableOpacity>
 
           <LinearGradient
@@ -168,25 +168,54 @@ export default function ChatScreen() {
           </LinearGradient>
 
           <View style={styles.headerTextContainer}>
-            <Text style={styles.assistantName}>Assistant {assistantName}</Text>
-            <Text style={styles.activityDate}>{formattedDate}</Text>
+            <Text
+              style={[
+                styles.assistantName,
+                { color: dark ? COLORS.white : "#333333" },
+              ]}
+            >
+              Assistant {assistantName}
+            </Text>
+            <Text
+              style={[
+                styles.activityDate,
+                { color: dark ? COLORS.secondaryWhite : "#757575" },
+              ]}
+            >
+              {formattedDate}
+            </Text>
           </View>
         </View>
 
         {/* Activity Title */}
-        <View style={styles.activityTitleContainer}>
+        <View
+          style={[
+            styles.activityTitleContainer,
+            {
+              backgroundColor: dark
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(0,0,0,0.03)",
+            },
+          ]}
+        >
           <View style={styles.activityTitleContent}>
-            <Text style={styles.activityTitle} numberOfLines={1}>
+            <Text
+              style={[
+                styles.activityTitle,
+                { color: dark ? COLORS.secondaryWhite : "#757575" },
+              ]}
+              numberOfLines={1}
+            >
               {activity.activite}
             </Text>
             <TouchableOpacity
-              onPress={() => setShowStatement(!showStatement)}
+              onPress={toggleStatement}
               style={styles.toggleButton}
             >
               <Ionicons
                 name={showStatement ? "chevron-up" : "chevron-down"}
                 size={16}
-                color="#757575"
+                color={dark ? COLORS.secondaryWhite : "#757575"}
               />
             </TouchableOpacity>
           </View>
@@ -194,9 +223,30 @@ export default function ChatScreen() {
 
         {/* Statement Section */}
         {showStatement && (
-          <View style={styles.statementContainer}>
-            <Text style={styles.statementTitle}>Énoncé de l'exercice</Text>
-            <Text style={styles.statementText}>
+          <View
+            style={[
+              styles.statementContainer,
+              {
+                backgroundColor: dark
+                  ? "rgba(255,255,255,0.03)"
+                  : "rgba(0,0,0,0.02)",
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.statementTitle,
+                { color: dark ? COLORS.white : "#333333" },
+              ]}
+            >
+              Énoncé de l'exercice
+            </Text>
+            <Text
+              style={[
+                styles.statementText,
+                { color: dark ? COLORS.secondaryWhite : "#333333" },
+              ]}
+            >
               {activity.commentaires ||
                 "L'élève a travaillé sur un exercice qui utilise l'application d'IA pour apprendre."}
             </Text>
@@ -204,7 +254,12 @@ export default function ChatScreen() {
             {activity.recommandations &&
               activity.recommandations.length > 0 && (
                 <View style={styles.recommendationsContainer}>
-                  <Text style={styles.recommendationsTitle}>
+                  <Text
+                    style={[
+                      styles.recommendationsTitle,
+                      { color: dark ? COLORS.white : "#333333" },
+                    ]}
+                  >
                     Recommandations:
                   </Text>
                   {activity.recommandations.map(
@@ -216,7 +271,14 @@ export default function ChatScreen() {
                           color={COLORS.primary}
                           style={styles.recommendationIcon}
                         />
-                        <Text style={styles.recommendationText}>{rec}</Text>
+                        <Text
+                          style={[
+                            styles.recommendationText,
+                            { color: dark ? COLORS.secondaryWhite : "#333333" },
+                          ]}
+                        >
+                          {rec}
+                        </Text>
                       </View>
                     )
                   )}
@@ -226,50 +288,36 @@ export default function ChatScreen() {
         )}
 
         {/* Chat Messages */}
-        <ScrollView
-          ref={scrollViewRef}
+        <ConversationView
+          messages={conversation}
           style={styles.chatContainer}
           contentContainerStyle={styles.chatContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {conversation.map((msg: any, index: number) => (
-            <View
-              key={index}
-              style={[
-                styles.messageBubble,
-                msg.sender === "assistant"
-                  ? styles.assistantBubble
-                  : styles.userBubble,
-              ]}
-            >
-              <Text style={styles.messageText}>{msg.message}</Text>
-              <Text style={styles.messageTimestamp}>{msg.timestamp}</Text>
-            </View>
-          ))}
-        </ScrollView>
+        />
 
         {/* Message Input (Read-only) */}
-        <View style={styles.inputContainer}>
-          <View style={styles.inputBox}>
-            <TextInput
-              placeholder="Ce chat est en lecture seule..."
-              placeholderTextColor="#757575"
-              style={styles.textInput}
-              editable={false}
-            />
-            <Ionicons name="lock-closed" size={18} color="#757575" />
-          </View>
-        </View>
+        <ChatInput
+          placeholder="Ce chat est en lecture seule..."
+          disabled={true}
+        />
 
         {/* Info Banner */}
-        <View style={styles.infoBanner}>
+        <View
+          style={[
+            styles.infoBanner,
+            {
+              backgroundColor: dark
+                ? "rgba(33, 150, 243, 0.1)"
+                : "rgba(33, 150, 243, 0.05)",
+            },
+          ]}
+        >
           <Ionicons
             name="information-circle"
             size={18}
             color={COLORS.primary}
             style={styles.infoIcon}
           />
-          <Text style={styles.infoText}>
+          <Text style={[styles.infoText, { color: COLORS.primary }]}>
             Ceci est un historique de conversation en lecture seule
           </Text>
         </View>
@@ -278,10 +326,13 @@ export default function ChatScreen() {
   );
 }
 
+import { TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
   },
   keyboardAvoidingContainer: {
     flex: 1,
@@ -294,7 +345,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: "#333333",
   },
   errorContainer: {
     flex: 1,
@@ -304,7 +354,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 18,
-    color: "#333333",
     marginTop: 16,
     marginBottom: 24,
   },
@@ -323,7 +372,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
   },
@@ -344,15 +392,12 @@ const styles = StyleSheet.create({
   assistantName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333333",
   },
   activityDate: {
     fontSize: 12,
-    color: "#757575",
   },
   activityTitleContainer: {
     padding: 12,
-    backgroundColor: "rgba(0,0,0,0.03)",
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
   },
@@ -363,7 +408,6 @@ const styles = StyleSheet.create({
   },
   activityTitle: {
     fontSize: 15,
-    color: "#757575",
     flex: 1,
     textAlign: "center",
   },
@@ -372,19 +416,16 @@ const styles = StyleSheet.create({
   },
   statementContainer: {
     padding: 16,
-    backgroundColor: "rgba(0,0,0,0.02)",
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
   },
   statementTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333333",
     marginBottom: 8,
   },
   statementText: {
     fontSize: 14,
-    color: "#333333",
     marginBottom: 12,
   },
   recommendationsContainer: {
@@ -393,7 +434,6 @@ const styles = StyleSheet.create({
   recommendationsTitle: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#333333",
     marginBottom: 8,
   },
   recommendationItem: {
@@ -407,67 +447,15 @@ const styles = StyleSheet.create({
   },
   recommendationText: {
     fontSize: 14,
-    color: "#333333",
     flex: 1,
   },
   chatContainer: {
     flex: 1,
-    padding: 16,
   },
   chatContent: {
-    paddingBottom: 16,
-  },
-  messageBubble: {
-    marginBottom: 16,
     padding: 16,
-    borderRadius: 16,
-    maxWidth: "80%",
-  },
-  assistantBubble: {
-    backgroundColor: "rgba(33, 150, 243, 0.1)",
-    alignSelf: "flex-start",
-    borderTopLeftRadius: 4,
-  },
-  userBubble: {
-    backgroundColor: "#E1E1E1",
-    alignSelf: "flex-end",
-    borderTopRightRadius: 4,
-  },
-  messageText: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: "#333333",
-  },
-  messageTimestamp: {
-    fontSize: 12,
-    color: "rgba(0, 0, 0, 0.5)",
-    alignSelf: "flex-end",
-    marginTop: 4,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    padding: 12,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.1)",
-    alignItems: "center",
-  },
-  inputBox: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.05)",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  textInput: {
-    flex: 1,
-    color: "#333333",
-    fontSize: 15,
   },
   infoBanner: {
-    backgroundColor: "rgba(33, 150, 243, 0.05)",
     padding: 12,
     alignItems: "center",
     flexDirection: "row",
@@ -477,7 +465,6 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   infoText: {
-    color: COLORS.primary,
     fontSize: 13,
   },
 });

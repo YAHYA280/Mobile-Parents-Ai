@@ -1,142 +1,84 @@
 // app/Enfants/Historique/index.tsx
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   View,
-  Text,
   FlatList,
-  SafeAreaView,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Text,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { COLORS } from "@/constants/theme";
-import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
 
-// Import the ActivityFilter component we'll use later
-// import ActivityFilter from "@/components/activities/ActivityFilters";
+import { COLORS } from "@/constants/theme";
+import { useChildren } from "@/contexts/ChildrenContext";
+import { useActivities } from "@/contexts/ActivitiesContext";
+import { useFilters } from "@/contexts/FiltersContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Activity as InterfaceActivity } from "@/types/interfaces";
+
+import Header from "@/components/ui/Header";
+import ActivityCard from "@/components/activities/ActivityCard";
+import ActivityFilter from "@/components/activities/ActivityFilters";
 
 export default function AllActivitiesScreen() {
   const router = useRouter();
   const { childId } = useLocalSearchParams();
   const childIdNum = Number(childId);
 
-  const [child, setChild] = useState<any>(null);
-  const [activities, setActivities] = useState<any[]>([]);
-  const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { getChild } = useChildren();
+  const {
+    filteredActivities: contextActivities,
+    loading,
+    getChildActivities,
+    getAvailableAssistants,
+    getAvailableSubjects,
+    getAvailableDifficulties,
+  } = useActivities();
 
-  // Filter states
-  const [filters, setFilters] = useState({
-    dateRange: {
-      startDate: null,
-      endDate: null,
-    },
-    selectedAssistants: [],
-    selectedSubjects: [],
-    selectedDifficulties: [],
-  });
+  const { filters, updateFilter, applyFilters, resetFilters } = useFilters();
 
+  const { dark } = useTheme();
+
+  const child = getChild(childIdNum);
+
+  // Convert activities to the format expected by ActivityCard
+  const filteredActivities: InterfaceActivity[] = contextActivities.map(
+    (activity) => ({
+      id: activity.id,
+      activite: activity.activite,
+      date: activity.date,
+      duree: activity.duree,
+      assistant: activity.assistant,
+      matiere: activity.matiere,
+      // Ensure score is a number or undefined, not a string
+      score:
+        typeof activity.score === "string"
+          ? parseFloat(activity.score)
+          : activity.score,
+      // Add the type property which doesn't exist in the original Activity type
+      type: activity.matiere || "Autre", // Use matiere as the type if available, otherwise "Autre"
+    })
+  );
+
+  // Get all available filter options
+  const availableAssistants = getAvailableAssistants();
+  const availableSubjects = getAvailableSubjects();
+  const availableDifficulties = getAvailableDifficulties();
+
+  // Set initial activities
   useEffect(() => {
-    const fetchData = () => {
-      try {
-        setIsLoading(true);
-
-        // Find child
-        const foundChild = CHILDREN_DATA.find((c) => c.id === childIdNum);
-        if (!foundChild) {
-          console.error("Child not found");
-          router.back();
-          return;
-        }
-
-        setChild(foundChild);
-        setActivities(foundChild.activitesRecentes);
-        setFilteredActivities(foundChild.activitesRecentes);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    // This approach would depend on how your context is set up
+    // You may need to fetch or filter activities for this child
+    getChildActivities(childIdNum);
   }, [childIdNum]);
 
-  // Handle filter changes
-  const handleFilterChange = (filterType: string, value: any) => {
-    setFilters((prev) => ({
-      ...prev,
-      [filterType]: value,
-    }));
-  };
-
-  // Apply filters
-  const applyFilters = () => {
-    let result = [...activities];
-
-    // Filter by date range
-    if (filters.dateRange.startDate) {
-      const startDate = new Date(filters.dateRange.startDate);
-      result = result.filter((activity) => {
-        const activityDate = new Date(activity.date);
-        return activityDate >= startDate;
-      });
-    }
-
-    if (filters.dateRange.endDate) {
-      const endDate = new Date(filters.dateRange.endDate);
-      endDate.setHours(23, 59, 59, 999); // End of day
-      result = result.filter((activity) => {
-        const activityDate = new Date(activity.date);
-        return activityDate <= endDate;
-      });
-    }
-
-    // Filter by assistants
-    if (filters.selectedAssistants.length > 0) {
-      result = result.filter((activity) =>
-        filters.selectedAssistants.includes(activity.assistant || "")
-      );
-    }
-
-    // Filter by subjects
-    if (filters.selectedSubjects.length > 0) {
-      result = result.filter((activity) =>
-        filters.selectedSubjects.includes(activity.matiere || "")
-      );
-    }
-
-    // Filter by difficulty
-    if (filters.selectedDifficulties.length > 0) {
-      result = result.filter(
-        (activity) =>
-          activity.difficulty &&
-          filters.selectedDifficulties.includes(activity.difficulty)
-      );
-    }
-
-    setFilteredActivities(result);
-  };
-
-  // Reset filters
-  const resetFilters = () => {
-    setFilters({
-      dateRange: {
-        startDate: null,
-        endDate: null,
-      },
-      selectedAssistants: [],
-      selectedSubjects: [],
-      selectedDifficulties: [],
-    });
-    setFilteredActivities(activities);
-  };
-
-  // Navigate to activity details
+  // Handle activity press
   const handleActivityPress = (activityId: number) => {
-    router.push(`/Enfants/Historique/${activityId}?childId=${childIdNum}`);
+    // Fix the path to use absolute path instead of relative
+    router.push(`./Enfants/Historique/${activityId}?childId=${childIdNum}`);
   };
 
   // Go back
@@ -144,97 +86,79 @@ export default function AllActivitiesScreen() {
     router.back();
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+        ]}
+      >
+        <Header title="Historique d'activités" onBackPress={handleBack} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Chargement de l'historique...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Historique d'activités</Text>
-        <View style={styles.headerRight} />
-      </View>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
+      ]}
+    >
+      <Header
+        title="Historique d'activités"
+        subtitle={child ? child.name : ""}
+        onBackPress={handleBack}
+      />
 
-      {/* Filters - to be added as a component later */}
-      {/* <ActivityFilter
+      {/* Filters */}
+      <ActivityFilter
         dateRange={filters.dateRange}
         selectedAssistants={filters.selectedAssistants}
         selectedSubjects={filters.selectedSubjects}
         selectedDifficulties={filters.selectedDifficulties}
-        availableAssistants={[]}
-        availableSubjects={[]}
-        availableDifficulties={[]}
-        onFilterChange={handleFilterChange}
+        availableAssistants={availableAssistants}
+        availableSubjects={availableSubjects}
+        availableDifficulties={availableDifficulties}
+        onFilterChange={(filterType, value) =>
+          updateFilter(filterType as any, value)
+        }
         onResetFilters={resetFilters}
         onApplyFilters={applyFilters}
-      /> */}
+      />
 
       {/* Activity List */}
       {filteredActivities.length > 0 ? (
         <FlatList
           data={filteredActivities}
           keyExtractor={(item) => `activity-${item.id}`}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.activityCard}
-              onPress={() => handleActivityPress(item.id)}
-            >
-              <View style={styles.activityHeader}>
-                <Text style={styles.activityTitle}>{item.activite}</Text>
-                <Text style={styles.activityDate}>
-                  {new Date(item.date).toLocaleDateString("fr-FR")}
-                </Text>
-              </View>
-
-              <View style={styles.activityDetails}>
-                {item.matiere && (
-                  <View style={styles.detailItem}>
-                    <Ionicons name="book-outline" size={16} color="#757575" />
-                    <Text style={styles.detailText}>{item.matiere}</Text>
-                  </View>
-                )}
-
-                <View style={styles.detailItem}>
-                  <Ionicons name="time-outline" size={16} color="#757575" />
-                  <Text style={styles.detailText}>{item.duree}</Text>
-                </View>
-
-                {item.assistant && (
-                  <View style={styles.detailItem}>
-                    <Ionicons name="person-outline" size={16} color="#757575" />
-                    <Text style={styles.detailText}>{item.assistant}</Text>
-                  </View>
-                )}
-              </View>
-
-              <View style={styles.activityFooter}>
-                <Text style={styles.viewDetailsText}>Voir les détails</Text>
-                <Ionicons
-                  name="chevron-forward"
-                  size={16}
-                  color={COLORS.primary}
-                />
-              </View>
-            </TouchableOpacity>
+          renderItem={({ item, index }) => (
+            <ActivityCard
+              activity={item}
+              onPress={() => handleActivityPress(item.id as number)}
+              index={index}
+            />
           )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Ionicons name="search" size={64} color="#CCCCCC" />
-          <Text style={styles.emptyText}>
+          <Ionicons
+            name="search"
+            size={64}
+            color={dark ? COLORS.secondaryWhite : "#CCCCCC"}
+          />
+          <Text
+            style={[
+              styles.emptyText,
+              { color: dark ? COLORS.secondaryWhite : "#757575" },
+            ]}
+          >
             Aucune activité ne correspond à vos filtres
           </Text>
           <TouchableOpacity
@@ -254,43 +178,11 @@ export default function AllActivitiesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.1)",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.05)",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333333",
-  },
-  headerRight: {
-    width: 40,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: "#333333",
   },
   listContent: {
     padding: 16,
@@ -306,7 +198,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     fontSize: 16,
     textAlign: "center",
-    color: "#757575",
   },
   resetFiltersButton: {
     backgroundColor: COLORS.primary,
@@ -317,55 +208,5 @@ const styles = StyleSheet.create({
   resetFiltersText: {
     color: "#FFFFFF",
     fontWeight: "bold",
-  },
-  activityCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  activityHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  activityTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333333",
-    flex: 1,
-    marginRight: 8,
-  },
-  activityDate: {
-    fontSize: 12,
-    color: "#757575",
-  },
-  activityDetails: {
-    marginBottom: 12,
-  },
-  detailItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  detailText: {
-    fontSize: 14,
-    color: "#757575",
-    marginLeft: 8,
-  },
-  activityFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  viewDetailsText: {
-    fontSize: 14,
-    color: COLORS.primary,
-    marginRight: 4,
   },
 });

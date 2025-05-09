@@ -3,20 +3,23 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/theme";
-import { Text, View } from "react-native";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ChildTabsLayout() {
+  const { dark } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.gray3,
+        tabBarInactiveTintColor: dark ? COLORS.secondaryWhite : COLORS.gray3,
         tabBarStyle: {
           borderTopWidth: 1,
           borderTopColor: "rgba(0,0,0,0.1)",
           elevation: 0,
           shadowOpacity: 0,
+          backgroundColor: dark ? COLORS.dark1 : COLORS.white,
         },
         tabBarLabelStyle: {
           fontSize: 12,

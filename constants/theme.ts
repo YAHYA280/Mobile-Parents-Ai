@@ -287,6 +287,7 @@ export const ANIMATIONS = {
   },
 };
 
+// Updated TYPOGRAPHY constant with missing properties
 export const TYPOGRAPHY = {
   h1: {
     fontSize: 26,
@@ -305,6 +306,24 @@ export const TYPOGRAPHY = {
     fontFamily: "bold",
     lineHeight: 24,
     letterSpacing: 0.2,
+  },
+  h4: {
+    fontSize: 16,
+    fontFamily: "bold",
+    lineHeight: 22,
+    letterSpacing: 0.2,
+  },
+  h5: {
+    fontSize: 14,
+    fontFamily: "bold",
+    lineHeight: 20,
+    letterSpacing: 0.1,
+  },
+  h6: {
+    fontSize: 12,
+    fontFamily: "bold",
+    lineHeight: 18,
+    letterSpacing: 0.1,
   },
   subtitle1: {
     fontSize: 16,
@@ -338,6 +357,13 @@ export const TYPOGRAPHY = {
     fontSize: 12,
     fontFamily: "medium",
     lineHeight: 16,
+  },
+  overline: {
+    fontSize: 10,
+    fontFamily: "medium",
+    lineHeight: 14,
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
   },
 };
 
