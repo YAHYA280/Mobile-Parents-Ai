@@ -1,182 +1,206 @@
 // app/(tabs)/Enfants.tsx
-import type { NavigationProp } from "@react-navigation/native";
-
 import React from "react";
 import { Image } from "expo-image";
-import { useRouter, useNavigation } from "expo-router";
-import { icons, COLORS as HEADER_COLORS } from "@/constants";
+import { useRouter } from "expo-router";
+import { MotiView } from "moti";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
 } from "react-native";
 
-import { useTheme } from "../../theme/ThemeProvider";
-import { COLORS as THEME_COLORS } from "../../constants/theme";
+import { COLORS, TYPOGRAPHY, SHADOWS, RADIUS } from "../../constants/theme";
 import { CHILDREN_DATA, Child } from "../../data/Enfants/CHILDREN_DATA";
+import NotificationBell from "../../components/notifications/NotificationBell";
 
 // Function to get progress color based on value
 function getProgressColor(progress: number) {
   if (progress < 30) {
-    return THEME_COLORS.error; // Rouge
+    return COLORS.error; // Rouge
   }
   if (progress <= 50) {
-    return THEME_COLORS.secondary; // Orange
+    return COLORS.secondary; // Orange
   }
   if (progress <= 70) {
-    return THEME_COLORS.primary; // Jaune
+    return COLORS.primary; // Jaune
   }
-  return THEME_COLORS.greeen; // Vert
-}
-
-interface HomeProps {
-  navigation: any;
+  return COLORS.greeen; // Vert
 }
 
 // Main EnfantsList Component
-const EnfantsList: React.FC<HomeProps> = () => {
-  const navigation = useNavigation<NavigationProp<any>>();
+const EnfantsList: React.FC = () => {
   const router = useRouter();
-  const { colors } = useTheme();
-  const { width } = Dimensions.get("window");
-
-  const renderHeader = () => (
-    <View style={styles.headerContainer}>
-      <Text style={styles.headerTitle}>Mes Enfants</Text>
-      <View style={[styles.viewRight, { marginLeft: "auto" }]}>
-        <TouchableOpacity onPress={() => navigation.navigate("notifications")}>
-          <Image
-            source={icons.notificationBell2}
-            resizeMode="contain"
-            style={styles.bellIcon}
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
 
   const handleChildPress = (childId: number) => {
     router.push(`/Enfants/home?childId=${childId}`);
   };
 
-  // Type for renderItem
-  type RenderItemProps = {
-    item: Child;
-    index: number;
-  };
+  // Render header with animated appearance
+  const renderHeader = () => (
+    <MotiView
+      from={{ opacity: 0, translateY: -20 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "spring", damping: 18 }}
+      style={styles.headerContainer}
+    >
+      <Text style={styles.headerTitle}>Mes Enfants</Text>
+      <View style={styles.headerActions}>
+        <NotificationBell />
+      </View>
+    </MotiView>
+  );
 
-  const renderChildCard = ({ item }: RenderItemProps) => {
-    // Fix progress percentage parsing
+  // Render welcome card with animation
+  const renderWelcomeCard = () => (
+    <MotiView
+      from={{ opacity: 0, translateY: 20 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "timing", duration: 500 }}
+      style={styles.welcomeCard}
+    >
+      <Text style={styles.welcomeText}>
+        Suivez le progrès et les activités de vos enfants facilement
+      </Text>
+    </MotiView>
+  );
+
+  // Render child card with staggered animation
+  const renderChildCard = ({ item, index }: { item: Child; index: number }) => {
+    // Parse progress percentage
     const progressText = item.progress;
     const progressValue = parseFloat(progressText.replace("%", ""));
+    const progressColor = getProgressColor(progressValue);
 
     return (
-      <View style={styles.childCard}>
-        <View style={styles.cardHeader}>
-          <View style={styles.avatarContainer}>
-            <Image
-              source={item.profileImage}
-              style={styles.avatar}
-              contentFit="cover"
-            />
-          </View>
-
-          <View style={styles.infoContainer}>
-            <Text style={styles.childName}>{item.name}</Text>
-            <Text style={styles.childDetails}>
-              {item.age} ans • {item.classe}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.progressSection}>
-          <View style={styles.progressRow}>
-            <Text style={styles.progressLabel}>Progrès global</Text>
-            <Text
-              style={[
-                styles.progressValue,
-                { color: getProgressColor(progressValue) },
-              ]}
-            >
-              {progressText}
-            </Text>
-          </View>
-
-          <View style={styles.progressBarContainer}>
-            <View
-              style={[
-                styles.progressBar,
-                {
-                  width: `${progressValue}%`,
-                  backgroundColor: getProgressColor(progressValue),
-                },
-              ]}
-            />
-          </View>
-        </View>
-
-        {/* Point forts and à améliorer */}
-        <View style={styles.tagsSection}>
-          <View style={styles.tagsRow}>
-            <View style={styles.tagColumn}>
-              <Text style={styles.tagLabel}>Points forts</Text>
-              <View style={styles.tagsList}>
-                {item.matieresFortes.slice(0, 2).map((matiere, idx) => (
-                  <View key={idx} style={styles.tagItem}>
-                    <View style={styles.tagBullet} />
-                    <Text style={styles.tagText}>{matiere}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-            <View style={styles.tagColumn}>
-              <Text style={styles.tagLabel}>À améliorer</Text>
-              <View style={styles.tagsList}>
-                {item.matieresAmeliorer.slice(0, 2).map((matiere, idx) => (
-                  <View key={idx} style={styles.tagItem}>
-                    <View style={[styles.tagBullet, styles.improveBullet]} />
-                    <Text style={[styles.tagText, styles.improveText]}>
-                      {matiere.replace(/^\?/, "").trim()}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </View>
-        </View>
-
+      <MotiView
+        from={{ opacity: 0, translateY: 20 }}
+        animate={{ opacity: 1, translateY: 0 }}
+        transition={{ type: "timing", duration: 500 }}
+        style={styles.childCardWrapper}
+      >
         <TouchableOpacity
-          style={styles.detailsButton}
+          style={styles.childCard}
           onPress={() => handleChildPress(item.id)}
+          activeOpacity={0.8}
         >
-          <Text style={styles.detailsButtonText}>Accéder aux détails</Text>
+          <View style={styles.cardHeader}>
+            <View
+              style={[styles.avatarContainer, { borderColor: progressColor }]}
+            >
+              <Image
+                source={item.profileImage}
+                style={styles.avatar}
+                contentFit="cover"
+                transition={500}
+              />
+            </View>
+
+            <View style={styles.infoContainer}>
+              <Text style={styles.childName} numberOfLines={1}>
+                {item.name}
+              </Text>
+              <Text style={styles.childDetails}>
+                {item.age} ans • {item.classe}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.progressSection}>
+            <View style={styles.progressRow}>
+              <Text style={styles.progressLabel}>Progrès global</Text>
+              <Text style={[styles.progressValue, { color: progressColor }]}>
+                {progressText}
+              </Text>
+            </View>
+
+            <View style={styles.progressBarContainer}>
+              <MotiView
+                from={{ width: "0%" }}
+                animate={{ width: `${progressValue}%` }}
+                transition={{
+                  type: "timing",
+                  duration: 1000,
+                  delay: 300 + index * 100,
+                }}
+                style={[styles.progressBar, { backgroundColor: progressColor }]}
+              />
+            </View>
+          </View>
+
+          {/* Points forts and à améliorer */}
+          <View style={styles.tagsSection}>
+            <View style={styles.tagColumns}>
+              <View style={styles.tagColumn}>
+                <Text style={styles.tagLabel}>Points forts</Text>
+                <View style={styles.tagsList}>
+                  {item.matieresFortes.slice(0, 2).map((matiere, idx) => (
+                    <View key={idx} style={styles.tagItem}>
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={14}
+                        color="#4CAF50"
+                        style={styles.tagIcon}
+                      />
+                      <Text style={styles.tagText}>{matiere}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+              <View style={styles.tagColumn}>
+                <Text style={styles.tagLabel}>À améliorer</Text>
+                <View style={styles.tagsList}>
+                  {item.matieresAmeliorer.slice(0, 2).map((matiere, idx) => (
+                    <View
+                      key={idx}
+                      style={[styles.tagItem, styles.improveTagItem]}
+                    >
+                      <Ionicons
+                        name="alert-circle"
+                        size={14}
+                        color="#F44336"
+                        style={styles.tagIcon}
+                      />
+                      <Text style={[styles.tagText, styles.improveText]}>
+                        {matiere.replace(/^\?/, "").trim()}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.detailsButton}
+            onPress={() => handleChildPress(item.id)}
+          >
+            <Text style={styles.detailsButtonText}>Accéder aux détails</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color="#FFFFFF"
+              style={{ marginLeft: 4 }}
+            />
+          </TouchableOpacity>
         </TouchableOpacity>
-      </View>
+      </MotiView>
     );
   };
 
   return (
     <SafeAreaView style={styles.area}>
-      <View style={styles.container}>{renderHeader()}</View>
-
-      <View style={styles.welcomeCard}>
-        <View style={styles.welcomeIconContainer}>
-          <Text style={styles.welcomeIcon}>👨‍👩‍👧‍👦</Text>
-        </View>
-        <Text style={styles.welcomeText}>
-          Suivez le progrès et les activités de vos enfants facilement
-        </Text>
-      </View>
+      {renderHeader()}
 
       <FlatList
         data={CHILDREN_DATA}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderChildCard}
         contentContainerStyle={styles.listContainer}
+        ListHeaderComponent={renderWelcomeCard}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
@@ -188,71 +212,64 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F8F8F8",
   },
-  container: {
-    backgroundColor: "#FFFFFF",
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 3,
-  },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: "#FFFFFF",
+    ...SHADOWS.small,
   },
   headerTitle: {
-    fontSize: 22,
-    fontFamily: "bold",
+    ...TYPOGRAPHY.h1,
     color: "#333333",
   },
-  viewRight: {
+  headerActions: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  bellIcon: {
-    height: 24,
-    width: 24,
-    tintColor: "#333333",
   },
   welcomeCard: {
     margin: 16,
-    backgroundColor: "rgba(255, 142, 105, 0.1)",
-    borderRadius: 12,
+    borderRadius: RADIUS.lg,
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "rgba(255,142,105,0.1)",
+    ...SHADOWS.small,
   },
   welcomeIconContainer: {
     width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "rgba(255,255,255,0.3)",
     justifyContent: "center",
     alignItems: "center",
   },
   welcomeIcon: {
-    fontSize: 30,
+    fontSize: 24,
   },
   welcomeText: {
     flex: 1,
-    fontSize: 14,
-    color: THEME_COLORS.primary,
-    lineHeight: 20,
-    marginLeft: 8,
+    fontSize: 15,
+    lineHeight: 22,
+    marginLeft: 12,
+    fontFamily: "medium",
+    color: COLORS.primary,
   },
   listContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
     paddingBottom: 80,
   },
-  childCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 16,
+  childCardWrapper: {
     marginBottom: 20,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+  },
+  childCard: {
+    borderRadius: RADIUS.lg,
+    padding: 16,
+    overflow: "hidden",
+    backgroundColor: "#FFFFFF",
+    ...SHADOWS.medium,
   },
   cardHeader: {
     flexDirection: "row",
@@ -265,8 +282,8 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     overflow: "hidden",
     marginRight: 16,
-    borderWidth: 2,
-    borderColor: THEME_COLORS.primary,
+    borderWidth: 3,
+    ...SHADOWS.small,
   },
   avatar: {
     width: "100%",
@@ -279,14 +296,14 @@ const styles = StyleSheet.create({
   childName: {
     fontSize: 18,
     fontFamily: "bold",
-    color: "#333333",
     marginBottom: 4,
     textTransform: "capitalize",
+    color: "#333333",
   },
   childDetails: {
     fontSize: 14,
-    color: "#757575",
     fontFamily: "regular",
+    color: "#757575",
   },
   progressSection: {
     marginBottom: 16,
@@ -299,8 +316,8 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     fontSize: 14,
-    color: "#757575",
     fontFamily: "medium",
+    color: "#757575",
   },
   progressValue: {
     fontSize: 14,
@@ -308,9 +325,9 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     height: 8,
-    backgroundColor: "#E0E0E0",
     borderRadius: 4,
     marginBottom: 12,
+    backgroundColor: "#E0E0E0",
   },
   progressBar: {
     height: "100%",
@@ -319,7 +336,7 @@ const styles = StyleSheet.create({
   tagsSection: {
     marginBottom: 16,
   },
-  tagsRow: {
+  tagColumns: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -329,9 +346,9 @@ const styles = StyleSheet.create({
   },
   tagLabel: {
     fontSize: 14,
-    color: "#757575",
-    marginBottom: 8,
     fontFamily: "medium",
+    marginBottom: 8,
+    color: "#757575",
   },
   tagsList: {
     gap: 6,
@@ -339,31 +356,32 @@ const styles = StyleSheet.create({
   tagItem: {
     flexDirection: "row",
     alignItems: "center",
+    padding: 6,
+    borderRadius: RADIUS.md,
     marginBottom: 4,
+    backgroundColor: "rgba(76, 175, 80, 0.1)",
   },
-  tagBullet: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#4CAF50",
-    marginRight: 8,
+  tagIcon: {
+    marginRight: 4,
   },
-  improveBullet: {
-    backgroundColor: "#F44336",
+  improveTagItem: {
+    backgroundColor: "rgba(244, 67, 54, 0.1)",
   },
   tagText: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#333333",
+    fontFamily: "medium",
   },
   improveText: {
     color: "#333333",
   },
   detailsButton: {
-    backgroundColor: THEME_COLORS.primary,
+    backgroundColor: COLORS.primary,
     paddingVertical: 12,
     borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
+    flexDirection: "row",
   },
   detailsButtonText: {
     color: "#FFFFFF",

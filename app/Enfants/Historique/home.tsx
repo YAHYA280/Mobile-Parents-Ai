@@ -1,4 +1,4 @@
-// app/Enfants/home.tsx
+// app/Enfants/Historique/home.tsx
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -13,8 +13,9 @@ import { Image } from "expo-image";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS } from "@/constants/theme";
-import { CHILDREN_DATA, Child, Activity } from "@/data/Enfants/CHILDREN_DATA";
+import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
 import ActivityCard from "@/components/cards/ActivityCard";
+import { Child, Activity } from "@/types/interfaces"; // Import from our centralized interfaces
 
 const tabs = ["Aperçu", "Activités", "Suivi"];
 
@@ -29,7 +30,7 @@ const ChildHome: React.FC = () => {
 
   // Get child data
   useEffect(() => {
-    const foundChild = CHILDREN_DATA.find((c) => c.id === childId);
+    const foundChild = CHILDREN_DATA.find((c) => c.id === childId) as Child;
     setChild(foundChild || null);
   }, [childId]);
 
@@ -43,7 +44,7 @@ const ChildHome: React.FC = () => {
   };
 
   // Navigate to activity details
-  const handleActivityPress = (activityId: number) => {
+  const handleActivityPress = (activityId: string | number) => {
     router.push(
       `/Enfants/Historique/historydetails?activityId=${activityId}&childId=${childId}`
     );
@@ -66,10 +67,10 @@ const ChildHome: React.FC = () => {
   }
 
   // Parse progress as number
-  const progressValue = parseFloat(child.progress.replace("%", ""));
+  const progressValue = parseFloat(child.progress.toString().replace("%", ""));
 
   // Helper function to get progress color
-  const getProgressColor = (value: number) => {
+  const getProgressColor = (value: number): string => {
     if (value >= 75) return "#4CAF50"; // Green
     if (value >= 50) return "#FFC107"; // Yellow
     if (value >= 25) return "#FF9800"; // Orange
@@ -119,7 +120,7 @@ const ChildHome: React.FC = () => {
                   <ActivityCard
                     key={activity.id}
                     activity={activity}
-                    onPress={() => handleActivityPress(activity.id ?? 0)}
+                    onPress={() => handleActivityPress(activity.id)}
                     index={index}
                   />
                 ))}
@@ -189,7 +190,7 @@ const ChildHome: React.FC = () => {
                 <ActivityCard
                   key={activity.id}
                   activity={activity}
-                  onPress={() => handleActivityPress(activity.id ?? 0)}
+                  onPress={() => handleActivityPress(activity.id)}
                   index={index}
                 />
               )

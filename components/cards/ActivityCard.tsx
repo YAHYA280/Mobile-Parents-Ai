@@ -3,7 +3,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS } from "@/constants/theme";
-import { Activity } from "@/data/Enfants/CHILDREN_DATA";
+import { Activity } from "@/types/interfaces"; // Import from our centralized interfaces
 
 interface ActivityCardProps {
   activity: Activity;
