@@ -1,4 +1,4 @@
-// app/Enfants/Historique/activityList.tsx
+// app/Enfants/Historique/index.tsx
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -8,46 +8,27 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { COLORS } from "@/constants/theme";
+import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
 
-import { COLORS } from "../../../constants/theme";
-import { useTheme } from "../../../theme/ThemeProvider";
-import {
-  CHILDREN_DATA,
-  Child,
-  Activity,
-} from "../../../data/Enfants/CHILDREN_DATA";
-import ActivityCard from "../../../components/cards/ActivityCard";
-import EnhancedActivityFilter from "../../../components/filters/ActivityFilter";
+// Import the ActivityFilter component we'll use later
+// import ActivityFilter from "@/components/activities/ActivityFilters";
 
-// Define filter states interface
-interface FilterState {
-  dateRange: {
-    startDate: string | null;
-    endDate: string | null;
-  };
-  selectedAssistants: string[];
-  selectedSubjects: string[];
-  selectedDifficulties: string[];
-}
-
-const ActivityList = () => {
+export default function AllActivitiesScreen() {
   const router = useRouter();
-  const { dark, colors } = useTheme();
-  const params = useLocalSearchParams();
-  const childId = Number(params.childId);
+  const { childId } = useLocalSearchParams();
+  const childIdNum = Number(childId);
 
-  // States
-  const [child, setChild] = useState<Child | null>(null);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
+  const [child, setChild] = useState<any>(null);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Filter states
-  const [filters, setFilters] = useState<FilterState>({
+  const [filters, setFilters] = useState({
     dateRange: {
       startDate: null,
       endDate: null,
@@ -57,55 +38,39 @@ const ActivityList = () => {
     selectedDifficulties: [],
   });
 
-  // Available filter options (will be populated from data)
-  const [availableAssistants, setAvailableAssistants] = useState<string[]>([]);
-  const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
-  const [availableDifficulties] = useState<string[]>([
-    "Facile",
-    "Moyen",
-    "Difficile",
-  ]);
-
-  // Fetch data
   useEffect(() => {
     const fetchData = () => {
       try {
         setIsLoading(true);
 
         // Find child
-        const foundChild = CHILDREN_DATA.find((c) => c.id === childId);
+        const foundChild = CHILDREN_DATA.find((c) => c.id === childIdNum);
         if (!foundChild) {
-          Alert.alert("Erreur", "Enfant non trouvé");
+          console.error("Child not found");
           router.back();
           return;
         }
+
         setChild(foundChild);
-
-        // Get activities
-        const childActivities = foundChild.activitesRecentes || [];
-        setActivities(childActivities);
-        setFilteredActivities(childActivities);
-
-        // Extract unique filter options
-        const assistants = Array.from(
-          new Set(childActivities.map((a) => a.assistant).filter(Boolean))
-        );
-        const subjects = Array.from(
-          new Set(childActivities.map((a) => a.matiere).filter(Boolean))
-        );
-
-        setAvailableAssistants(assistants as string[]);
-        setAvailableSubjects(subjects as string[]);
+        setActivities(foundChild.activitesRecentes);
+        setFilteredActivities(foundChild.activitesRecentes);
       } catch (error) {
-        console.error("Erreur:", error);
-        Alert.alert("Erreur", "Une erreur est survenue");
+        console.error("Error:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [childId, router]);
+  }, [childIdNum]);
+
+  // Handle filter changes
+  const handleFilterChange = (filterType: string, value: any) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]: value,
+    }));
+  };
 
   // Apply filters
   const applyFilters = () => {
@@ -155,14 +120,6 @@ const ActivityList = () => {
     setFilteredActivities(result);
   };
 
-  // Handle filter changes
-  const handleFilterChange = (filterType: string, value: any) => {
-    setFilters((prev) => ({
-      ...prev,
-      [filterType]: value,
-    }));
-  };
-
   // Reset filters
   const resetFilters = () => {
     setFilters({
@@ -179,9 +136,7 @@ const ActivityList = () => {
 
   // Navigate to activity details
   const handleActivityPress = (activityId: number) => {
-    router.push(
-      `/Enfants/Historique/historydetails?activityId=${activityId}&childId=${childId}`
-    );
+    router.push(`/Enfants/Historique/${activityId}?childId=${childIdNum}`);
   };
 
   // Go back
@@ -191,90 +146,95 @@ const ActivityList = () => {
 
   if (isLoading) {
     return (
-      <SafeAreaView
-        style={[styles.container, { backgroundColor: colors.background }]}
-      >
+      <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text
-            style={[
-              styles.loadingText,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Chargement de l'historique...
-          </Text>
+          <Text style={styles.loadingText}>Chargement de l'historique...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={dark ? COLORS.white : COLORS.black}
-          />
+          <Ionicons name="arrow-back" size={24} color="#333333" />
         </TouchableOpacity>
-        <Text
-          style={[
-            styles.headerTitle,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
-          Historique d'activités
-        </Text>
+        <Text style={styles.headerTitle}>Historique d'activités</Text>
         <View style={styles.headerRight} />
       </View>
 
-      {/* Filters */}
-      <EnhancedActivityFilter
+      {/* Filters - to be added as a component later */}
+      {/* <ActivityFilter
         dateRange={filters.dateRange}
         selectedAssistants={filters.selectedAssistants}
         selectedSubjects={filters.selectedSubjects}
         selectedDifficulties={filters.selectedDifficulties}
-        availableAssistants={availableAssistants}
-        availableSubjects={availableSubjects}
-        availableDifficulties={availableDifficulties}
+        availableAssistants={[]}
+        availableSubjects={[]}
+        availableDifficulties={[]}
         onFilterChange={handleFilterChange}
         onResetFilters={resetFilters}
         onApplyFilters={applyFilters}
-      />
+      /> */}
 
       {/* Activity List */}
       {filteredActivities.length > 0 ? (
         <FlatList
           data={filteredActivities}
           keyExtractor={(item) => `activity-${item.id}`}
-          renderItem={({ item, index }) => (
-            <ActivityCard
-              activity={item}
-              onPress={() => handleActivityPress(item.id || 0)}
-              index={index}
-            />
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.activityCard}
+              onPress={() => handleActivityPress(item.id)}
+            >
+              <View style={styles.activityHeader}>
+                <Text style={styles.activityTitle}>{item.activite}</Text>
+                <Text style={styles.activityDate}>
+                  {new Date(item.date).toLocaleDateString("fr-FR")}
+                </Text>
+              </View>
+
+              <View style={styles.activityDetails}>
+                {item.matiere && (
+                  <View style={styles.detailItem}>
+                    <Ionicons name="book-outline" size={16} color="#757575" />
+                    <Text style={styles.detailText}>{item.matiere}</Text>
+                  </View>
+                )}
+
+                <View style={styles.detailItem}>
+                  <Ionicons name="time-outline" size={16} color="#757575" />
+                  <Text style={styles.detailText}>{item.duree}</Text>
+                </View>
+
+                {item.assistant && (
+                  <View style={styles.detailItem}>
+                    <Ionicons name="person-outline" size={16} color="#757575" />
+                    <Text style={styles.detailText}>{item.assistant}</Text>
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.activityFooter}>
+                <Text style={styles.viewDetailsText}>Voir les détails</Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={16}
+                  color={COLORS.primary}
+                />
+              </View>
+            </TouchableOpacity>
           )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Ionicons
-            name="search"
-            size={64}
-            color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-          />
-          <Text
-            style={[
-              styles.emptyText,
-              { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-            ]}
-          >
+          <Ionicons name="search" size={64} color="#CCCCCC" />
+          <Text style={styles.emptyText}>
             Aucune activité ne correspond à vos filtres
           </Text>
           <TouchableOpacity
@@ -289,11 +249,12 @@ const ActivityList = () => {
       )}
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F8F8F8",
   },
   header: {
     flexDirection: "row",
@@ -301,6 +262,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
+    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
   },
@@ -315,6 +277,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#333333",
   },
   headerRight: {
     width: 40,
@@ -327,6 +290,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
+    color: "#333333",
   },
   listContent: {
     padding: 16,
@@ -342,6 +306,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     fontSize: 16,
     textAlign: "center",
+    color: "#757575",
   },
   resetFiltersButton: {
     backgroundColor: COLORS.primary,
@@ -350,9 +315,57 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   resetFiltersText: {
-    color: COLORS.white,
+    color: "#FFFFFF",
     fontWeight: "bold",
   },
+  activityCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  activityHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  activityTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333333",
+    flex: 1,
+    marginRight: 8,
+  },
+  activityDate: {
+    fontSize: 12,
+    color: "#757575",
+  },
+  activityDetails: {
+    marginBottom: 12,
+  },
+  detailItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  detailText: {
+    fontSize: 14,
+    color: "#757575",
+    marginLeft: 8,
+  },
+  activityFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  viewDetailsText: {
+    fontSize: 14,
+    color: COLORS.primary,
+    marginRight: 4,
+  },
 });
-
-export default ActivityList;
