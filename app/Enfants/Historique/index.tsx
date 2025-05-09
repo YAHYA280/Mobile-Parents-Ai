@@ -16,7 +16,6 @@ import { COLORS } from "@/constants/theme";
 import { useChildren } from "@/contexts/ChildrenContext";
 import { useActivities } from "@/contexts/ActivitiesContext";
 import { useFilters } from "@/contexts/FiltersContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Activity as InterfaceActivity } from "@/types/interfaces";
 
 import Header from "@/components/ui/Header";
@@ -39,8 +38,6 @@ export default function AllActivitiesScreen() {
   } = useActivities();
 
   const { filters, updateFilter, applyFilters, resetFilters } = useFilters();
-
-  const { dark } = useTheme();
 
   const child = getChild(childIdNum);
 
@@ -88,12 +85,7 @@ export default function AllActivitiesScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <Header title="Historique d'activités" onBackPress={handleBack} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
@@ -103,12 +95,7 @@ export default function AllActivitiesScreen() {
   }
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-      ]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
       <Header
         title="Historique d'activités"
         subtitle={child ? child.name : ""}
@@ -148,17 +135,8 @@ export default function AllActivitiesScreen() {
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Ionicons
-            name="search"
-            size={64}
-            color={dark ? COLORS.secondaryWhite : "#CCCCCC"}
-          />
-          <Text
-            style={[
-              styles.emptyText,
-              { color: dark ? COLORS.secondaryWhite : "#757575" },
-            ]}
-          >
+          <Ionicons name="search" size={64} color={"#CCCCCC"} />
+          <Text style={[styles.emptyText, { color: "#757575" }]}>
             Aucune activité ne correspond à vos filtres
           </Text>
           <TouchableOpacity

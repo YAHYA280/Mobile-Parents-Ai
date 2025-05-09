@@ -6,7 +6,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { COLORS } from "@/constants/theme";
 import { useChildren } from "@/contexts/ChildrenContext";
-import { useTheme } from "@/contexts/ThemeContext";
 
 import Header from "@/components/ui/Header";
 import PerformanceChart from "@/components/children/SuiviTab/PerformanceChart";
@@ -17,19 +16,13 @@ export default function ChildTrackingScreen() {
   const router = useRouter();
   const childId = Number(id);
   const { getChild, getChildPerformance, loading } = useChildren();
-  const { dark } = useTheme();
 
   const child = getChild(childId);
   const performance = getChildPerformance(childId);
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
@@ -39,29 +32,17 @@ export default function ChildTrackingScreen() {
 
   if (!child || !performance) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <Header title="Suivi" onBackPress={() => router.back()} />
         <View style={styles.errorContainer}>
-          <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
-            Enfant non trouvé
-          </Text>
+          <Text style={{ color: COLORS.black }}>Enfant non trouvé</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-      ]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
       <Header
         title="Suivi de performance"
         subtitle={child.name}

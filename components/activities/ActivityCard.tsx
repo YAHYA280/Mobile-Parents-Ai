@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, TYPOGRAPHY, RADIUS } from "@/constants/theme";
-import { useTheme } from "@/theme/ThemeProvider";
 import { Activity } from "@/types/interfaces";
 import { MotiView } from "moti";
 
@@ -17,8 +16,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   onPress,
   index = 0,
 }) => {
-  const { dark } = useTheme();
-
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -71,28 +68,15 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
       }}
     >
       <TouchableOpacity
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
-        ]}
+        style={[styles.container, { backgroundColor: COLORS.white }]}
         onPress={onPress}
         activeOpacity={0.8}
       >
         <View style={styles.dateColumn}>
-          <Text
-            style={[
-              styles.dateDay,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.dateDay, { color: COLORS.black }]}>
             {formattedDate.split(" ")[0]}
           </Text>
-          <Text
-            style={[
-              styles.dateMonth,
-              { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-            ]}
-          >
+          <Text style={[styles.dateMonth, { color: COLORS.gray3 }]}>
             {formattedDate.split(" ")[1]}
           </Text>
           <View
@@ -120,12 +104,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
             {activity.score && (
               <View style={styles.scoreContainer}>
                 <Ionicons name="star" size={14} color="#FFD700" />
-                <Text
-                  style={[
-                    styles.scoreText,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
+                <Text style={[styles.scoreText, { color: COLORS.black }]}>
                   {activity.score}
                 </Text>
               </View>
@@ -133,10 +112,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
           </View>
 
           <Text
-            style={[
-              styles.activityTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
+            style={[styles.activityTitle, { color: COLORS.black }]}
             numberOfLines={2}
           >
             {activity.activite}
@@ -144,34 +120,16 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
 
           <View style={styles.metadataRow}>
             <View style={styles.metadataItem}>
-              <Ionicons
-                name="time-outline"
-                size={12}
-                color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-              />
-              <Text
-                style={[
-                  styles.metadataText,
-                  { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-                ]}
-              >
+              <Ionicons name="time-outline" size={12} color={COLORS.gray3} />
+              <Text style={[styles.metadataText, { color: COLORS.gray3 }]}>
                 {activity.duree}
               </Text>
             </View>
 
             {activity.matiere && (
               <View style={styles.metadataItem}>
-                <Ionicons
-                  name="book-outline"
-                  size={12}
-                  color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-                />
-                <Text
-                  style={[
-                    styles.metadataText,
-                    { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-                  ]}
-                >
+                <Ionicons name="book-outline" size={12} color={COLORS.gray3} />
+                <Text style={[styles.metadataText, { color: COLORS.gray3 }]}>
                   {activity.matiere}
                 </Text>
               </View>

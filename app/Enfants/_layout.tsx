@@ -12,10 +12,11 @@ export default function EnfantsLayout() {
         <FiltersProvider>
           <Stack
             screenOptions={{
-              headerShown: false, // Hide default header
-              animation: "slide_from_right", // Animation type
+              headerShown: false,
+              animation: "slide_from_right",
             }}
           >
+            {/* Only define screens that actually exist */}
             <Stack.Screen
               name="index"
               options={{
@@ -23,7 +24,7 @@ export default function EnfantsLayout() {
               }}
             />
             <Stack.Screen
-              name="[id]/index"
+              name="[id]"
               options={{
                 headerShown: false,
               }}
@@ -34,6 +35,8 @@ export default function EnfantsLayout() {
                 title: "Historique d'activités",
               }}
             />
+            {/* Only include these if the files actually exist */}
+            {/* If these files don't exist, remove these screens */}
             <Stack.Screen
               name="Historique/[activityId]/index"
               options={{

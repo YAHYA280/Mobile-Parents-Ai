@@ -15,7 +15,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/theme";
 import { useChildren } from "@/contexts/ChildrenContext";
 import { useActivities } from "@/contexts/ActivitiesContext";
-import { useTheme } from "@/contexts/ThemeContext";
 
 import Header from "@/components/ui/Header";
 
@@ -63,7 +62,6 @@ export default function VideoResourcesScreen() {
 
   const { getChild } = useChildren();
   const { getActivity, loading } = useActivities();
-  const { dark } = useTheme();
 
   const [selectedVideo, setSelectedVideo] = useState<any>(VIDEO_RESOURCES[0]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -99,21 +97,11 @@ export default function VideoResourcesScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <Header title="Ressources vidéo" onBackPress={handleBack} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text
-            style={[
-              styles.loadingText,
-              { color: dark ? COLORS.white : "#333333" },
-            ]}
-          >
+          <Text style={[styles.loadingText, { color: "#333333" }]}>
             Chargement des ressources...
           </Text>
         </View>
@@ -123,21 +111,11 @@ export default function VideoResourcesScreen() {
 
   if (!activity || !child) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <Header title="Ressources vidéo" onBackPress={handleBack} />
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={64} color="#FF3B30" />
-          <Text
-            style={[
-              styles.errorText,
-              { color: dark ? COLORS.white : "#333333" },
-            ]}
-          >
+          <Text style={[styles.errorText, { color: "#333333" }]}>
             Ressources non trouvées
           </Text>
           <TouchableOpacity style={styles.errorButton} onPress={handleBack}>
@@ -149,12 +127,7 @@ export default function VideoResourcesScreen() {
   }
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-      ]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
       <Header
         title="Ressources vidéo"
         subtitle={activity.activite}
@@ -166,12 +139,7 @@ export default function VideoResourcesScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Video Player */}
-        <View
-          style={[
-            styles.videoContainer,
-            { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
-          ]}
-        >
+        <View style={[styles.videoContainer, { backgroundColor: "#FFFFFF" }]}>
           <View style={styles.videoPlayer}>
             <TouchableOpacity
               style={styles.playButton}
@@ -186,18 +154,9 @@ export default function VideoResourcesScreen() {
           </View>
 
           {/* Controls */}
-          <View
-            style={[
-              styles.videoControls,
-              { backgroundColor: dark ? "rgba(255,255,255,0.05)" : "#F8F8F8" },
-            ]}
-          >
+          <View style={[styles.videoControls, { backgroundColor: "#F8F8F8" }]}>
             <TouchableOpacity style={styles.controlButton}>
-              <Ionicons
-                name="play-skip-back"
-                size={24}
-                color={dark ? COLORS.white : "#333333"}
-              />
+              <Ionicons name="play-skip-back" size={24} color={"#333333"} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -215,32 +174,18 @@ export default function VideoResourcesScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.controlButton}>
-              <Ionicons
-                name="play-skip-forward"
-                size={24}
-                color={dark ? COLORS.white : "#333333"}
-              />
+              <Ionicons name="play-skip-forward" size={24} color={"#333333"} />
             </TouchableOpacity>
           </View>
 
           {/* Video Info */}
           <View style={styles.videoInfo}>
-            <Text
-              style={[
-                styles.videoTitle,
-                { color: dark ? COLORS.white : "#333333" },
-              ]}
-            >
+            <Text style={[styles.videoTitle, { color: "#333333" }]}>
               {selectedVideo.title}
             </Text>
 
             <View style={styles.videoMetadata}>
-              <Text
-                style={[
-                  styles.subjectText,
-                  { color: dark ? COLORS.secondaryWhite : "#757575" },
-                ]}
-              >
+              <Text style={[styles.subjectText, { color: "#757575" }]}>
                 {selectedVideo.subject}
               </Text>
               <View
@@ -263,21 +208,11 @@ export default function VideoResourcesScreen() {
               </View>
             </View>
 
-            <Text
-              style={[
-                styles.durationText,
-                { color: dark ? COLORS.secondaryWhite : "#757575" },
-              ]}
-            >
+            <Text style={[styles.durationText, { color: "#757575" }]}>
               Durée: {selectedVideo.duration}
             </Text>
 
-            <Text
-              style={[
-                styles.videoDescription,
-                { color: dark ? COLORS.white : "#333333" },
-              ]}
-            >
+            <Text style={[styles.videoDescription, { color: "#333333" }]}>
               {selectedVideo.description}
             </Text>
 
@@ -288,18 +223,11 @@ export default function VideoResourcesScreen() {
                   style={[
                     styles.tagBadge,
                     {
-                      backgroundColor: dark
-                        ? "rgba(255,255,255,0.1)"
-                        : "rgba(0,0,0,0.05)",
+                      backgroundColor: "rgba(0,0,0,0.05)",
                     },
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.tagText,
-                      { color: dark ? COLORS.secondaryWhite : "#757575" },
-                    ]}
-                  >
+                  <Text style={[styles.tagText, { color: "#757575" }]}>
                     {tag}
                   </Text>
                 </View>
@@ -312,15 +240,10 @@ export default function VideoResourcesScreen() {
         <View
           style={[
             styles.relatedVideosContainer,
-            { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
+            { backgroundColor: "#FFFFFF" },
           ]}
         >
-          <Text
-            style={[
-              styles.relatedVideosTitle,
-              { color: dark ? COLORS.white : "#333333" },
-            ]}
-          >
+          <Text style={[styles.relatedVideosTitle, { color: "#333333" }]}>
             Vidéos connexes
           </Text>
 
@@ -331,9 +254,7 @@ export default function VideoResourcesScreen() {
                 style={[
                   styles.relatedVideoItem,
                   {
-                    borderBottomColor: dark
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0,0,0,0.05)",
+                    borderBottomColor: "rgba(0,0,0,0.05)",
                   },
                 ]}
                 onPress={() => selectVideo(video)}
@@ -344,10 +265,7 @@ export default function VideoResourcesScreen() {
 
                 <View style={styles.relatedVideoInfo}>
                   <Text
-                    style={[
-                      styles.relatedVideoTitle,
-                      { color: dark ? COLORS.white : "#333333" },
-                    ]}
+                    style={[styles.relatedVideoTitle, { color: "#333333" }]}
                   >
                     {video.title}
                   </Text>
@@ -355,7 +273,7 @@ export default function VideoResourcesScreen() {
                     <Text
                       style={[
                         styles.relatedVideoDuration,
-                        { color: dark ? COLORS.secondaryWhite : "#757575" },
+                        { color: "#757575" },
                       ]}
                     >
                       {video.duration}
@@ -363,7 +281,7 @@ export default function VideoResourcesScreen() {
                     <Text
                       style={[
                         styles.relatedVideoDifficulty,
-                        { color: dark ? COLORS.secondaryWhite : "#757575" },
+                        { color: "#757575" },
                       ]}
                     >
                       {video.difficulty}

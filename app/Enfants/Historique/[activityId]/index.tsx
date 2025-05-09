@@ -14,7 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "@/constants/theme";
 import { useChildren } from "@/contexts/ChildrenContext";
 import { useActivities } from "@/contexts/ActivitiesContext";
-import { useTheme } from "@/contexts/ThemeContext";
 
 import Header from "@/components/ui/Header";
 import ActivityHeader from "@/components/activities/ActivityHeader";
@@ -29,7 +28,6 @@ export default function ActivityDetailsScreen() {
 
   const { getChild } = useChildren();
   const { getActivity, loading } = useActivities();
-  const { dark } = useTheme();
 
   const [blocageIdentified, setBlockageIdentified] = useState(false);
   const [parentFeedback, setParentFeedback] = useState("");
@@ -78,12 +76,7 @@ export default function ActivityDetailsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <Header title="Détails de l'activité" onBackPress={handleBack} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
@@ -94,20 +87,10 @@ export default function ActivityDetailsScreen() {
 
   if (!activity || !child) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <Header title="Détails de l'activité" onBackPress={handleBack} />
         <View style={styles.errorContainer}>
-          <Text
-            style={[
-              styles.errorText,
-              { color: dark ? COLORS.white : "#333333" },
-            ]}
-          >
+          <Text style={[styles.errorText, { color: "#333333" }]}>
             Activité non trouvée
           </Text>
           <TouchableOpacity style={styles.errorButton} onPress={handleBack}>
@@ -119,12 +102,7 @@ export default function ActivityDetailsScreen() {
   }
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-      ]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
       <ActivityHeader
         title="Détails de l'activité"
         onBack={handleBack}
@@ -143,18 +121,8 @@ export default function ActivityDetailsScreen() {
         />
 
         {/* Parent Feedback */}
-        <View
-          style={[
-            styles.feedbackSection,
-            { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
-          ]}
-        >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : "#333333" },
-            ]}
-          >
+        <View style={[styles.feedbackSection, { backgroundColor: "#FFFFFF" }]}>
+          <Text style={[styles.sectionTitle, { color: "#333333" }]}>
             Commentaires des parents
           </Text>
 
@@ -165,27 +133,15 @@ export default function ActivityDetailsScreen() {
                 style={[
                   styles.feedbackItem,
                   {
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.05)"
-                      : "#FFFFFF",
+                    backgroundColor: "#FFFFFF",
                     borderLeftColor: COLORS.primary,
                   },
                 ]}
               >
-                <Text
-                  style={[
-                    styles.feedbackText,
-                    { color: dark ? COLORS.white : "#333333" },
-                  ]}
-                >
+                <Text style={[styles.feedbackText, { color: "#333333" }]}>
                   {feedback.text}
                 </Text>
-                <Text
-                  style={[
-                    styles.feedbackDate,
-                    { color: dark ? COLORS.secondaryWhite : "#757575" },
-                  ]}
-                >
+                <Text style={[styles.feedbackDate, { color: "#757575" }]}>
                   {feedback.date.toLocaleDateString()}
                 </Text>
               </View>
@@ -195,14 +151,14 @@ export default function ActivityDetailsScreen() {
           <View style={styles.addFeedbackContainer}>
             <TextInput
               placeholder="Ajouter un commentaire..."
-              placeholderTextColor={dark ? "rgba(255,255,255,0.5)" : "#999999"}
+              placeholderTextColor={"#999999"}
               value={parentFeedback}
               onChangeText={setParentFeedback}
               style={[
                 styles.feedbackInput,
                 {
-                  backgroundColor: dark ? "rgba(255,255,255,0.1)" : "#FFFFFF",
-                  color: dark ? COLORS.white : "#333333",
+                  backgroundColor: "#FFFFFF",
+                  color: "#333333",
                 },
               ]}
               multiline

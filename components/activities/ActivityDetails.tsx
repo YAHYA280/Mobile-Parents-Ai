@@ -2,8 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { COLORS, TYPOGRAPHY, RADIUS } from "@/constants/theme";
-import { useTheme } from "@/theme/ThemeProvider";
+import { COLORS, RADIUS } from "@/constants/theme";
 
 interface ActivityDetailsProps {
   activity: any;
@@ -16,8 +15,6 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
   onChatPress,
   onVideoPress,
 }) => {
-  const { dark } = useTheme();
-
   // Get subject theme
   const getSubjectTheme = (subject: string = "Autre") => {
     const themes: Record<string, { colors: string[]; icon: string }> = {
@@ -89,12 +86,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
     : [];
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: COLORS.white }]}>
       {/* Header with type and date */}
       <View style={styles.header}>
         <LinearGradient
@@ -112,12 +104,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
           <Text style={styles.assistantText}>{activity.assistant}</Text>
         </LinearGradient>
 
-        <Text
-          style={[
-            styles.dateText,
-            { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-          ]}
-        >
+        <Text style={[styles.dateText, { color: COLORS.gray3 }]}>
           {formatDate(activity.date)}
         </Text>
       </View>
@@ -133,10 +120,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
           <Ionicons name={subjectTheme.icon as any} size={16} color="#FFFFFF" />
         </LinearGradient>
 
-        <Text
-          style={[styles.title, { color: dark ? COLORS.white : COLORS.black }]}
-          numberOfLines={2}
-        >
+        <Text style={[styles.title, { color: COLORS.black }]} numberOfLines={2}>
           {activity.activite}
         </Text>
       </View>
@@ -146,9 +130,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
         style={[
           styles.detailsContainer,
           {
-            backgroundColor: dark
-              ? "rgba(255,255,255,0.05)"
-              : "rgba(0,0,0,0.03)",
+            backgroundColor: "rgba(0,0,0,0.03)",
           },
         ]}
       >
@@ -159,12 +141,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
             color={COLORS.primary}
             style={styles.detailIcon}
           />
-          <Text
-            style={[
-              styles.detailText,
-              { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-            ]}
-          >
+          <Text style={[styles.detailText, { color: COLORS.gray3 }]}>
             Durée: {activity.duree}
           </Text>
         </View>
@@ -177,12 +154,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
               color={COLORS.primary}
               style={styles.detailIcon}
             />
-            <Text
-              style={[
-                styles.detailText,
-                { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-              ]}
-            >
+            <Text style={[styles.detailText, { color: COLORS.gray3 }]}>
               Score: {activity.score}
             </Text>
           </View>
@@ -196,12 +168,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
               color={COLORS.primary}
               style={styles.detailIcon}
             />
-            <Text
-              style={[
-                styles.detailText,
-                { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-              ]}
-            >
+            <Text style={[styles.detailText, { color: COLORS.gray3 }]}>
               Difficulté: {activity.difficulty}
             </Text>
           </View>
@@ -211,30 +178,18 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
       {/* Comments section */}
       {activity.commentaires && (
         <View style={styles.section}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
             Commentaires
           </Text>
           <View
             style={[
               styles.commentContainer,
               {
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.05)"
-                  : "rgba(0,0,0,0.03)",
+                backgroundColor: "rgba(0,0,0,0.03)",
               },
             ]}
           >
-            <Text
-              style={[
-                styles.commentText,
-                { color: dark ? COLORS.secondaryWhite : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.commentText, { color: COLORS.black }]}>
               {activity.commentaires}
             </Text>
           </View>
@@ -244,12 +199,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
       {/* Recommendations section */}
       {activity.recommandations && activity.recommandations.length > 0 && (
         <View style={styles.section}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
             Recommandations
           </Text>
           {activity.recommandations.map((rec: string, index: number) => (
@@ -261,10 +211,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
                 style={styles.recommendationIcon}
               />
               <Text
-                style={[
-                  styles.recommendationText,
-                  { color: dark ? COLORS.secondaryWhite : COLORS.black },
-                ]}
+                style={[styles.recommendationText, { color: COLORS.black }]}
               >
                 {rec}
               </Text>
@@ -277,12 +224,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
       {activity.conversation && activity.conversation.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
               Conversation
             </Text>
             <TouchableOpacity onPress={onChatPress}>
@@ -294,9 +236,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
             style={[
               styles.chatContainer,
               {
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.05)"
-                  : "rgba(0,0,0,0.03)",
+                backgroundColor: "rgba(0,0,0,0.03)",
               },
             ]}
           >
@@ -311,12 +251,8 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
                   {
                     backgroundColor:
                       msg.sender === "assistant"
-                        ? dark
-                          ? "rgba(33, 150, 243, 0.3)"
-                          : "rgba(33, 150, 243, 0.1)"
-                        : dark
-                          ? "rgba(66, 66, 66, 0.8)"
-                          : "#E1E1E1",
+                        ? "rgba(33, 150, 243, 0.1)"
+                        : "#E1E1E1",
                   },
                 ]}
               >
@@ -327,9 +263,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
                       color:
                         msg.sender === "assistant"
                           ? COLORS.primary
-                          : dark
-                            ? COLORS.white
-                            : COLORS.black,
+                          : COLORS.black,
                     },
                   ]}
                 >
@@ -354,12 +288,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
 
       {/* Educational resources */}
       <View style={styles.section}>
-        <Text
-          style={[
-            styles.sectionTitle,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
+        <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
           Ressources pédagogiques
         </Text>
 
@@ -367,9 +296,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
           style={[
             styles.resourceButton,
             {
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(0,0,0,0.03)",
+              backgroundColor: "rgba(0,0,0,0.03)",
             },
           ]}
           onPress={onVideoPress}
@@ -382,29 +309,15 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
           />
 
           <View style={styles.resourceContent}>
-            <Text
-              style={[
-                styles.resourceTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.resourceTitle, { color: COLORS.black }]}>
               Vidéo explicative - {activity.matiere || "Sujet"}
             </Text>
-            <Text
-              style={[
-                styles.resourceSubtitle,
-                { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-              ]}
-            >
+            <Text style={[styles.resourceSubtitle, { color: COLORS.gray3 }]}>
               Ressource complémentaire
             </Text>
           </View>
 
-          <Ionicons
-            name="chevron-forward"
-            size={20}
-            color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-          />
+          <Ionicons name="chevron-forward" size={20} color={COLORS.gray3} />
         </TouchableOpacity>
       </View>
     </View>

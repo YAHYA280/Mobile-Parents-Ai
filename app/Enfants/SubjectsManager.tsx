@@ -18,7 +18,6 @@ import {
 } from "react-native";
 
 import { COLORS } from "../../constants/theme";
-import { useTheme } from "../../theme/ThemeProvider";
 
 // Structure pour une matière
 export type ISubject = {
@@ -80,7 +79,6 @@ interface ChildSubjectsManagerProps {
 const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
   childId,
 }) => {
-  const { dark } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [subscription] = useState<ISubscription>(MOCK_SUBSCRIPTION);
   const [allChildren] = useState<IChildInfo[]>(MOCK_CHILDREN);
@@ -185,18 +183,8 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
   // Afficher un message si aucun enfant correspondant n'est trouvé
   if (!currentChild) {
     return (
-      <View
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.black : COLORS.white },
-        ]}
-      >
-        <Text
-          style={[
-            styles.errorText,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
+      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
+        <Text style={[styles.errorText, { color: COLORS.black }]}>
           Enfant non trouvé. Veuillez vérifier l&apos;identifiant.
         </Text>
       </View>
@@ -204,19 +192,9 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.black : COLORS.white },
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: COLORS.white }]}>
       <View style={styles.headerRow}>
-        <Text
-          style={[
-            styles.sectionTitle,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
+        <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
           Matières
         </Text>
         <TouchableOpacity
@@ -229,17 +207,8 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
       </View>
 
       <View style={styles.infoContainer}>
-        <FontAwesomeIcon
-          icon={faInfo}
-          size={14}
-          color={dark ? COLORS.secondaryWhite : COLORS.gray}
-        />
-        <Text
-          style={[
-            styles.infoText,
-            { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-          ]}
-        >
+        <FontAwesomeIcon icon={faInfo} size={14} color={COLORS.gray} />
+        <Text style={[styles.infoText, { color: COLORS.gray }]}>
           Votre abonnement {subscription.title} permet d&apos;assigner un total
           de {subscription.nbr_subjects} matières pour{" "}
           {subscription.nbr_children_access} enfants.
@@ -256,12 +225,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
       ) : (
         <>
           <View style={styles.counterContainer}>
-            <Text
-              style={[
-                styles.counter,
-                { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-              ]}
-            >
+            <Text style={[styles.counter, { color: COLORS.gray }]}>
               {selectedCount} matières utilisées sur {subscription.nbr_subjects}{" "}
               disponibles
             </Text>
@@ -284,12 +248,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                 ))}
             </View>
           ) : (
-            <Text
-              style={[
-                styles.emptyText,
-                { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-              ]}
-            >
+            <Text style={[styles.emptyText, { color: COLORS.gray }]}>
               Aucune matière assignée. Ajoutez des matières pour personnaliser
               l&apos;apprentissage.
             </Text>
@@ -305,25 +264,17 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
       >
         <View style={styles.modalOverlay}>
           <View
-            style={[
-              styles.modalContent,
-              { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
-            ]}
+            style={[styles.modalContent, { backgroundColor: COLORS.white }]}
           >
             <View style={styles.modalHeader}>
-              <Text
-                style={[
-                  styles.modalTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.modalTitle, { color: COLORS.black }]}>
                 Gérer les matières
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <FontAwesomeIcon
                   icon={faTimes}
                   size={20}
-                  color={dark ? COLORS.white : COLORS.black}
+                  color={COLORS.black}
                 />
               </TouchableOpacity>
             </View>
@@ -340,12 +291,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
               </View>
             ) : (
               <>
-                <Text
-                  style={[
-                    styles.modalSubtitle,
-                    { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-                  ]}
-                >
+                <Text style={[styles.modalSubtitle, { color: COLORS.gray }]}>
                   Vous pouvez sélectionner jusqu&apos;à {remainingSubjects}{" "}
                   matières (sur {subscription.nbr_subjects} de votre
                   abonnement).
@@ -361,9 +307,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                         {
                           backgroundColor: item.isSelected
                             ? "rgba(36, 210, 109, 0.1)"
-                            : dark
-                              ? COLORS.dark2
-                              : COLORS.greyScale100,
+                            : COLORS.greyScale100,
                           borderColor: item.isSelected
                             ? "#24D26D"
                             : "transparent",
@@ -375,18 +319,12 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                         <FontAwesomeIcon
                           icon={faBook}
                           size={16}
-                          color={
-                            item.isSelected
-                              ? "#24D26D"
-                              : dark
-                                ? COLORS.white
-                                : COLORS.gray
-                          }
+                          color={item.isSelected ? "#24D26D" : COLORS.gray}
                         />
                         <Text
                           style={[
                             styles.subjectItemText,
-                            { color: dark ? COLORS.white : COLORS.black },
+                            { color: COLORS.black },
                           ]}
                         >
                           {item.name}
@@ -407,10 +345,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
 
                 <View style={styles.allocationInfo}>
                   <Text
-                    style={[
-                      styles.allocationInfoText,
-                      { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-                    ]}
+                    style={[styles.allocationInfoText, { color: COLORS.gray }]}
                   >
                     Vous pouvez distribuer librement les{" "}
                     {subscription.nbr_subjects} matières de votre abonnement
@@ -425,18 +360,13 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                 style={[
                   styles.cancelButton,
                   {
-                    borderColor: dark
-                      ? "rgba(255,255,255,0.2)"
-                      : "rgba(0,0,0,0.1)",
+                    borderColor: "rgba(0,0,0,0.1)",
                   },
                 ]}
                 onPress={() => setModalVisible(false)}
               >
                 <Text
-                  style={[
-                    styles.cancelButtonText,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
+                  style={[styles.cancelButtonText, { color: COLORS.black }]}
                 >
                   Annuler
                 </Text>

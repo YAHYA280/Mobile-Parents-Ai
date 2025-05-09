@@ -14,7 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "@/constants/theme";
 import { useChildren } from "@/contexts/ChildrenContext";
 import { useActivities } from "@/contexts/ActivitiesContext";
-import { useTheme } from "@/contexts/ThemeContext";
 
 import ChatBubble from "@/components/chat/ChatBubble";
 import ChatInput from "@/components/chat/ChatInput";
@@ -49,7 +48,6 @@ export default function ChatScreen() {
 
   const { getChild } = useChildren();
   const { getActivity, loading } = useActivities();
-  const { dark } = useTheme();
 
   const [showStatement, setShowStatement] = useState(false);
 
@@ -71,21 +69,11 @@ export default function ChatScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <Header title="Conversation" onBackPress={handleBack} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text
-            style={[
-              styles.loadingText,
-              { color: dark ? COLORS.white : "#333333" },
-            ]}
-          >
+          <Text style={[styles.loadingText, { color: "#333333" }]}>
             Chargement de la conversation...
           </Text>
         </View>
@@ -95,21 +83,11 @@ export default function ChatScreen() {
 
   if (!activity || !child) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <Header title="Conversation" onBackPress={handleBack} />
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={64} color="#FF3B30" />
-          <Text
-            style={[
-              styles.errorText,
-              { color: dark ? COLORS.white : "#333333" },
-            ]}
-          >
+          <Text style={[styles.errorText, { color: "#333333" }]}>
             Conversation introuvable
           </Text>
           <TouchableOpacity style={styles.errorButton} onPress={handleBack}>
@@ -132,30 +110,16 @@ export default function ChatScreen() {
   const conversation = activity.conversation || [];
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-      ]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
       <KeyboardAvoidingView
         style={styles.keyboardAvoidingContainer}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
       >
         {/* Custom Header */}
-        <View
-          style={[
-            styles.header,
-            { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
-          ]}
-        >
+        <View style={[styles.header, { backgroundColor: "#FFFFFF" }]}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={dark ? COLORS.white : "#333333"}
-            />
+            <Ionicons name="arrow-back" size={24} color={"#333333"} />
           </TouchableOpacity>
 
           <LinearGradient
@@ -168,20 +132,10 @@ export default function ChatScreen() {
           </LinearGradient>
 
           <View style={styles.headerTextContainer}>
-            <Text
-              style={[
-                styles.assistantName,
-                { color: dark ? COLORS.white : "#333333" },
-              ]}
-            >
+            <Text style={[styles.assistantName, { color: "#333333" }]}>
               Assistant {assistantName}
             </Text>
-            <Text
-              style={[
-                styles.activityDate,
-                { color: dark ? COLORS.secondaryWhite : "#757575" },
-              ]}
-            >
+            <Text style={[styles.activityDate, { color: "#757575" }]}>
               {formattedDate}
             </Text>
           </View>
@@ -192,18 +146,13 @@ export default function ChatScreen() {
           style={[
             styles.activityTitleContainer,
             {
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(0,0,0,0.03)",
+              backgroundColor: "rgba(0,0,0,0.03)",
             },
           ]}
         >
           <View style={styles.activityTitleContent}>
             <Text
-              style={[
-                styles.activityTitle,
-                { color: dark ? COLORS.secondaryWhite : "#757575" },
-              ]}
+              style={[styles.activityTitle, { color: "#757575" }]}
               numberOfLines={1}
             >
               {activity.activite}
@@ -215,7 +164,7 @@ export default function ChatScreen() {
               <Ionicons
                 name={showStatement ? "chevron-up" : "chevron-down"}
                 size={16}
-                color={dark ? COLORS.secondaryWhite : "#757575"}
+                color={"#757575"}
               />
             </TouchableOpacity>
           </View>
@@ -227,26 +176,14 @@ export default function ChatScreen() {
             style={[
               styles.statementContainer,
               {
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.03)"
-                  : "rgba(0,0,0,0.02)",
+                backgroundColor: "rgba(0,0,0,0.02)",
               },
             ]}
           >
-            <Text
-              style={[
-                styles.statementTitle,
-                { color: dark ? COLORS.white : "#333333" },
-              ]}
-            >
+            <Text style={[styles.statementTitle, { color: "#333333" }]}>
               Énoncé de l'exercice
             </Text>
-            <Text
-              style={[
-                styles.statementText,
-                { color: dark ? COLORS.secondaryWhite : "#333333" },
-              ]}
-            >
+            <Text style={[styles.statementText, { color: "#333333" }]}>
               {activity.commentaires ||
                 "L'élève a travaillé sur un exercice qui utilise l'application d'IA pour apprendre."}
             </Text>
@@ -255,10 +192,7 @@ export default function ChatScreen() {
               activity.recommandations.length > 0 && (
                 <View style={styles.recommendationsContainer}>
                   <Text
-                    style={[
-                      styles.recommendationsTitle,
-                      { color: dark ? COLORS.white : "#333333" },
-                    ]}
+                    style={[styles.recommendationsTitle, { color: "#333333" }]}
                   >
                     Recommandations:
                   </Text>
@@ -274,7 +208,7 @@ export default function ChatScreen() {
                         <Text
                           style={[
                             styles.recommendationText,
-                            { color: dark ? COLORS.secondaryWhite : "#333333" },
+                            { color: "#333333" },
                           ]}
                         >
                           {rec}
@@ -305,9 +239,7 @@ export default function ChatScreen() {
           style={[
             styles.infoBanner,
             {
-              backgroundColor: dark
-                ? "rgba(33, 150, 243, 0.1)"
-                : "rgba(33, 150, 243, 0.05)",
+              backgroundColor: "rgba(33, 150, 243, 0.05)",
             },
           ]}
         >

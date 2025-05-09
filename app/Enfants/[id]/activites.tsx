@@ -13,7 +13,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "@/constants/theme";
 import { useChildren } from "@/contexts/ChildrenContext";
 import { useActivities } from "@/contexts/ActivitiesContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Activity as InterfaceActivity } from "@/types/interfaces";
 
 import Header from "@/components/ui/Header";
@@ -26,7 +25,6 @@ export default function ChildActivitiesScreen() {
   const childId = Number(id);
   const { getChild, getChildSummary, loading: childLoading } = useChildren();
   const { getChildActivities, loading: activitiesLoading } = useActivities();
-  const { dark } = useTheme();
 
   const child = getChild(childId);
   const summary = getChildSummary(childId);
@@ -53,12 +51,7 @@ export default function ChildActivitiesScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
@@ -68,29 +61,17 @@ export default function ChildActivitiesScreen() {
 
   if (!child || !summary) {
     return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-        ]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
         <Header title="Activités" onBackPress={() => router.back()} />
         <View style={styles.errorContainer}>
-          <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
-            Enfant non trouvé
-          </Text>
+          <Text style={{ color: COLORS.black }}>Enfant non trouvé</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" },
-      ]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: "#F8F8F8" }]}>
       <Header
         title="Activités"
         subtitle={child.name}

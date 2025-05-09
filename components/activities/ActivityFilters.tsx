@@ -13,7 +13,6 @@ import { MotiView } from "moti";
 import { Calendar } from "react-native-calendars";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, TYPOGRAPHY } from "@/constants/theme";
-import { useTheme } from "@/theme/ThemeProvider";
 
 interface FilterState {
   dateRange: {
@@ -53,8 +52,6 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
   onResetFilters,
   onApplyFilters,
 }) => {
-  const { dark } = useTheme();
-
   // Modal states
   const [modalVisible, setModalVisible] = useState(false);
   const [calendarVisible, setCalendarVisible] = useState(false);
@@ -243,32 +240,19 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
     >
       <View style={styles.filterButtonsRow}>
         <TouchableOpacity
-          style={[
-            styles.filterButton,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
+          style={[styles.filterButton, { backgroundColor: COLORS.white }]}
           onPress={() => openFilterModal("date")}
         >
           <Ionicons
             name="calendar-outline"
             size={18}
-            color={
-              dateRange.startDate
-                ? COLORS.primary
-                : dark
-                  ? COLORS.white
-                  : COLORS.gray3
-            }
+            color={dateRange.startDate ? COLORS.primary : COLORS.gray3}
           />
           <Text
             style={[
               styles.filterButtonText,
               {
-                color: dateRange.startDate
-                  ? COLORS.primary
-                  : dark
-                    ? COLORS.white
-                    : COLORS.gray3,
+                color: dateRange.startDate ? COLORS.primary : COLORS.gray3,
               },
               dateRange.startDate && styles.activeFilterText,
             ]}
@@ -287,21 +271,14 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.filterButton,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
+          style={[styles.filterButton, { backgroundColor: COLORS.white }]}
           onPress={() => openFilterModal("assistants")}
         >
           <Ionicons
             name="people-outline"
             size={18}
             color={
-              selectedAssistants.length > 0
-                ? COLORS.primary
-                : dark
-                  ? COLORS.white
-                  : COLORS.gray3
+              selectedAssistants.length > 0 ? COLORS.primary : COLORS.gray3
             }
           />
           <Text
@@ -309,11 +286,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
               styles.filterButtonText,
               {
                 color:
-                  selectedAssistants.length > 0
-                    ? COLORS.primary
-                    : dark
-                      ? COLORS.white
-                      : COLORS.gray3,
+                  selectedAssistants.length > 0 ? COLORS.primary : COLORS.gray3,
               },
               selectedAssistants.length > 0 && styles.activeFilterText,
             ]}
@@ -327,33 +300,20 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.filterButton,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
+          style={[styles.filterButton, { backgroundColor: COLORS.white }]}
           onPress={() => openFilterModal("subjects")}
         >
           <Ionicons
             name="book-outline"
             size={18}
-            color={
-              selectedSubjects.length > 0
-                ? COLORS.primary
-                : dark
-                  ? COLORS.white
-                  : COLORS.gray3
-            }
+            color={selectedSubjects.length > 0 ? COLORS.primary : COLORS.gray3}
           />
           <Text
             style={[
               styles.filterButtonText,
               {
                 color:
-                  selectedSubjects.length > 0
-                    ? COLORS.primary
-                    : dark
-                      ? COLORS.white
-                      : COLORS.gray3,
+                  selectedSubjects.length > 0 ? COLORS.primary : COLORS.gray3,
               },
               selectedSubjects.length > 0 && styles.activeFilterText,
             ]}
@@ -367,21 +327,14 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.filterButton,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
+          style={[styles.filterButton, { backgroundColor: COLORS.white }]}
           onPress={() => openFilterModal("difficulties")}
         >
           <Ionicons
             name="stats-chart-outline"
             size={18}
             color={
-              selectedDifficulties.length > 0
-                ? COLORS.primary
-                : dark
-                  ? COLORS.white
-                  : COLORS.gray3
+              selectedDifficulties.length > 0 ? COLORS.primary : COLORS.gray3
             }
           />
           <Text
@@ -391,9 +344,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                 color:
                   selectedDifficulties.length > 0
                     ? COLORS.primary
-                    : dark
-                      ? COLORS.white
-                      : COLORS.gray3,
+                    : COLORS.gray3,
               },
               selectedDifficulties.length > 0 && styles.activeFilterText,
             ]}
@@ -552,19 +503,12 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                 style={[
                   styles.resetButton,
                   {
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0,0,0,0.05)",
+                    backgroundColor: "rgba(0,0,0,0.05)",
                   },
                 ]}
                 onPress={onResetFilters}
               >
-                <Text
-                  style={[
-                    styles.resetButtonText,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
+                <Text style={[styles.resetButtonText, { color: COLORS.black }]}>
                   Réinitialiser
                 </Text>
               </TouchableOpacity>
@@ -585,18 +529,10 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
             from={{ opacity: 0, translateY: 50 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ type: "spring", damping: 18 }}
-            style={[
-              styles.modalContainer,
-              { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
-            ]}
+            style={[styles.modalContainer, { backgroundColor: COLORS.white }]}
           >
             <View style={styles.modalHeader}>
-              <Text
-                style={[
-                  styles.modalTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.modalTitle, { color: COLORS.black }]}>
                 {activeFilterType === "date"
                   ? "Sélectionner la période"
                   : activeFilterType === "assistants"
@@ -606,11 +542,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                       : "Filtrer par difficulté"}
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons
-                  name="close"
-                  size={24}
-                  color={dark ? COLORS.white : COLORS.black}
-                />
+                <Ionicons name="close" size={24} color={COLORS.black} />
               </TouchableOpacity>
             </View>
 
@@ -620,26 +552,15 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                   style={[
                     styles.searchInputContainer,
                     {
-                      backgroundColor: dark
-                        ? "rgba(255,255,255,0.1)"
-                        : "rgba(0,0,0,0.05)",
+                      backgroundColor: "rgba(0,0,0,0.05)",
                     },
                   ]}
                 >
-                  <Ionicons
-                    name="search"
-                    size={20}
-                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-                  />
+                  <Ionicons name="search" size={20} color={COLORS.gray3} />
                   <TextInput
-                    style={[
-                      styles.searchInput,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
+                    style={[styles.searchInput, { color: COLORS.black }]}
                     placeholder="Rechercher..."
-                    placeholderTextColor={
-                      dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.3)"
-                    }
+                    placeholderTextColor={"rgba(0,0,0,0.3)"}
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                   />
@@ -648,7 +569,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                       <Ionicons
                         name="close-circle"
                         size={20}
-                        color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                        color={COLORS.gray3}
                       />
                     </TouchableOpacity>
                   )}
@@ -664,7 +585,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                     <Text
                       style={[
                         styles.dateSelectionTitle,
-                        { color: dark ? COLORS.white : COLORS.black },
+                        { color: COLORS.black },
                       ]}
                     >
                       {calendarMode === "start"
@@ -680,9 +601,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                           calendarMode === "start" &&
                             styles.dateDisplaySelected,
                           {
-                            backgroundColor: dark
-                              ? "rgba(255,255,255,0.05)"
-                              : "rgba(0,0,0,0.05)",
+                            backgroundColor: "rgba(0,0,0,0.05)",
                           },
                         ]}
                       >
@@ -690,19 +609,14 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                           style={[
                             styles.dateLabel,
                             {
-                              color: dark
-                                ? COLORS.secondaryWhite
-                                : COLORS.gray3,
+                              color: COLORS.gray3,
                             },
                           ]}
                         >
                           Début
                         </Text>
                         <Text
-                          style={[
-                            styles.dateValue,
-                            { color: dark ? COLORS.white : COLORS.black },
-                          ]}
+                          style={[styles.dateValue, { color: COLORS.black }]}
                         >
                           {dateRange.startDate
                             ? formatDate(dateRange.startDate)
@@ -714,7 +628,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                         <Ionicons
                           name="arrow-forward"
                           size={16}
-                          color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                          color={COLORS.gray3}
                         />
                       </View>
 
@@ -724,9 +638,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                           dateRange.endDate && styles.dateDisplayActive,
                           calendarMode === "end" && styles.dateDisplaySelected,
                           {
-                            backgroundColor: dark
-                              ? "rgba(255,255,255,0.05)"
-                              : "rgba(0,0,0,0.05)",
+                            backgroundColor: "rgba(0,0,0,0.05)",
                           },
                         ]}
                       >
@@ -734,19 +646,14 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                           style={[
                             styles.dateLabel,
                             {
-                              color: dark
-                                ? COLORS.secondaryWhite
-                                : COLORS.gray3,
+                              color: COLORS.gray3,
                             },
                           ]}
                         >
                           Fin
                         </Text>
                         <Text
-                          style={[
-                            styles.dateValue,
-                            { color: dark ? COLORS.white : COLORS.black },
-                          ]}
+                          style={[styles.dateValue, { color: COLORS.black }]}
                         >
                           {dateRange.endDate
                             ? formatDate(dateRange.endDate)
@@ -783,15 +690,13 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                       selectedDayBackgroundColor: COLORS.primary,
                       selectedDayTextColor: "#ffffff",
                       arrowColor: COLORS.primary,
-                      monthTextColor: dark ? COLORS.white : COLORS.black,
+                      monthTextColor: COLORS.black,
                       textMonthFontWeight: "bold",
                       textDayHeaderFontWeight: "500",
-                      textSectionTitleColor: dark
-                        ? COLORS.secondaryWhite
-                        : COLORS.gray3,
-                      backgroundColor: dark ? COLORS.dark1 : COLORS.white,
-                      calendarBackground: dark ? COLORS.dark1 : COLORS.white,
-                      dayTextColor: dark ? COLORS.white : COLORS.black,
+                      textSectionTitleColor: COLORS.gray3,
+                      backgroundColor: COLORS.white,
+                      calendarBackground: COLORS.white,
+                      dayTextColor: COLORS.black,
                     }}
                   />
 
@@ -800,9 +705,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                       style={[
                         styles.calendarActionButton,
                         {
-                          borderColor: dark
-                            ? "rgba(255,255,255,0.2)"
-                            : "rgba(0,0,0,0.1)",
+                          borderColor: "rgba(0,0,0,0.1)",
                         },
                       ]}
                       onPress={() =>
@@ -815,7 +718,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                       <Text
                         style={[
                           styles.calendarActionButtonText,
-                          { color: dark ? COLORS.white : COLORS.black },
+                          { color: COLORS.black },
                         ]}
                       >
                         Effacer les dates
@@ -851,9 +754,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                           {
                             backgroundColor: isSelected
                               ? color + "20"
-                              : dark
-                                ? COLORS.dark2
-                                : "rgba(0,0,0,0.03)",
+                              : "rgba(0,0,0,0.03)",
                             borderColor: isSelected ? color : "transparent",
                           },
                         ]}
@@ -874,13 +775,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                               <Ionicons
                                 name="people"
                                 size={16}
-                                color={
-                                  isSelected
-                                    ? color
-                                    : dark
-                                      ? COLORS.white
-                                      : COLORS.gray3
-                                }
+                                color={isSelected ? color : COLORS.gray3}
                               />
                             </View>
                           )}
@@ -899,13 +794,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                               <Ionicons
                                 name="book"
                                 size={16}
-                                color={
-                                  isSelected
-                                    ? color
-                                    : dark
-                                      ? COLORS.white
-                                      : COLORS.gray3
-                                }
+                                color={isSelected ? color : COLORS.gray3}
                               />
                             </View>
                           )}
@@ -924,13 +813,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                               <Ionicons
                                 name="stats-chart"
                                 size={16}
-                                color={
-                                  isSelected
-                                    ? color
-                                    : dark
-                                      ? COLORS.white
-                                      : COLORS.gray3
-                                }
+                                color={isSelected ? color : COLORS.gray3}
                               />
                             </View>
                           )}
@@ -938,7 +821,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                           <Text
                             style={[
                               styles.optionItemText,
-                              { color: dark ? COLORS.white : COLORS.black },
+                              { color: COLORS.black },
                             ]}
                           >
                             {item}
@@ -964,16 +847,12 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                   }}
                   ListEmptyComponent={() => (
                     <View style={styles.emptyListContainer}>
-                      <Ionicons
-                        name="search"
-                        size={40}
-                        color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-                      />
+                      <Ionicons name="search" size={40} color={COLORS.gray3} />
                       <Text
                         style={[
                           styles.emptyListText,
                           {
-                            color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                            color: COLORS.gray3,
                           },
                         ]}
                       >
@@ -991,9 +870,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                 style={[
                   styles.modalCancelButton,
                   {
-                    borderColor: dark
-                      ? "rgba(255,255,255,0.2)"
-                      : "rgba(0,0,0,0.1)",
+                    borderColor: "rgba(0,0,0,0.1)",
                   },
                 ]}
                 onPress={() => setModalVisible(false)}
@@ -1001,7 +878,7 @@ const ActivityFilter: React.FC<ActivityFilterProps> = ({
                 <Text
                   style={[
                     styles.modalCancelButtonText,
-                    { color: dark ? COLORS.white : COLORS.black },
+                    { color: COLORS.black },
                   ]}
                 >
                   Annuler

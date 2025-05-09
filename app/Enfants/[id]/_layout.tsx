@@ -3,23 +3,21 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/theme";
-import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ChildTabsLayout() {
-  const { dark } = useTheme();
-
+  // No context usage at all to avoid any potential circular dependencies
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: dark ? COLORS.secondaryWhite : COLORS.gray3,
+        tabBarInactiveTintColor: "#757575",
         tabBarStyle: {
           borderTopWidth: 1,
           borderTopColor: "rgba(0,0,0,0.1)",
           elevation: 0,
           shadowOpacity: 0,
-          backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+          backgroundColor: "#FFFFFF",
         },
         tabBarLabelStyle: {
           fontSize: 12,
