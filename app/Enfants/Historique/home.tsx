@@ -1,292 +1,381 @@
-// app/Enfants/Historique/home.tsx
+// app/Enfants/home.tsx
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  FlatList,
+  ScrollView,
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { MotiView } from "moti";
+import { Image } from "expo-image";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { TYPOGRAPHY, COLORS, SPACING, RADIUS } from "@/constants/theme";
-import { CHILDREN_DATA, enhanceActivity } from "@/data/Enfants/CHILDREN_DATA";
+import { COLORS, TYPOGRAPHY, SPACING, RADIUS } from "@/constants/theme";
+import { CHILDREN_DATA, Child, Activity } from "@/data/Enfants/CHILDREN_DATA";
 import ActivityCard from "@/components/cards/ActivityCard";
-import ActivityFilter from "@/components/filters/ActivityFilter";
 
-const HistoriqueActivites = () => {
+const tabs = ["Aperçu", "Activités", "Suivi"];
+
+const ChildHome: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const childId =
     typeof params.childId === "string" ? parseInt(params.childId, 10) : 0;
 
-  const [child, setChild] = useState<any>(null);
-  const [activities, setActivities] = useState<any[]>([]);
-  const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
+  const [child, setChild] = useState<Child | null>(null);
+  const [activeTab, setActiveTab] = useState<number>(0);
 
-  // Filter state
-  const [dateRange, setDateRange] = useState({
-    startDate: null,
-    endDate: null,
-  });
-  const [selectedAssistants, setSelectedAssistants] = useState<string[]>([]);
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const activitiesPerPage = 5;
-
-  // Get child data and activities
+  // Get child data
   useEffect(() => {
     const foundChild = CHILDREN_DATA.find((c) => c.id === childId);
-    if (foundChild) {
-      setChild(foundChild);
-
-      // Enhance activities with additional data
-      const enhancedActivities = foundChild.activitesRecentes.map((activity) =>
-        enhanceActivity(activity)
-      );
-
-      setActivities(enhancedActivities);
-      setFilteredActivities(enhancedActivities);
-    }
+    setChild(foundChild || null);
   }, [childId]);
-
-  // Apply filters effect
-  useEffect(() => {
-    if (!activities.length) return;
-
-    let filtered = [...activities];
-
-    // Filter by date range
-    if (dateRange.startDate) {
-      filtered = filtered.filter((activity) => {
-        const activityDate = new Date(activity.date);
-        const startDate = new Date(dateRange.startDate!);
-        return activityDate >= startDate;
-      });
-    }
-
-    if (dateRange.endDate) {
-      filtered = filtered.filter((activity) => {
-        const activityDate = new Date(activity.date);
-        const endDate = new Date(dateRange.endDate!);
-        endDate.setDate(endDate.getDate() + 1); // Include end date
-        return activityDate < endDate;
-      });
-    }
-
-    // Filter by assistants
-    if (selectedAssistants.length > 0) {
-      filtered = filtered.filter(
-        (activity) =>
-          activity.assistant && selectedAssistants.includes(activity.assistant)
-      );
-    }
-
-    // Filter by subjects
-    if (selectedSubjects.length > 0) {
-      filtered = filtered.filter(
-        (activity) =>
-          activity.matiere && selectedSubjects.includes(activity.matiere)
-      );
-    }
-
-    setFilteredActivities(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [activities, dateRange, selectedAssistants, selectedSubjects]);
 
   const handleBack = () => {
     router.back();
   };
 
-  // Handle activity press
+  // Handle tab change
+  const handleTabChange = (index: number) => {
+    setActiveTab(index);
+  };
+
+  // Navigate to activity details
   const handleActivityPress = (activityId: number) => {
     router.push(
       `/Enfants/Historique/historydetails?activityId=${activityId}&childId=${childId}`
     );
   };
 
-  // Handle filter changes
-  const handleFilterChange = (filterType: string, value: any) => {
-    switch (filterType) {
-      case "dateRange":
-        setDateRange(value);
-        break;
-      case "assistants":
-        setSelectedAssistants(value);
-        break;
-      case "subjects":
-        setSelectedSubjects(value);
-        break;
-      default:
-        break;
-    }
-  };
-
-  // Reset all filters
-  const resetFilters = () => {
-    setDateRange({ startDate: null, endDate: null });
-    setSelectedAssistants([]);
-    setSelectedSubjects([]);
-  };
-
-  // Get unique assistants from activities
-  const getAvailableAssistants = () => {
-    const assistants = activities
-      .map((activity) => activity.assistant)
-      .filter((value, index, self) => value && self.indexOf(value) === index);
-    return assistants;
-  };
-
-  // Get unique subjects from activities
-  const getAvailableSubjects = () => {
-    const subjects = activities
-      .map((activity) => activity.matiere)
-      .filter((value, index, self) => value && self.indexOf(value) === index);
-    return subjects;
-  };
-
-  // Get paginated activities
-  const getPaginatedActivities = () => {
-    const startIndex = (currentPage - 1) * activitiesPerPage;
-    const endIndex = startIndex + activitiesPerPage;
-    return filteredActivities.slice(startIndex, endIndex);
-  };
-
-  // Calculate total pages
-  const totalPages = Math.ceil(filteredActivities.length / activitiesPerPage);
-
-  // Pagination controls
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  // Navigate to full activity history
+  const viewAllActivities = () => {
+    router.push(`/Enfants/Historique/home?childId=${childId}`);
   };
 
   if (!child) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
+  // Parse progress as number
+  const progressValue = parseFloat(child.progress.replace("%", ""));
+
+  // Helper function to get progress color
+  const getProgressColor = (value: number) => {
+    if (value >= 75) return "#4CAF50"; // Green
+    if (value >= 50) return "#FFC107"; // Yellow
+    if (value >= 25) return "#FF9800"; // Orange
+    return "#F44336"; // Red
+  };
+
+  // Render content based on active tab
+  const renderContent = () => {
+    switch (activeTab) {
+      case 0: // Aperçu
+        return (
+          <View>
+            {/* Performance Overview */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Progrès Global</Text>
+              <View style={styles.progressCircleContainer}>
+                <View
+                  style={[
+                    styles.progressCircle,
+                    { borderColor: getProgressColor(progressValue) },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.progressCircleText,
+                      { color: getProgressColor(progressValue) },
+                    ]}
+                  >
+                    {child.progress}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Recent Activities */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Activités récentes</Text>
+                <TouchableOpacity onPress={viewAllActivities}>
+                  <Text style={styles.viewAllText}>Voir tout</Text>
+                </TouchableOpacity>
+              </View>
+
+              {child.activitesRecentes
+                .slice(0, 3)
+                .map((activity: Activity, index: number) => (
+                  <ActivityCard
+                    key={activity.id}
+                    activity={activity}
+                    onPress={() => handleActivityPress(activity.id ?? 0)}
+                    index={index}
+                  />
+                ))}
+            </View>
+
+            {/* Strengths */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Points forts</Text>
+
+              <View style={styles.strengthsContainer}>
+                {child.matieresFortes.map((matiere: string, index: number) => (
+                  <View key={index} style={styles.strengthItem}>
+                    <View style={styles.strengthIconContainer}>
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={24}
+                        color="#4CAF50"
+                      />
+                    </View>
+                    <Text style={styles.strengthText}>{matiere}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {/* Improvements */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Points à améliorer</Text>
+
+              <View style={styles.strengthsContainer}>
+                {child.matieresAmeliorer.map(
+                  (matiere: string, index: number) => (
+                    <View key={index} style={styles.improvementItem}>
+                      <View style={styles.improvementIconContainer}>
+                        <Ionicons
+                          name="alert-circle"
+                          size={24}
+                          color="#F44336"
+                        />
+                      </View>
+                      <Text style={styles.improvementText}>
+                        {matiere.replace(/^\?/, "").trim()}
+                      </Text>
+                    </View>
+                  )
+                )}
+              </View>
+            </View>
+          </View>
+        );
+
+      case 1: // Activities
+        return (
+          <View>
+            <TouchableOpacity
+              style={styles.viewAllActivitiesButton}
+              onPress={viewAllActivities}
+            >
+              <Text style={styles.viewAllActivitiesText}>
+                Voir tout l'historique
+              </Text>
+              <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+
+            {child.activitesRecentes.map(
+              (activity: Activity, index: number) => (
+                <ActivityCard
+                  key={activity.id}
+                  activity={activity}
+                  onPress={() => handleActivityPress(activity.id ?? 0)}
+                  index={index}
+                />
+              )
+            )}
+          </View>
+        );
+
+      case 2: // Performance
+        return (
+          <View>
+            {/* Overall Progress */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Performance globale</Text>
+              <View style={styles.progressCircleContainer}>
+                <View
+                  style={[
+                    styles.progressCircle,
+                    { borderColor: getProgressColor(progressValue) },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.progressCircleText,
+                      { color: getProgressColor(progressValue) },
+                    ]}
+                  >
+                    {child.progress}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Subject Performance */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Performance par matière</Text>
+
+              {/* Dynamically create subject cards with progress */}
+              {[...child.matieresFortes, ...child.matieresAmeliorer].map(
+                (matiere, index) => {
+                  const isStrength = child.matieresFortes.includes(matiere);
+                  const progress = isStrength
+                    ? Math.floor(Math.random() * 20) + 80 // 80-100% for strengths
+                    : Math.floor(Math.random() * 30) + 45; // 45-75% for improvements
+
+                  return (
+                    <View key={index} style={styles.subjectCard}>
+                      <View style={styles.subjectHeader}>
+                        <Text style={styles.subjectName}>
+                          {matiere.replace(/^\?/, "").trim()}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.subjectScore,
+                            { color: getProgressColor(progress) },
+                          ]}
+                        >
+                          {progress}%
+                        </Text>
+                      </View>
+                      <View style={styles.subjectProgressContainer}>
+                        <View
+                          style={[
+                            styles.subjectProgress,
+                            {
+                              width: `${progress}%`,
+                              backgroundColor: getProgressColor(progress),
+                            },
+                          ]}
+                        />
+                      </View>
+                    </View>
+                  );
+                }
+              )}
+            </View>
+
+            {/* Statistics */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Statistiques d'apprentissage
+              </Text>
+
+              <View style={styles.statsContainer}>
+                <View style={styles.statItem}>
+                  <View style={styles.statIconContainer}>
+                    <Ionicons
+                      name="time-outline"
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                  </View>
+                  <View style={styles.statContent}>
+                    <Text style={styles.statLabel}>Temps total</Text>
+                    <Text style={styles.statValue}>14h 30min</Text>
+                  </View>
+                </View>
+
+                <View style={styles.statItem}>
+                  <View style={styles.statIconContainer}>
+                    <Ionicons
+                      name="checkmark-done-outline"
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                  </View>
+                  <View style={styles.statContent}>
+                    <Text style={styles.statLabel}>Activités terminées</Text>
+                    <Text style={styles.statValue}>
+                      {child.activitesRecentes.length}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.statItem}>
+                  <View style={styles.statIconContainer}>
+                    <Ionicons
+                      name="star-outline"
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                  </View>
+                  <View style={styles.statContent}>
+                    <Text style={styles.statLabel}>Score moyen</Text>
+                    <Text style={styles.statValue}>78%</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <MotiView
-        from={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ type: "timing", duration: 300 }}
-        style={styles.header}
-      >
+      <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
+          <Ionicons name="arrow-back" size={24} color="#333333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Historique des activités</Text>
-      </MotiView>
+        <Text style={styles.headerTitle}>Profil de l'enfant</Text>
+      </View>
 
-      <View style={styles.childInfoHeader}>
+      <View style={styles.profileHeader}>
+        <View style={styles.avatarContainer}>
+          <Image
+            source={child.profileImage}
+            style={styles.avatar}
+            contentFit="cover"
+          />
+        </View>
         <Text style={styles.childName}>{child.name}</Text>
         <Text style={styles.childDetails}>
           {child.classe} • {child.age} ans
         </Text>
       </View>
 
-      <ActivityFilter
-        dateRange={dateRange}
-        selectedAssistants={selectedAssistants}
-        selectedSubjects={selectedSubjects}
-        availableAssistants={getAvailableAssistants()}
-        availableSubjects={getAvailableSubjects()}
-        onFilterChange={handleFilterChange}
-        onResetFilters={resetFilters}
-      />
-
-      <View style={styles.content}>
-        {filteredActivities.length === 0 ? (
-          <MotiView
-            from={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", damping: 18 }}
-            style={styles.emptyStateContainer}
+      <View style={styles.tabContainer}>
+        {tabs.map((tab, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[styles.tab, activeTab === index && styles.activeTab]}
+            onPress={() => handleTabChange(index)}
           >
-            <Ionicons name="search" size={60} color="#CCCCCC" />
-            <Text style={styles.emptyStateTitle}>Aucune activité trouvée</Text>
-            <Text style={styles.emptyStateText}>
-              Aucune activité ne correspond à vos critères de recherche.
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === index && styles.activeTabText,
+              ]}
+            >
+              {tab}
             </Text>
-            <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
-              <Text style={styles.resetButtonText}>
-                Réinitialiser les filtres
-              </Text>
-            </TouchableOpacity>
-          </MotiView>
-        ) : (
-          <FlatList
-            data={getPaginatedActivities()}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item, index }) => (
-              <ActivityCard
-                activity={item}
-                onPress={() => handleActivityPress(item.id)}
-                index={index}
-              />
-            )}
-            contentContainerStyle={styles.activitiesList}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
+            {activeTab === index && <View style={styles.activeIndicator} />}
+          </TouchableOpacity>
+        ))}
       </View>
 
-      {/* Pagination */}
-      {filteredActivities.length > 0 && totalPages > 1 && (
-        <View style={styles.paginationContainer}>
-          <TouchableOpacity
-            style={[
-              styles.paginationButton,
-              currentPage === 1 && styles.paginationButtonDisabled,
-            ]}
-            onPress={handlePreviousPage}
-            disabled={currentPage === 1}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={20}
-              color={currentPage === 1 ? "#CCCCCC" : COLORS.primary}
-            />
-          </TouchableOpacity>
-
-          <Text style={styles.paginationText}>
-            Page {currentPage} sur {totalPages}
-          </Text>
-
-          <TouchableOpacity
-            style={[
-              styles.paginationButton,
-              currentPage === totalPages && styles.paginationButtonDisabled,
-            ]}
-            onPress={handleNextPage}
-            disabled={currentPage === totalPages}
-          >
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={currentPage === totalPages ? "#CCCCCC" : COLORS.primary}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {renderContent()}
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -302,99 +391,257 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loadingText: {
-    ...TYPOGRAPHY.h3,
-    color: "#666",
+    fontSize: 16,
+    marginTop: 16,
+    color: "#333333",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.1)",
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.05)",
-    alignItems: "center",
-    justifyContent: "center",
     marginRight: 16,
   },
   headerTitle: {
-    ...TYPOGRAPHY.h2,
-    color: "#333",
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333333",
   },
-  childInfoHeader: {
-    paddingHorizontal: 16,
-    marginBottom: 16,
+  profileHeader: {
+    alignItems: "center",
+    paddingVertical: 20,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  avatarContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: COLORS.primary,
+    overflow: "hidden",
+    marginBottom: 12,
+  },
+  avatar: {
+    width: "100%",
+    height: "100%",
   },
   childName: {
-    ...TYPOGRAPHY.h3,
-    color: "#333",
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333333",
+    marginBottom: 4,
+    textTransform: "capitalize",
   },
   childDetails: {
-    ...TYPOGRAPHY.body2,
-    color: "#666",
+    fontSize: 16,
+    color: "#757575",
+  },
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.05)",
+  },
+  tab: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 16,
+    position: "relative",
+  },
+  activeTab: {
+    // Style changes are handled through the indicator
+  },
+  tabText: {
+    fontSize: 14,
+    color: "#757575",
+    fontWeight: "normal",
+  },
+  activeTabText: {
+    color: COLORS.primary,
+    fontWeight: "600",
+  },
+  activeIndicator: {
+    position: "absolute",
+    bottom: 0,
+    width: 30,
+    height: 3,
+    backgroundColor: COLORS.primary,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
   },
   content: {
     flex: 1,
   },
-  activitiesList: {
-    paddingBottom: 16,
-  },
-  emptyStateContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+  scrollContent: {
     padding: 16,
-    marginTop: 40,
+    paddingBottom: 24,
   },
-  emptyStateTitle: {
-    ...TYPOGRAPHY.h3,
-    color: "#333",
-    marginTop: 16,
-    marginBottom: 8,
+  section: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  emptyStateText: {
-    ...TYPOGRAPHY.body1,
-    color: "#666",
-    textAlign: "center",
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333333",
     marginBottom: 16,
   },
-  resetButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: RADIUS.xxl,
+  viewAllText: {
+    fontSize: 14,
+    color: COLORS.primary,
   },
-  resetButtonText: {
-    ...TYPOGRAPHY.button,
-    color: "#FFFFFF",
+  progressCircleContainer: {
+    alignItems: "center",
+    marginVertical: 16,
   },
-  paginationContainer: {
+  progressCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 10,
+    borderColor: COLORS.primary,
+    backgroundColor: "rgba(255,255,255,0.9)",
+  },
+  progressCircleText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: COLORS.primary,
+  },
+  strengthsContainer: {
+    marginBottom: 8,
+  },
+  strengthItem: {
     flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(76, 175, 80, 0.1)",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  strengthIconContainer: {
+    marginRight: 16,
+  },
+  strengthText: {
+    fontSize: 16,
+    color: "#333333",
+    flex: 1,
+  },
+  improvementItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(244, 67, 54, 0.1)",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  improvementIconContainer: {
+    marginRight: 16,
+  },
+  improvementText: {
+    fontSize: 16,
+    color: "#333333",
+    flex: 1,
+  },
+  viewAllActivitiesButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.primary,
+    marginBottom: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  viewAllActivitiesText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginRight: 8,
+  },
+  subjectCard: {
+    backgroundColor: "rgba(0,0,0,0.02)",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+  },
+  subjectHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  subjectName: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#333333",
+  },
+  subjectScore: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  subjectProgressContainer: {
+    height: 8,
+    backgroundColor: "#E0E0E0",
+    borderRadius: 4,
+  },
+  subjectProgress: {
+    height: "100%",
+    borderRadius: 4,
+  },
+  statsContainer: {
+    gap: 16,
+  },
+  statItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "rgba(255,142,105,0.1)",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.05)",
+    marginRight: 16,
   },
-  paginationButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.05)",
-    alignItems: "center",
-    justifyContent: "center",
+  statContent: {
+    flex: 1,
   },
-  paginationButtonDisabled: {
-    opacity: 0.5,
+  statLabel: {
+    fontSize: 14,
+    color: "#757575",
+    marginBottom: 4,
   },
-  paginationText: {
-    ...TYPOGRAPHY.body1,
-    color: "#666",
-    marginHorizontal: 16,
+  statValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333333",
   },
 });
 
-export default HistoriqueActivites;
+export default ChildHome;

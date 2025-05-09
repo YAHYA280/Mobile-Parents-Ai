@@ -1,3 +1,4 @@
+// app/(tabs)/Enfants.tsx
 import type { NavigationProp } from "@react-navigation/native";
 
 import React from "react";
@@ -16,36 +17,9 @@ import {
 
 import { useTheme } from "../../theme/ThemeProvider";
 import { COLORS as THEME_COLORS } from "../../constants/theme";
-import { CHILDREN_DATA } from "../../data/Enfants/CHILDREN_DATA";
+import { CHILDREN_DATA, Child } from "../../data/Enfants/CHILDREN_DATA";
 
-// Types definitions
-interface Child {
-  id: number;
-  name: string;
-  progress: string;
-  evolutionRate?: number;
-  engagementScore?: number;
-  age: number;
-  classe: string;
-  matieresFortes: string[];
-  matieresAmeliorer: string[];
-  activitesRecentes: any[];
-  profileImage: any;
-}
-// Définir COLORS localement
-const COLORS = {
-  primary: "#ff8e69",
-  secondary: "#fe7862",
-  error: "#F75555",
-  greeen: "#0ABE75",
-  gray: "#9E9E9E",
-  white: "#FFFFFF",
-  black: "#000000",
-  dark1: "#000000",
-  dark2: "#1F222A",
-  secondaryWhite: "#F8F8F8"
-};
-// New progress color function with more detailed color scale
+// Function to get progress color based on value
 function getProgressColor(progress: number) {
   if (progress < 30) {
     return THEME_COLORS.error; // Rouge
@@ -62,24 +36,23 @@ function getProgressColor(progress: number) {
 interface HomeProps {
   navigation: any;
 }
+
 // Main EnfantsList Component
-const EnfantsList : React.FC<HomeProps> = () => {
+const EnfantsList: React.FC<HomeProps> = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const router = useRouter();
-  const { dark, colors } = useTheme();
-  Dimensions.get('window');
+  const { colors } = useTheme();
+  const { width } = Dimensions.get("window");
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      <View style={[styles.viewRight, { marginLeft: 'auto' }]}>
+      <Text style={styles.headerTitle}>Mes Enfants</Text>
+      <View style={[styles.viewRight, { marginLeft: "auto" }]}>
         <TouchableOpacity onPress={() => navigation.navigate("notifications")}>
           <Image
             source={icons.notificationBell2}
             resizeMode="contain"
-            style={[
-              styles.bellIcon,
-              { tintColor: dark ? COLORS.white : HEADER_COLORS.greyscale900 },
-            ]}
+            style={styles.bellIcon}
           />
         </TouchableOpacity>
       </View>
@@ -99,30 +72,21 @@ const EnfantsList : React.FC<HomeProps> = () => {
   const renderChildCard = ({ item }: RenderItemProps) => {
     // Fix progress percentage parsing
     const progressText = item.progress;
-    const progressValue = parseFloat(progressText.replace('%', ''));
+    const progressValue = parseFloat(progressText.replace("%", ""));
 
     return (
-      <View
-        style={[
-          styles.childCard,
-          { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-        ]}
-      >
+      <View style={styles.childCard}>
         <View style={styles.cardHeader}>
           <View style={styles.avatarContainer}>
-            <Image source={item.profileImage} style={styles.avatar} contentFit="cover" />
+            <Image
+              source={item.profileImage}
+              style={styles.avatar}
+              contentFit="cover"
+            />
           </View>
 
           <View style={styles.infoContainer}>
-            <Text
-              style={[
-                styles.childName,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              {item.name}
-            </Text>
-
+            <Text style={styles.childName}>{item.name}</Text>
             <Text style={styles.childDetails}>
               {item.age} ans • {item.classe}
             </Text>
@@ -153,11 +117,36 @@ const EnfantsList : React.FC<HomeProps> = () => {
               ]}
             />
           </View>
+        </View>
 
-          {/* Section pour l'engagement et l'évolution si disponibles */}
-          {(item.engagementScore !== undefined || item.evolutionRate !== undefined) && (
-            <View style={styles.metricsContainer} />
-          )}
+        {/* Point forts and à améliorer */}
+        <View style={styles.tagsSection}>
+          <View style={styles.tagsRow}>
+            <View style={styles.tagColumn}>
+              <Text style={styles.tagLabel}>Points forts</Text>
+              <View style={styles.tagsList}>
+                {item.matieresFortes.slice(0, 2).map((matiere, idx) => (
+                  <View key={idx} style={styles.tagItem}>
+                    <View style={styles.tagBullet} />
+                    <Text style={styles.tagText}>{matiere}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+            <View style={styles.tagColumn}>
+              <Text style={styles.tagLabel}>À améliorer</Text>
+              <View style={styles.tagsList}>
+                {item.matieresAmeliorer.slice(0, 2).map((matiere, idx) => (
+                  <View key={idx} style={styles.tagItem}>
+                    <View style={[styles.tagBullet, styles.improveBullet]} />
+                    <Text style={[styles.tagText, styles.improveText]}>
+                      {matiere.replace(/^\?/, "").trim()}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </View>
         </View>
 
         <TouchableOpacity
@@ -171,18 +160,15 @@ const EnfantsList : React.FC<HomeProps> = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        {renderHeader()}
-      </View>
-      <View style={styles.header}>
-        <Text
-          style={[
-            styles.headerTitle,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
-          Mes Enfants
+    <SafeAreaView style={styles.area}>
+      <View style={styles.container}>{renderHeader()}</View>
+
+      <View style={styles.welcomeCard}>
+        <View style={styles.welcomeIconContainer}>
+          <Text style={styles.welcomeIcon}>👨‍👩‍👧‍👦</Text>
+        </View>
+        <Text style={styles.welcomeText}>
+          Suivez le progrès et les activités de vos enfants facilement
         </Text>
       </View>
 
@@ -200,33 +186,65 @@ const EnfantsList : React.FC<HomeProps> = () => {
 const styles = StyleSheet.create({
   area: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: "#F8F8F8",
   },
   container: {
-    flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: "#FFFFFF",
     padding: 16,
-    marginBottom: 32,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  header: {
+  headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 20,
+    justifyContent: "space-between",
   },
   headerTitle: {
     fontSize: 22,
     fontFamily: "bold",
-    color: COLORS.black,
+    color: "#333333",
+  },
+  viewRight: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  bellIcon: {
+    height: 24,
+    width: 24,
+    tintColor: "#333333",
+  },
+  welcomeCard: {
+    margin: 16,
+    backgroundColor: "rgba(255, 142, 105, 0.1)",
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  welcomeIconContainer: {
+    width: 50,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  welcomeIcon: {
+    fontSize: 30,
+  },
+  welcomeText: {
+    flex: 1,
+    fontSize: 14,
+    color: THEME_COLORS.primary,
+    lineHeight: 20,
+    marginLeft: 8,
   },
   listContainer: {
     padding: 16,
     paddingBottom: 80,
   },
   childCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
@@ -248,7 +266,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginRight: 16,
     borderWidth: 2,
-    borderColor: COLORS.white,
+    borderColor: THEME_COLORS.primary,
   },
   avatar: {
     width: "100%",
@@ -261,13 +279,13 @@ const styles = StyleSheet.create({
   childName: {
     fontSize: 18,
     fontFamily: "bold",
-    color: COLORS.black,
+    color: "#333333",
     marginBottom: 4,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
   childDetails: {
     fontSize: 14,
-    color: COLORS.gray,
+    color: "#757575",
     fontFamily: "regular",
   },
   progressSection: {
@@ -281,7 +299,7 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     fontSize: 14,
-    color: COLORS.gray,
+    color: "#757575",
     fontFamily: "medium",
   },
   progressValue: {
@@ -298,37 +316,59 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 4,
   },
-  metricsContainer: {
+  tagsSection: {
+    marginBottom: 16,
+  },
+  tagsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 8,
+  },
+  tagColumn: {
+    flex: 1,
+    paddingHorizontal: 4,
+  },
+  tagLabel: {
+    fontSize: 14,
+    color: "#757575",
+    marginBottom: 8,
+    fontFamily: "medium",
+  },
+  tagsList: {
+    gap: 6,
+  },
+  tagItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  tagBullet: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#4CAF50",
+    marginRight: 8,
+  },
+  improveBullet: {
+    backgroundColor: "#F44336",
+  },
+  tagText: {
+    fontSize: 14,
+    color: "#333333",
+  },
+  improveText: {
+    color: "#333333",
   },
   detailsButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: THEME_COLORS.primary,
     paddingVertical: 12,
     borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
   },
   detailsButtonText: {
-    color: COLORS.white,
+    color: "#FFFFFF",
     fontFamily: "medium",
     fontSize: 14,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  viewRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  bellIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.black,
-    marginRight: 8,
   },
 });
 

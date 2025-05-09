@@ -1,5 +1,6 @@
-import { LinearGradient } from "expo-linear-gradient";
+// app/Enfants/Historique/chat.tsx
 import React, { useRef, useState, useEffect } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
@@ -15,15 +16,18 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
-import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
-
-import Statement from "./statement";
+import type {
+  Child,
+  Activity,
+  ConversationMessage,
+} from "../../../data/Enfants/CHILDREN_DATA";
 import { COLORS } from "../../../constants/theme";
 import { useTheme } from "../../../theme/ThemeProvider";
 import {
   CHILDREN_DATA,
   enhanceActivity,
 } from "../../../data/Enfants/CHILDREN_DATA";
+import Statement from "./statement";
 
 // Assistant mapping with colors and icons
 const ASSISTANT_THEME: {
@@ -47,7 +51,7 @@ const ASSISTANT_THEME: {
   },
 };
 
-const ChatScreen = () => {
+const ChatScreen: React.FC = () => {
   const router = useRouter();
   const { dark, colors } = useTheme();
   const params = useLocalSearchParams();
@@ -61,8 +65,8 @@ const ChatScreen = () => {
   // States
   const [child, setChild] = useState<Child | null>(null);
   const [activity, setActivity] = useState<Activity | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showStatement, setShowStatement] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [showStatement, setShowStatement] = useState<boolean>(false);
 
   // Fetch data
   useEffect(() => {
@@ -101,7 +105,7 @@ const ChatScreen = () => {
     };
 
     fetchData();
-  }, [childId, activityId, router]); // Added router to the dependency array
+  }, [childId, activityId, router]);
 
   // Scroll to bottom when conversation changes
   useEffect(() => {
@@ -132,9 +136,7 @@ const ChatScreen = () => {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text
-            style={{ marginTop: 20, color: dark ? COLORS.white : COLORS.black }}
-          >
+          <Text style={{ marginTop: 20, color: "#333333" }}>
             Chargement de la conversation...
           </Text>
         </View>
@@ -149,14 +151,8 @@ const ChatScreen = () => {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <FontAwesome5
-            name="exclamation-circle"
-            size={64}
-            color={dark ? COLORS.white : COLORS.black}
-          />
-          <Text
-            style={{ marginTop: 20, color: dark ? COLORS.white : COLORS.black }}
-          >
+          <FontAwesome5 name="exclamation-circle" size={64} color="#333333" />
+          <Text style={{ marginTop: 20, color: "#333333" }}>
             Conversation introuvable
           </Text>
           <TouchableOpacity
@@ -192,7 +188,7 @@ const ChatScreen = () => {
   const conversation = activity.conversation || [];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -206,17 +202,12 @@ const ChatScreen = () => {
               alignItems: "center",
               padding: 16,
               borderBottomWidth: 1,
-              borderBottomColor: dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.1)",
+              borderBottomColor: "rgba(0,0,0,0.1)",
+              backgroundColor: "#FFFFFF",
             }}
           >
             <TouchableOpacity onPress={handleBack} style={{ marginRight: 16 }}>
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color={dark ? COLORS.white : COLORS.black}
-              />
+              <Ionicons name="arrow-back" size={24} color="#333333" />
             </TouchableOpacity>
 
             <LinearGradient
@@ -240,7 +231,7 @@ const ChatScreen = () => {
                 style={{
                   fontSize: 16,
                   fontWeight: "bold",
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: "#333333",
                 }}
               >
                 Assistant {assistantName}
@@ -248,7 +239,7 @@ const ChatScreen = () => {
               <Text
                 style={{
                   fontSize: 12,
-                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  color: "#757575",
                 }}
               >
                 {formattedDate}
@@ -260,13 +251,9 @@ const ChatScreen = () => {
           <View
             style={{
               padding: 12,
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(0,0,0,0.03)",
+              backgroundColor: "rgba(0,0,0,0.03)",
               borderBottomWidth: 1,
-              borderBottomColor: dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.1)",
+              borderBottomColor: "rgba(0,0,0,0.1)",
             }}
           >
             <View
@@ -280,7 +267,7 @@ const ChatScreen = () => {
                 style={{
                   fontSize: 15,
                   textAlign: "center",
-                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  color: "#757575",
                   flex: 1,
                 }}
               >
@@ -293,16 +280,15 @@ const ChatScreen = () => {
                 <FontAwesome5
                   name={showStatement ? "chevron-up" : "chevron-down"}
                   size={16}
-                  color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                  color="#757575"
                 />
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Corrected Statement Section */}
-          {showStatement && <Statement activity={activity} dark={dark} />}
+          {/* Statement Section */}
+          {showStatement && <Statement activity={activity} dark={false} />}
 
-          {/* Rest of the code remains the same... */}
           {/* Chat Messages */}
           <ScrollView
             ref={scrollViewRef}
@@ -310,7 +296,7 @@ const ChatScreen = () => {
             contentContainerStyle={{ paddingBottom: 16 }}
             showsVerticalScrollIndicator={false}
           >
-            {conversation.map((msg, index) => (
+            {conversation.map((msg: ConversationMessage, index: number) => (
               <View
                 key={index}
                 style={{
@@ -323,12 +309,8 @@ const ChatScreen = () => {
                   style={{
                     backgroundColor:
                       msg.sender === "assistant"
-                        ? dark
-                          ? "rgba(0, 149, 255, 0.2)"
-                          : "rgba(0, 149, 255, 0.1)"
-                        : dark
-                          ? "rgba(66, 66, 66, 0.8)"
-                          : "#E1E1E1",
+                        ? "rgba(0, 149, 255, 0.1)"
+                        : "#E1E1E1",
                     padding: 16,
                     borderRadius: 16,
                     maxWidth: "80%",
@@ -338,14 +320,7 @@ const ChatScreen = () => {
                 >
                   <Text
                     style={{
-                      color:
-                        msg.sender === "assistant"
-                          ? dark
-                            ? COLORS.white
-                            : COLORS.primary
-                          : dark
-                            ? COLORS.white
-                            : COLORS.black,
+                      color: msg.sender === "assistant" ? "#0067B1" : "#333333",
                       fontSize: 15,
                       lineHeight: 22,
                     }}
@@ -355,9 +330,7 @@ const ChatScreen = () => {
                   <Text
                     style={{
                       fontSize: 12,
-                      color: dark
-                        ? "rgba(255, 255, 255, 0.5)"
-                        : "rgba(0, 0, 0, 0.5)",
+                      color: "rgba(0, 0, 0, 0.5)",
                       alignSelf: "flex-end",
                       marginTop: 4,
                     }}
@@ -374,20 +347,16 @@ const ChatScreen = () => {
             style={{
               flexDirection: "row",
               padding: 12,
-              backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+              backgroundColor: "#FFFFFF",
               borderTopWidth: 1,
-              borderTopColor: dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.1)",
+              borderTopColor: "rgba(0,0,0,0.1)",
               alignItems: "center",
             }}
           >
             <View
               style={{
                 flex: 1,
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.05)",
+                backgroundColor: "rgba(0,0,0,0.05)",
                 borderRadius: 20,
                 paddingHorizontal: 16,
                 paddingVertical: 8,
@@ -397,30 +366,22 @@ const ChatScreen = () => {
             >
               <TextInput
                 placeholder="Ce chat est en lecture seule..."
-                placeholderTextColor={
-                  dark ? COLORS.secondaryWhite : COLORS.gray3
-                }
+                placeholderTextColor="#757575"
                 style={{
                   flex: 1,
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: "#333333",
                   fontSize: 15,
                 }}
                 editable={false}
               />
-              <Ionicons
-                name="lock-closed"
-                size={18}
-                color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-              />
+              <Ionicons name="lock-closed" size={18} color="#757575" />
             </View>
           </View>
 
           {/* Info Banner */}
           <View
             style={{
-              backgroundColor: dark
-                ? "rgba(0, 149, 255, 0.1)"
-                : "rgba(0, 149, 255, 0.05)",
+              backgroundColor: "rgba(0, 149, 255, 0.05)",
               padding: 12,
               alignItems: "center",
               flexDirection: "row",
