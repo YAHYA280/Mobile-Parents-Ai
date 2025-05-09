@@ -582,7 +582,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
                     style={styles.subjectCardHeader}
                   >
                     <View style={styles.subjectIconContainer}>
-                      <Ionicons name={icon} size={24} color="#FFFFFF" />
+                      <Ionicons name={icon as any} size={24} color="#FFFFFF" />
                     </View>
 
                     <Text style={styles.subjectName}>{subject.subject}</Text>
@@ -720,7 +720,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
                       {subject.improvement !== undefined && (
                         <View style={styles.subjectStatItem}>
                           <Ionicons
-                            name={improvement.icon}
+                            name={improvement.icon as any}
                             size={16}
                             color={improvement.color}
                             style={styles.subjectStatIcon}

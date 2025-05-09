@@ -2,7 +2,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef, useState, useEffect } from "react";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { MotiView } from "moti";
 import {
   View,
   Text,
@@ -14,9 +13,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
-  Dimensions,
-  StyleSheet,
-  StatusBar,
 } from "react-native";
 
 import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
@@ -29,39 +25,29 @@ import {
   enhanceActivity,
 } from "../../../data/Enfants/CHILDREN_DATA";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
 // Assistant mapping with colors and icons
 const ASSISTANT_THEME: {
-  [key: string]: {
-    colors: [string, string];
-    icon: string;
-    displayName: string;
-  };
+  [key: string]: { colors: [string, string]; icon: string };
 } = {
   "J'Apprends": {
     colors: ["#4CAF50", "#2E7D32"],
-    icon: "school",
-    displayName: "Éducation",
+    icon: "chalkboard-teacher",
   },
   Recherche: {
     colors: ["#2196F3", "#1565C0"],
     icon: "search",
-    displayName: "Recherche",
   },
   Accueil: {
     colors: ["#FF9800", "#F57C00"],
     icon: "home",
-    displayName: "Accueil",
   },
   Autre: {
     colors: ["#9C27B0", "#7B1FA2"],
-    icon: "apps",
-    displayName: "Assistant",
+    icon: "robot",
   },
 };
 
-const EnhancedChatScreen = () => {
+const ChatScreen = () => {
   const router = useRouter();
   const { dark, colors } = useTheme();
   const params = useLocalSearchParams();
@@ -77,9 +63,6 @@ const EnhancedChatScreen = () => {
   const [activity, setActivity] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showStatement, setShowStatement] = useState(false);
-  const [expandedMessageId, setExpandedMessageId] = useState<string | null>(
-    null
-  );
 
   // Fetch data
   useEffect(() => {
@@ -118,7 +101,7 @@ const EnhancedChatScreen = () => {
     };
 
     fetchData();
-  }, [childId, activityId, router]);
+  }, [childId, activityId, router]); // Added router to the dependency array
 
   // Scroll to bottom when conversation changes
   useEffect(() => {
@@ -141,30 +124,14 @@ const EnhancedChatScreen = () => {
     }
   };
 
-  // Toggle message expansion
-  const toggleMessageExpansion = (messageId: string) => {
-    if (expandedMessageId === messageId) {
-      setExpandedMessageId(null);
-    } else {
-      setExpandedMessageId(messageId);
-    }
-  };
-
   // Loading display
   if (isLoading) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <StatusBar barStyle={dark ? "light-content" : "dark-content"} />
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <MotiView
-            from={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "timing", duration: 800, loop: true }}
-          >
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          </MotiView>
+          <ActivityIndicator size="large" color={COLORS.primary} />
           <Text
             style={{ marginTop: 20, color: dark ? COLORS.white : COLORS.black }}
           >
@@ -179,28 +146,30 @@ const EnhancedChatScreen = () => {
   if (!activity || !child) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <StatusBar barStyle={dark ? "light-content" : "dark-content"} />
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <MotiView
-            from={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", damping: 13 }}
+          <FontAwesome5
+            name="exclamation-circle"
+            size={64}
+            color={dark ? COLORS.white : COLORS.black}
+          />
+          <Text
+            style={{ marginTop: 20, color: dark ? COLORS.white : COLORS.black }}
           >
-            <FontAwesome5
-              name="exclamation-circle"
-              size={64}
-              color={dark ? COLORS.white : COLORS.black}
-            />
-            <Text style={styles.notFoundTitle}>Conversation introuvable</Text>
-            <TouchableOpacity
-              style={styles.backButtonLarge}
-              onPress={handleBack}
-            >
-              <Text style={styles.backButtonText}>Retour</Text>
-            </TouchableOpacity>
-          </MotiView>
+            Conversation introuvable
+          </Text>
+          <TouchableOpacity
+            style={{
+              marginTop: 20,
+              backgroundColor: COLORS.primary,
+              padding: 12,
+              borderRadius: 8,
+            }}
+            onPress={handleBack}
+          >
+            <Text style={{ color: COLORS.white }}>Retour</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -223,10 +192,7 @@ const EnhancedChatScreen = () => {
   const conversation = activity.conversation || [];
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
-      <StatusBar barStyle={dark ? "light-content" : "dark-content"} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -235,16 +201,17 @@ const EnhancedChatScreen = () => {
         <View style={{ flex: 1 }}>
           {/* Header */}
           <View
-            style={[
-              styles.header,
-              {
-                borderBottomColor: dark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.1)",
-              },
-            ]}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 16,
+              borderBottomWidth: 1,
+              borderBottomColor: dark
+                ? "rgba(255,255,255,0.1)"
+                : "rgba(0,0,0,0.1)",
+            }}
           >
-            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+            <TouchableOpacity onPress={handleBack} style={{ marginRight: 16 }}>
               <Ionicons
                 name="arrow-back"
                 size={24}
@@ -256,231 +223,188 @@ const EnhancedChatScreen = () => {
               colors={assistantTheme.colors}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={styles.assistantIconContainer}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                justifyContent: "center",
+                alignItems: "center",
+                marginRight: 12,
+              }}
             >
-              <Ionicons name={assistantTheme.icon} size={20} color="#FFF" />
+              <FontAwesome5 name={assistantTheme.icon} size={16} color="#FFF" />
             </LinearGradient>
 
-            <View style={styles.headerInfo}>
+            <View style={{ flex: 1 }}>
               <Text
-                style={[
-                  styles.assistantName,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  color: dark ? COLORS.white : COLORS.black,
+                }}
               >
-                Assistant {assistantTheme.displayName}
+                Assistant {assistantName}
               </Text>
               <Text
-                style={[
-                  styles.assistantDate,
-                  { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-                ]}
+                style={{
+                  fontSize: 12,
+                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                }}
               >
                 {formattedDate}
               </Text>
             </View>
           </View>
 
-          {/* Activity Title Banner */}
-          <TouchableOpacity
-            style={[
-              styles.titleBanner,
-              {
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.05)"
-                  : "rgba(0,0,0,0.03)",
-                borderBottomColor: dark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.1)",
-              },
-            ]}
-            onPress={() => setShowStatement(!showStatement)}
+          {/* Activity Title */}
+          <View
+            style={{
+              padding: 12,
+              backgroundColor: dark
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(0,0,0,0.03)",
+              borderBottomWidth: 1,
+              borderBottomColor: dark
+                ? "rgba(255,255,255,0.1)"
+                : "rgba(0,0,0,0.1)",
+            }}
           >
-            <View style={styles.titleBannerContent}>
-              <MotiView
-                animate={{
-                  rotate: showStatement ? "180deg" : "0deg",
-                }}
-                transition={{
-                  type: "timing",
-                  duration: 300,
-                }}
-                style={styles.titleBannerIcon}
-              >
-                <FontAwesome5
-                  name="chevron-down"
-                  size={16}
-                  color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-                />
-              </MotiView>
-
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Text
-                style={[
-                  styles.titleBannerText,
-                  { color: dark ? COLORS.secondaryWhite : COLORS.gray3 },
-                ]}
+                style={{
+                  fontSize: 15,
+                  textAlign: "center",
+                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  flex: 1,
+                }}
               >
                 {activity.activite}
               </Text>
-
-              <View
-                style={[
-                  styles.subjectTag,
-                  { backgroundColor: getSubjectColor(activity.matiere || "") },
-                ]}
+              <TouchableOpacity
+                onPress={() => setShowStatement(!showStatement)}
+                style={{ padding: 8 }}
               >
-                <Text style={styles.subjectTagText}>{activity.matiere}</Text>
-              </View>
+                <FontAwesome5
+                  name={showStatement ? "chevron-up" : "chevron-down"}
+                  size={16}
+                  color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                />
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
+          </View>
 
-          {/* Statement Section - Animated */}
-          {showStatement && (
-            <MotiView
-              from={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              transition={{ type: "timing", duration: 300 }}
-            >
-              <Statement activity={activity} dark={dark} />
-            </MotiView>
-          )}
+          {/* Corrected Statement Section */}
+          {showStatement && <Statement activity={activity} dark={dark} />}
 
+          {/* Rest of the code remains the same... */}
           {/* Chat Messages */}
           <ScrollView
             ref={scrollViewRef}
-            style={styles.messagesContainer}
-            contentContainerStyle={styles.messagesContent}
+            style={{ flex: 1, padding: 16 }}
+            contentContainerStyle={{ paddingBottom: 16 }}
             showsVerticalScrollIndicator={false}
           >
-            {conversation.map((msg, index) => {
-              const isAssistant = msg.sender === "assistant";
-              const messageId = `${index}-${msg.timestamp}`;
-              const isExpanded = expandedMessageId === messageId;
-              const hasLongMessage = msg.message.length > 150;
-
-              return (
-                <MotiView
-                  key={index}
-                  from={{ opacity: 0, translateY: 20 }}
-                  animate={{ opacity: 1, translateY: 0 }}
-                  transition={{
-                    type: "spring",
-                    damping: 18,
-                    delay: index * 50,
-                    stiffness: 100,
+            {conversation.map((msg, index) => (
+              <View
+                key={index}
+                style={{
+                  marginBottom: 16,
+                  alignItems:
+                    msg.sender === "assistant" ? "flex-start" : "flex-end",
+                }}
+              >
+                <View
+                  style={{
+                    backgroundColor:
+                      msg.sender === "assistant"
+                        ? dark
+                          ? "rgba(0, 149, 255, 0.2)"
+                          : "rgba(0, 149, 255, 0.1)"
+                        : dark
+                          ? "rgba(66, 66, 66, 0.8)"
+                          : "#E1E1E1",
+                    padding: 16,
+                    borderRadius: 16,
+                    maxWidth: "80%",
+                    borderTopLeftRadius: msg.sender === "assistant" ? 4 : 16,
+                    borderTopRightRadius: msg.sender === "assistant" ? 16 : 4,
                   }}
-                  style={[
-                    styles.messageContainer,
-                    isAssistant
-                      ? styles.assistantMessageContainer
-                      : styles.userMessageContainer,
-                  ]}
                 >
-                  {isAssistant && (
-                    <LinearGradient
-                      colors={assistantTheme.colors}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={styles.messageBubbleIcon}
-                    >
-                      <Ionicons
-                        name={assistantTheme.icon}
-                        size={14}
-                        color="#FFF"
-                      />
-                    </LinearGradient>
-                  )}
-
-                  <View
-                    style={[
-                      styles.messageBubble,
-                      isAssistant
-                        ? [
-                            styles.assistantBubble,
-                            {
-                              backgroundColor: dark
-                                ? "rgba(0, 149, 255, 0.2)"
-                                : "rgba(0, 149, 255, 0.1)",
-                            },
-                          ]
-                        : [
-                            styles.userBubble,
-                            {
-                              backgroundColor: dark
-                                ? "rgba(66, 66, 66, 0.8)"
-                                : "#E9E9E9",
-                            },
-                          ],
-                    ]}
+                  <Text
+                    style={{
+                      color:
+                        msg.sender === "assistant"
+                          ? dark
+                            ? COLORS.white
+                            : COLORS.primary
+                          : dark
+                            ? COLORS.white
+                            : COLORS.black,
+                      fontSize: 15,
+                      lineHeight: 22,
+                    }}
                   >
-                    <Text
-                      style={[
-                        styles.messageText,
-                        {
-                          color: isAssistant
-                            ? dark
-                              ? COLORS.white
-                              : COLORS.primary
-                            : dark
-                              ? COLORS.white
-                              : COLORS.black,
-                        },
-                      ]}
-                    >
-                      {hasLongMessage && !isExpanded
-                        ? `${msg.message.substring(0, 150)}...`
-                        : msg.message}
-                    </Text>
-
-                    {hasLongMessage && (
-                      <TouchableOpacity
-                        style={styles.expandButton}
-                        onPress={() => toggleMessageExpansion(messageId)}
-                      >
-                        <Text style={styles.expandButtonText}>
-                          {isExpanded ? "Voir moins" : "Voir plus"}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-
-                    <Text style={styles.messageTime}>{msg.timestamp}</Text>
-                  </View>
-                </MotiView>
-              );
-            })}
+                    {msg.message}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: dark
+                        ? "rgba(255, 255, 255, 0.5)"
+                        : "rgba(0, 0, 0, 0.5)",
+                      alignSelf: "flex-end",
+                      marginTop: 4,
+                    }}
+                  >
+                    {msg.timestamp}
+                  </Text>
+                </View>
+              </View>
+            ))}
           </ScrollView>
 
-          {/* Message Input (Disabled but looks interactive) */}
+          {/* Message Input (Just for UI, not functional) */}
           <View
-            style={[
-              styles.inputContainer,
-              {
-                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
-                borderTopColor: dark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.1)",
-              },
-            ]}
+            style={{
+              flexDirection: "row",
+              padding: 12,
+              backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+              borderTopWidth: 1,
+              borderTopColor: dark
+                ? "rgba(255,255,255,0.1)"
+                : "rgba(0,0,0,0.1)",
+              alignItems: "center",
+            }}
           >
             <View
-              style={[
-                styles.inputWrapper,
-                {
-                  backgroundColor: dark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
-                },
-              ]}
+              style={{
+                flex: 1,
+                backgroundColor: dark
+                  ? "rgba(255,255,255,0.1)"
+                  : "rgba(0,0,0,0.05)",
+                borderRadius: 20,
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
             >
               <TextInput
                 placeholder="Ce chat est en lecture seule..."
                 placeholderTextColor={
                   dark ? COLORS.secondaryWhite : COLORS.gray3
                 }
-                style={[
-                  styles.input,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
+                style={{
+                  flex: 1,
+                  color: dark ? COLORS.white : COLORS.black,
+                  fontSize: 15,
+                }}
                 editable={false}
               />
               <Ionicons
@@ -493,22 +417,23 @@ const EnhancedChatScreen = () => {
 
           {/* Info Banner */}
           <View
-            style={[
-              styles.infoBanner,
-              {
-                backgroundColor: dark
-                  ? "rgba(0, 149, 255, 0.1)"
-                  : "rgba(0, 149, 255, 0.05)",
-              },
-            ]}
+            style={{
+              backgroundColor: dark
+                ? "rgba(0, 149, 255, 0.1)"
+                : "rgba(0, 149, 255, 0.05)",
+              padding: 12,
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
           >
             <Ionicons
               name="information-circle"
               size={18}
               color={COLORS.primary}
-              style={styles.infoIcon}
+              style={{ marginRight: 8 }}
             />
-            <Text style={styles.infoText}>
+            <Text style={{ color: COLORS.primary, fontSize: 13 }}>
               Ceci est un historique de conversation en lecture seule
             </Text>
           </View>
@@ -518,204 +443,4 @@ const EnhancedChatScreen = () => {
   );
 };
 
-// Helper function to get color based on subject
-const getSubjectColor = (subject: string): string => {
-  const subjectLower = subject?.toLowerCase() || "";
-
-  if (subjectLower.includes("math")) return "#2196F3";
-  if (subjectLower.includes("français") || subjectLower.includes("francais"))
-    return "#4CAF50";
-  if (subjectLower.includes("histoire") || subjectLower.includes("géo"))
-    return "#FF9800";
-  if (subjectLower.includes("science")) return "#9C27B0";
-  if (subjectLower.includes("anglais")) return "#F44336";
-
-  // Default color
-  return COLORS.primary;
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  assistantIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  headerInfo: {
-    flex: 1,
-  },
-  assistantName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 2,
-  },
-  assistantDate: {
-    fontSize: 13,
-  },
-  titleBanner: {
-    padding: 14,
-    borderBottomWidth: 1,
-  },
-  titleBannerContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  titleBannerIcon: {
-    width: 24,
-    height: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  titleBannerText: {
-    flex: 1,
-    fontSize: 15,
-    textAlign: "center",
-    paddingHorizontal: 8,
-  },
-  subjectTag: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  subjectTagText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  messagesContainer: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  messagesContent: {
-    paddingVertical: 16,
-  },
-  messageContainer: {
-    flexDirection: "row",
-    marginBottom: 16,
-    maxWidth: "85%",
-  },
-  assistantMessageContainer: {
-    alignSelf: "flex-start",
-  },
-  userMessageContainer: {
-    alignSelf: "flex-end",
-  },
-  messageBubbleIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 8,
-    alignSelf: "flex-start",
-    marginTop: 4,
-  },
-  messageBubble: {
-    borderRadius: 18,
-    padding: 12,
-    paddingHorizontal: 16,
-  },
-  assistantBubble: {
-    borderTopLeftRadius: 4,
-  },
-  userBubble: {
-    borderTopRightRadius: 4,
-  },
-  messageText: {
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  expandButton: {
-    marginTop: 6,
-    alignSelf: "flex-start",
-  },
-  expandButtonText: {
-    color: COLORS.primary,
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  messageTime: {
-    fontSize: 12,
-    color: "rgba(150, 150, 150, 0.8)",
-    alignSelf: "flex-end",
-    marginTop: 6,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    padding: 12,
-    borderTopWidth: 1,
-    alignItems: "center",
-  },
-  inputWrapper: {
-    flex: 1,
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    marginRight: 8,
-  },
-  infoBanner: {
-    padding: 12,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-  },
-  infoIcon: {
-    marginRight: 8,
-  },
-  infoText: {
-    color: COLORS.primary,
-    fontSize: 13,
-  },
-  notFoundTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 20,
-    marginBottom: 24,
-  },
-  backButtonLarge: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignSelf: "center",
-  },
-  backButtonText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
-
-export default EnhancedChatScreen;
+export default ChatScreen;
