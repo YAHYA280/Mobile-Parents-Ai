@@ -800,7 +800,6 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         <SearchBar
           searchKeyword={searchKeyword}
           setSearchKeyword={setSearchKeyword}
-          dark={dark}
           activityDateRange={activityDateRange}
           toggleActivityCalendar={() => toggleActivityCalendar("start")}
           resetAllFilters={resetActivityFilters}
@@ -817,7 +816,6 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
             }) => {
               setActivityDateRange(range);
             }}
-            dark={dark}
           />
         )}
 
@@ -836,7 +834,6 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                 setAdvancedFilters({ selectedAssistants: assistantsUpdater });
               }
             }}
-            dark={dark}
           />
         )}
 
@@ -1011,7 +1008,6 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
       <FilterModal
         showActivityCalendar={showActivityCalendar}
         toggleActivityCalendar={toggleActivityCalendar}
-        dark={dark}
         searchKeyword={searchKeyword}
         setSearchKeyword={setSearchKeyword}
         uniqueAssistantTypes={uniqueAssistantTypes}

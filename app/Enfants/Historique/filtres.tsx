@@ -1,5 +1,5 @@
 // app/Enfants/Historique/filtres.tsx – fully fixed and compilable version
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Calendar, DateData } from "react-native-calendars";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -11,8 +11,6 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
-  StyleSheet,
-  Platform,
 } from "react-native";
 import {
   faSync,
@@ -20,12 +18,9 @@ import {
   faCalendar,
   faTimesCircle,
   faCheck,
-  faChevronRight,
   faBook,
   faChalkboardTeacher,
   faFilter,
-  faChevronDown,
-  faChevronUp,
 } from "@fortawesome/free-solid-svg-icons";
 
 import type { Activity } from "../../../data/Enfants/CHILDREN_DATA";
@@ -179,7 +174,7 @@ export const extractAssistantType = (activity: Activity): string => {
 interface SearchBarProps {
   searchKeyword: string;
   setSearchKeyword: (value: string) => void;
-  dark: boolean;
+
   activityDateRange: { startDate: string | null; endDate: string | null };
   toggleActivityCalendar: () => void;
   resetAllFilters: () => void;
@@ -189,7 +184,7 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({
   searchKeyword,
   setSearchKeyword,
-  dark,
+
   activityDateRange,
   toggleActivityCalendar,
   resetAllFilters,
@@ -201,7 +196,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <View
       style={{
-        backgroundColor: dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.03)",
+        backgroundColor: "rgba(0,0,0,0.03)",
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
@@ -216,7 +211,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         style={{
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+          backgroundColor: "rgba(0,0,0,0.05)",
           borderRadius: 25,
           paddingHorizontal: 15,
           paddingVertical: 4,
@@ -225,22 +220,20 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       >
         <FontAwesomeIcon
           icon={faSearch}
-          color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+          color={COLORS.gray3}
           size={16}
           style={{ marginRight: 8 }}
         />
         <TextInput
           placeholder="Rechercher une activité..."
-          placeholderTextColor={
-            dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)"
-          }
+          placeholderTextColor={"rgba(0,0,0,0.4)"}
           value={searchKeyword}
           onChangeText={setSearchKeyword}
           style={{
             flex: 1,
             paddingVertical: 10,
             paddingHorizontal: 2,
-            color: dark ? COLORS.white : COLORS.black,
+            color: COLORS.black,
             fontSize: 15,
           }}
         />
@@ -251,16 +244,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               width: 30,
               height: 30,
               borderRadius: 15,
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: "rgba(0,0,0,0.05)",
               justifyContent: "center",
               alignItems: "center",
             }}
           >
             <FontAwesomeIcon
               icon={faTimesCircle}
-              color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+              color={COLORS.gray3}
               size={16}
             />
           </TouchableOpacity>
@@ -273,9 +264,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           style={{
             backgroundColor: isDateFilterActive
               ? "rgba(0, 149, 255, 0.1)"
-              : dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.05)",
+              : "rgba(0,0,0,0.05)",
             flexDirection: "row",
             alignItems: "center",
             paddingHorizontal: 16,
@@ -288,23 +277,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         >
           <FontAwesomeIcon
             icon={faCalendar}
-            color={
-              isDateFilterActive
-                ? COLORS.primary
-                : dark
-                  ? COLORS.secondaryWhite
-                  : COLORS.gray3
-            }
+            color={isDateFilterActive ? COLORS.primary : COLORS.gray3}
             size={16}
             style={{ marginRight: 8 }}
           />
           <Text
             style={{
-              color: isDateFilterActive
-                ? COLORS.primary
-                : dark
-                  ? COLORS.secondaryWhite
-                  : COLORS.gray3,
+              color: isDateFilterActive ? COLORS.primary : COLORS.gray3,
               fontWeight: isDateFilterActive ? "600" : "normal",
               fontSize: 14,
             }}
@@ -316,9 +295,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         {hasFilters && (
           <TouchableOpacity
             style={{
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: "rgba(0,0,0,0.05)",
               flexDirection: "row",
               alignItems: "center",
               paddingHorizontal: 16,
@@ -330,13 +307,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           >
             <FontAwesomeIcon
               icon={faSync}
-              color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+              color={COLORS.gray3}
               size={16}
               style={{ marginRight: 8 }}
             />
             <Text
               style={{
-                color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                color: COLORS.gray3,
                 fontSize: 14,
               }}
             >
@@ -359,13 +336,11 @@ interface DateRangeIndicatorProps {
     startDate: string | null;
     endDate: string | null;
   }) => void;
-  dark: boolean;
 }
 
 export const DateRangeIndicator: React.FC<DateRangeIndicatorProps> = ({
   activityDateRange,
   setActivityDateRange,
-  dark,
 }) => {
   if (!activityDateRange.startDate && !activityDateRange.endDate) return null;
 
@@ -386,9 +361,7 @@ export const DateRangeIndicator: React.FC<DateRangeIndicatorProps> = ({
   return (
     <View
       style={{
-        backgroundColor: dark
-          ? "rgba(0, 149, 255, 0.2)"
-          : "rgba(0, 149, 255, 0.1)",
+        backgroundColor: "rgba(0, 149, 255, 0.1)",
         borderRadius: 12,
         padding: 12,
         marginVertical: 12,
@@ -443,14 +416,12 @@ interface AssistantTypeFiltersProps {
   setSelectedAssistantTypes: (
     value: ((prev: string[]) => string[]) | string[]
   ) => void;
-  dark: boolean;
 }
 
 export const AssistantTypeFilters: React.FC<AssistantTypeFiltersProps> = ({
   uniqueAssistantTypes,
   selectedAssistantTypes,
   setSelectedAssistantTypes,
-  dark,
 }) => {
   if (!uniqueAssistantTypes || uniqueAssistantTypes.length === 0) return null;
   const safeSelectedTypes = selectedAssistantTypes || [];
@@ -461,7 +432,7 @@ export const AssistantTypeFilters: React.FC<AssistantTypeFiltersProps> = ({
         style={{
           fontSize: 16,
           fontWeight: "500",
-          color: dark ? COLORS.white : COLORS.black,
+          color: COLORS.black,
           marginBottom: 10,
           paddingHorizontal: 4,
         }}
@@ -484,9 +455,7 @@ export const AssistantTypeFilters: React.FC<AssistantTypeFiltersProps> = ({
                 alignItems: "center",
                 backgroundColor: isSelected
                   ? theme.colors[0]
-                  : dark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
+                  : "rgba(0,0,0,0.05)",
                 borderRadius: 25,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
@@ -510,22 +479,12 @@ export const AssistantTypeFilters: React.FC<AssistantTypeFiltersProps> = ({
             >
               <FontAwesomeIcon
                 icon={theme.icon}
-                color={
-                  isSelected
-                    ? "#FFFFFF"
-                    : dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.gray3
-                }
+                color={isSelected ? "#FFFFFF" : COLORS.gray3}
                 style={{ marginRight: 8 }}
               />
               <Text
                 style={{
-                  color: isSelected
-                    ? "#FFFFFF"
-                    : dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.gray3,
+                  color: isSelected ? "#FFFFFF" : COLORS.gray3,
                   fontWeight: isSelected ? "600" : "normal",
                   fontSize: 14,
                 }}
@@ -563,14 +522,12 @@ interface SubjectFiltersProps {
   availableSubjects: string[];
   selectedSubjects: string[];
   setSelectedSubjects: (subjects: string[]) => void;
-  dark: boolean;
 }
 
 export const SubjectFilters: React.FC<SubjectFiltersProps> = ({
   availableSubjects,
   selectedSubjects,
   setSelectedSubjects,
-  dark,
 }) => {
   if (!availableSubjects || availableSubjects.length === 0) return null;
   const safeSelectedSubjects = selectedSubjects || [];
@@ -581,7 +538,7 @@ export const SubjectFilters: React.FC<SubjectFiltersProps> = ({
         style={{
           fontSize: 16,
           fontWeight: "500",
-          color: dark ? COLORS.white : COLORS.black,
+          color: COLORS.black,
           marginBottom: 10,
           paddingHorizontal: 4,
         }}
@@ -604,9 +561,7 @@ export const SubjectFilters: React.FC<SubjectFiltersProps> = ({
                 alignItems: "center",
                 backgroundColor: isSelected
                   ? theme.colors[0]
-                  : dark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
+                  : "rgba(0,0,0,0.05)",
                 borderRadius: 25,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
@@ -626,22 +581,12 @@ export const SubjectFilters: React.FC<SubjectFiltersProps> = ({
             >
               <FontAwesomeIcon
                 icon={theme.icon}
-                color={
-                  isSelected
-                    ? "#FFFFFF"
-                    : dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.gray3
-                }
+                color={isSelected ? "#FFFFFF" : COLORS.gray3}
                 style={{ marginRight: 8 }}
               />
               <Text
                 style={{
-                  color: isSelected
-                    ? "#FFFFFF"
-                    : dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.gray3,
+                  color: isSelected ? "#FFFFFF" : COLORS.gray3,
                   fontWeight: isSelected ? "600" : "normal",
                   fontSize: 14,
                 }}
@@ -679,14 +624,12 @@ interface ChapterFiltersProps {
   availableChapters: string[];
   selectedChapters: string[];
   setSelectedChapters: (chapters: string[]) => void;
-  dark: boolean;
 }
 
 export const ChapterFilters: React.FC<ChapterFiltersProps> = ({
   availableChapters,
   selectedChapters,
   setSelectedChapters,
-  dark,
 }) => {
   if (!availableChapters || availableChapters.length === 0) return null;
   const safeSelectedChapters = selectedChapters || [];
@@ -697,7 +640,7 @@ export const ChapterFilters: React.FC<ChapterFiltersProps> = ({
         style={{
           fontSize: 16,
           fontWeight: "500",
-          color: dark ? COLORS.white : COLORS.black,
+          color: COLORS.black,
           marginBottom: 10,
           paddingHorizontal: 4,
         }}
@@ -717,11 +660,7 @@ export const ChapterFilters: React.FC<ChapterFiltersProps> = ({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: isSelected
-                  ? "#009688"
-                  : dark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
+                backgroundColor: isSelected ? "#009688" : "rgba(0,0,0,0.05)",
                 borderRadius: 25,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
@@ -741,22 +680,12 @@ export const ChapterFilters: React.FC<ChapterFiltersProps> = ({
             >
               <FontAwesomeIcon
                 icon={faBook}
-                color={
-                  isSelected
-                    ? "#FFFFFF"
-                    : dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.gray3
-                }
+                color={isSelected ? "#FFFFFF" : COLORS.gray3}
                 style={{ marginRight: 8 }}
               />
               <Text
                 style={{
-                  color: isSelected
-                    ? "#FFFFFF"
-                    : dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.gray3,
+                  color: isSelected ? "#FFFFFF" : COLORS.gray3,
                   fontWeight: isSelected ? "600" : "normal",
                   fontSize: 14,
                 }}
@@ -794,14 +723,12 @@ interface ExerciseFiltersProps {
   availableExercises: string[];
   selectedExercises: string[];
   setSelectedExercises: (exercises: string[]) => void;
-  dark: boolean;
 }
 
 export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
   availableExercises,
   selectedExercises,
   setSelectedExercises,
-  dark,
 }) => {
   if (!availableExercises || availableExercises.length === 0) return null;
   const safeSelectedExercises = selectedExercises || [];
@@ -812,7 +739,7 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
         style={{
           fontSize: 16,
           fontWeight: "500",
-          color: dark ? COLORS.white : COLORS.black,
+          color: COLORS.black,
           marginBottom: 10,
           paddingHorizontal: 4,
         }}
@@ -832,11 +759,7 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: isSelected
-                  ? "#E91E63"
-                  : dark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
+                backgroundColor: isSelected ? "#E91E63" : "rgba(0,0,0,0.05)",
                 borderRadius: 25,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
@@ -856,22 +779,12 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
             >
               <FontAwesomeIcon
                 icon={faBook}
-                color={
-                  isSelected
-                    ? "#FFFFFF"
-                    : dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.gray3
-                }
+                color={isSelected ? "#FFFFFF" : COLORS.gray3}
                 style={{ marginRight: 8 }}
               />
               <Text
                 style={{
-                  color: isSelected
-                    ? "#FFFFFF"
-                    : dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.gray3,
+                  color: isSelected ? "#FFFFFF" : COLORS.gray3,
                   fontWeight: isSelected ? "600" : "normal",
                   fontSize: 14,
                 }}
@@ -908,7 +821,7 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
 interface FilterModalProps {
   showActivityCalendar: boolean;
   toggleActivityCalendar: (mode?: "start" | "end") => void;
-  dark: boolean;
+
   searchKeyword: string;
   setSearchKeyword: (value: string) => void;
   uniqueAssistantTypes: string[];
@@ -936,12 +849,9 @@ interface FilterModalProps {
 export const FilterModal: React.FC<FilterModalProps> = ({
   showActivityCalendar,
   toggleActivityCalendar,
-  dark,
   searchKeyword,
   setSearchKeyword,
   uniqueAssistantTypes,
-  selectedAssistantTypes,
-  setSelectedAssistantTypes,
   activityCalendarMode,
   activityDateRange,
   handleActivityDayPress,
@@ -1087,7 +997,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 
         <Animated.View
           style={{
-            backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+            backgroundColor: COLORS.white,
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
             padding: 20,
@@ -1113,7 +1023,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               style={{
                 fontSize: 18,
                 fontWeight: "bold",
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               }}
             >
               Filtrer les activités
@@ -1124,16 +1034,14 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 width: 36,
                 height: 36,
                 borderRadius: 18,
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.05)",
+                backgroundColor: "rgba(0,0,0,0.05)",
                 justifyContent: "center",
                 alignItems: "center",
               }}
             >
               <FontAwesomeIcon
                 icon={faTimesCircle}
-                color={dark ? COLORS.white : COLORS.black}
+                color={COLORS.black}
                 size={18}
               />
             </TouchableOpacity>
@@ -1146,9 +1054,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             {/* SEARCH INPUT */}
             <View
               style={{
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.05)",
+                backgroundColor: "rgba(0,0,0,0.05)",
                 borderRadius: 25,
                 flexDirection: "row",
                 alignItems: "center",
@@ -1158,21 +1064,19 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             >
               <FontAwesomeIcon
                 icon={faSearch}
-                color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                color={COLORS.gray3}
                 size={16}
                 style={{ marginRight: 10 }}
               />
               <TextInput
                 placeholder="Rechercher..."
-                placeholderTextColor={
-                  dark ? COLORS.secondaryWhite : COLORS.gray3
-                }
+                placeholderTextColor={COLORS.gray3}
                 value={searchKeyword}
                 onChangeText={setSearchKeyword}
                 style={{
                   flex: 1,
                   paddingVertical: 14,
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                   fontSize: 16,
                 }}
               />
@@ -1181,7 +1085,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   {
                     <FontAwesomeIcon
                       icon={faTimesCircle}
-                      color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                      color={COLORS.gray3}
                       size={16}
                     />
                   }
@@ -1208,7 +1112,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   style={{
                     fontSize: 18,
                     fontWeight: "600",
-                    color: dark ? COLORS.white : COLORS.black,
+                    color: COLORS.black,
                   }}
                 >
                   {getModeTitleText()}
@@ -1217,9 +1121,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 
               <View
                 style={{
-                  backgroundColor: dark
-                    ? "rgba(0, 149, 255, 0.15)"
-                    : "rgba(0, 149, 255, 0.08)",
+                  backgroundColor: "rgba(0, 149, 255, 0.08)",
                   borderRadius: 12,
                   padding: 12,
                   marginBottom: 16,
@@ -1227,7 +1129,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               >
                 <Text
                   style={{
-                    color: dark ? COLORS.secondaryWhite : COLORS.primary,
+                    color: COLORS.primary,
                     textAlign: "center",
                     fontSize: 15,
                   }}
@@ -1278,7 +1180,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   !activityDateRange.endDate && (
                     <Text
                       style={{
-                        color: dark ? "rgba(255,255,255,0.7)" : COLORS.gray3,
+                        color: COLORS.gray3,
                         textAlign: "center",
                         marginTop: 8,
                         fontStyle: "italic",
@@ -1301,20 +1203,18 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   shadowRadius: 3,
                 }}
                 theme={{
-                  backgroundColor: dark ? COLORS.dark2 : "#FFFFFF",
-                  calendarBackground: dark ? COLORS.dark2 : "#FFFFFF",
-                  textSectionTitleColor: dark ? COLORS.white : COLORS.black,
+                  backgroundColor: "#FFFFFF",
+                  calendarBackground: "#FFFFFF",
+                  textSectionTitleColor: COLORS.black,
                   selectedDayBackgroundColor: COLORS.primary,
                   selectedDayTextColor: "#FFFFFF",
                   todayTextColor: COLORS.primary,
-                  dayTextColor: dark ? COLORS.white : COLORS.black,
-                  textDisabledColor: dark
-                    ? "rgba(255,255,255,0.3)"
-                    : "rgba(0,0,0,0.3)",
+                  dayTextColor: COLORS.black,
+                  textDisabledColor: "rgba(0,0,0,0.3)",
                   dotColor: COLORS.primary,
                   selectedDotColor: "#FFFFFF",
                   arrowColor: COLORS.primary,
-                  monthTextColor: dark ? COLORS.white : COLORS.black,
+                  monthTextColor: COLORS.black,
                   textMonthFontWeight: "bold",
                   textDayFontSize: 14,
                   textMonthFontSize: 16,
@@ -1350,7 +1250,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     });
                   }
                 }}
-                dark={dark}
               />
             )}
           </ScrollView>
@@ -1360,9 +1259,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             <TouchableOpacity
               style={{
                 flex: 1,
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.05)",
+                backgroundColor: "rgba(0,0,0,0.05)",
                 paddingVertical: 15,
                 borderRadius: 12,
                 alignItems: "center",
@@ -1372,7 +1269,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             >
               <Text
                 style={{
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                   fontWeight: "500",
                   fontSize: 16,
                 }}
