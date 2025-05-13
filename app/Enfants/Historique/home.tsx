@@ -2,21 +2,17 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "expo-router";
-import { Calendar } from "react-native-calendars";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
-  TextInput,
   SafeAreaView,
   ActivityIndicator,
   Animated,
-  Dimensions,
   StatusBar,
   Modal,
-  Image,
   ListRenderItemInfo,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -31,9 +27,6 @@ import {
   SearchBar,
   DateRangeIndicator,
   AssistantTypeFilters,
-  SubjectFilters,
-  ChapterFilters,
-  ExerciseFilters,
   FilterModal,
 } from "./filtres";
 
@@ -42,15 +35,12 @@ interface HistoriqueActivitesProps {
   childData: Child;
 }
 
-// Safely set filters with proper type
-const setFilters = (prev: any, newState: any) => ({ ...prev, ...newState });
-
 const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
   isTabComponent = false,
   childData,
 }) => {
   const router = useRouter();
-  const { dark, colors } = useTheme();
+  const { dark } = useTheme();
   const flatListRef = useRef<FlatList<Activity>>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -201,7 +191,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         <TouchableOpacity
           onPress={() => viewActivityDetails(item)}
           style={{
-            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            backgroundColor: "#FFFFFF",
             borderRadius: 16,
             marginBottom: 16,
             shadowColor: "#000",
@@ -268,7 +258,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                   style={{
                     fontSize: 13,
                     fontWeight: "600",
-                    color: dark ? COLORS.secondaryWhite : "#666666",
+                    color: "#666666",
                     textTransform: "capitalize",
                   }}
                 >
@@ -277,7 +267,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                 <Text
                   style={{
                     fontSize: 12,
-                    color: dark ? "rgba(255,255,255,0.6)" : "#9E9E9E",
+                    color: "#9E9E9E",
                     textTransform: "capitalize",
                   }}
                 >
@@ -292,7 +282,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                   style={{
                     fontSize: 16,
                     fontWeight: "600",
-                    color: dark ? COLORS.white : "#333333",
+                    color: "#333333",
                     marginBottom: 10,
                     lineHeight: 22,
                   }}
@@ -312,9 +302,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                   {/* Duration */}
                   <View
                     style={{
-                      backgroundColor: dark
-                        ? "rgba(255,255,255,0.1)"
-                        : "rgba(0,0,0,0.05)",
+                      backgroundColor: "rgba(0,0,0,0.05)",
                       paddingHorizontal: 10,
                       paddingVertical: 5,
                       borderRadius: 12,
@@ -325,12 +313,12 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                     <FontAwesomeIcon
                       icon={"clock" as IconProp}
                       size={12}
-                      color={dark ? COLORS.secondaryWhite : "#666666"}
+                      color={"#666666"}
                       style={{ marginRight: 4 }}
                     />
                     <Text
                       style={{
-                        color: dark ? COLORS.secondaryWhite : "#666666",
+                        color: "#666666",
                         fontSize: 12,
                       }}
                     >
@@ -372,9 +360,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                   {item.matiere && (
                     <View
                       style={{
-                        backgroundColor: dark
-                          ? "rgba(255,255,255,0.1)"
-                          : "rgba(0,0,0,0.05)",
+                        backgroundColor: "rgba(0,0,0,0.05)",
                         paddingHorizontal: 10,
                         paddingVertical: 5,
                         borderRadius: 12,
@@ -385,12 +371,12 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                       <FontAwesomeIcon
                         icon={"book" as IconProp}
                         size={12}
-                        color={dark ? COLORS.secondaryWhite : "#666666"}
+                        color={"#666666"}
                         style={{ marginRight: 4 }}
                       />
                       <Text
                         style={{
-                          color: dark ? COLORS.secondaryWhite : "#666666",
+                          color: "#666666",
                           fontSize: 12,
                         }}
                       >
@@ -404,9 +390,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                 {item.commentaires && (
                   <View
                     style={{
-                      backgroundColor: dark
-                        ? "rgba(255,255,255,0.05)"
-                        : "rgba(0, 0, 0, 0.03)",
+                      backgroundColor: "rgba(0, 0, 0, 0.03)",
                       padding: 12,
                       borderRadius: 8,
                       marginBottom: 12,
@@ -415,7 +399,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                     <Text
                       style={{
                         fontSize: 13,
-                        color: dark ? COLORS.secondaryWhite : "#666666",
+                        color: "#666666",
                         lineHeight: 18,
                       }}
                     >
@@ -468,7 +452,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         </TouchableOpacity>
       );
     },
-    [dark, viewActivityDetails]
+    [viewActivityDetails]
   );
 
   // Calculate pagination
@@ -489,11 +473,9 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
           flexDirection: "row",
           alignItems: "center",
           padding: 16,
-          backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+          backgroundColor: "#FFFFFF",
           borderBottomWidth: 1,
-          borderBottomColor: dark
-            ? "rgba(255,255,255,0.1)"
-            : "rgba(0,0,0,0.05)",
+          borderBottomColor: "rgba(0,0,0,0.05)",
           elevation: 2,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 1 },
@@ -507,9 +489,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
             width: 40,
             height: 40,
             borderRadius: 20,
-            backgroundColor: dark
-              ? "rgba(255,255,255,0.08)"
-              : "rgba(0,0,0,0.05)",
+            backgroundColor: "rgba(0,0,0,0.05)",
             justifyContent: "center",
             alignItems: "center",
             marginRight: 16,
@@ -518,7 +498,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
           <FontAwesomeIcon
             icon={"arrow-left" as IconProp}
             size={18}
-            color={dark ? COLORS.white : COLORS.black}
+            color={COLORS.black}
           />
         </TouchableOpacity>
 
@@ -527,7 +507,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
             style={{
               fontSize: 18,
               fontWeight: "bold",
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
             }}
           >
             Historique d'activités
@@ -536,7 +516,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
             <Text
               style={{
                 fontSize: 14,
-                color: dark ? COLORS.secondaryWhite : "#666666",
+                color: "#666666",
               }}
             >
               {childData.name} • {childData.classe}
@@ -554,14 +534,14 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         alignItems: "center",
         justifyContent: "center",
         padding: 30,
-        backgroundColor: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
+        backgroundColor: "rgba(0,0,0,0.02)",
         borderRadius: 16,
         marginBottom: 20,
       }}
     >
       <Text
         style={{
-          color: dark ? COLORS.white : COLORS.black,
+          color: COLORS.black,
           fontSize: 18,
           fontWeight: "600",
           marginBottom: 10,
@@ -572,7 +552,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
       </Text>
       <Text
         style={{
-          color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+          color: COLORS.gray3,
           fontSize: 15,
           textAlign: "center",
           marginBottom: 16,
@@ -647,7 +627,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
           style={{
             width: "90%",
             maxHeight: "80%",
-            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            backgroundColor: "#FFFFFF",
             borderRadius: 16,
             padding: 20,
             elevation: 5,
@@ -669,7 +649,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
               style={{
                 fontSize: 18,
                 fontWeight: "bold",
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               }}
             >
               Conseils pour démarrer
@@ -690,7 +670,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
               <FontAwesomeIcon
                 icon={"times" as IconProp}
                 size={16}
-                color={dark ? COLORS.white : COLORS.black}
+                color={COLORS.black}
               />
             </TouchableOpacity>
           </View>
@@ -731,9 +711,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                 style={{
                   flexDirection: "row",
                   marginBottom: 16,
-                  backgroundColor: dark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.02)",
+                  backgroundColor: "rgba(0,0,0,0.02)",
                   padding: 16,
                   borderRadius: 12,
                 }}
@@ -756,7 +734,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                     style={{
                       fontSize: 16,
                       fontWeight: "600",
-                      color: dark ? COLORS.white : COLORS.black,
+                      color: COLORS.black,
                       marginBottom: 6,
                     }}
                   >
@@ -765,7 +743,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                   <Text
                     style={{
                       fontSize: 14,
-                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      color: COLORS.gray3,
                       lineHeight: 20,
                     }}
                   >
@@ -873,9 +851,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
               flex: 1,
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(0,0,0,0.02)",
+              backgroundColor: "rgba(0,0,0,0.02)",
               borderRadius: 16,
               padding: 30,
               marginBottom: 20,
@@ -885,7 +861,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
             <Text
               style={{
                 marginTop: 16,
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
                 fontSize: 16,
               }}
             >
@@ -898,9 +874,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
             {hasActiveFilters() && (
               <View
                 style={{
-                  backgroundColor: dark
-                    ? "rgba(255, 142, 105, 0.2)"
-                    : "rgba(255, 142, 105, 0.1)",
+                  backgroundColor: "rgba(255, 142, 105, 0.1)",
                   borderRadius: 12,
                   padding: 12,
                   marginBottom: 16,
@@ -955,7 +929,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                   justifyContent: "space-between",
                   alignItems: "center",
                   paddingVertical: 16,
-                  backgroundColor: dark ? COLORS.dark1 : "transparent",
+                  backgroundColor: "transparent",
                 }}
               >
                 {/* Previous Page Button */}
@@ -968,9 +942,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                     borderRadius: 22,
                     backgroundColor:
                       currentPage === 1
-                        ? dark
-                          ? "rgba(255,255,255,0.1)"
-                          : "rgba(0, 0, 0, 0.05)"
+                        ? "rgba(0, 0, 0, 0.05)"
                         : "rgba(255, 142, 105, 0.1)",
                     opacity: currentPage === 1 ? 0.5 : 1,
                   }}
@@ -979,13 +951,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                 >
                   <FontAwesomeIcon
                     icon={"chevron-left" as IconProp}
-                    color={
-                      currentPage === 1
-                        ? dark
-                          ? "#CCCCCC"
-                          : "#999999"
-                        : COLORS.primary
-                    }
+                    color={currentPage === 1 ? "#999999" : COLORS.primary}
                     size={18}
                   />
                 </TouchableOpacity>
@@ -993,9 +959,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                 {/* Page Number Indicator */}
                 <View
                   style={{
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0, 0, 0, 0.05)",
+                    backgroundColor: "rgba(0, 0, 0, 0.05)",
                     paddingHorizontal: 20,
                     paddingVertical: 10,
                     borderRadius: 25,
@@ -1005,7 +969,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                     style={{
                       fontSize: 15,
                       fontWeight: "600",
-                      color: dark ? COLORS.white : COLORS.black,
+                      color: COLORS.black,
                     }}
                   >
                     {`${currentPage} / ${totalPages}`}
@@ -1022,9 +986,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                     borderRadius: 22,
                     backgroundColor:
                       currentPage === totalPages
-                        ? dark
-                          ? "rgba(255,255,255,0.1)"
-                          : "rgba(0, 0, 0, 0.05)"
+                        ? "rgba(0, 0, 0, 0.05)"
                         : "rgba(255, 142, 105, 0.1)",
                     opacity: currentPage === totalPages ? 0.5 : 1,
                   }}
@@ -1034,11 +996,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                   <FontAwesomeIcon
                     icon={"chevron-right" as IconProp}
                     color={
-                      currentPage === totalPages
-                        ? dark
-                          ? "#CCCCCC"
-                          : "#999999"
-                        : COLORS.primary
+                      currentPage === totalPages ? "#999999" : COLORS.primary
                     }
                     size={18}
                   />
@@ -1090,7 +1048,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
       <View
         style={{
           flex: 1,
-          backgroundColor: dark ? COLORS.dark1 : "#F8F8F8",
+          backgroundColor: "#F8F8F8",
         }}
       >
         {renderContent()}
@@ -1102,13 +1060,10 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: dark ? COLORS.dark1 : "#F8F8F8",
+        backgroundColor: "#F8F8F8",
       }}
     >
-      <StatusBar
-        barStyle={dark ? "light-content" : "dark-content"}
-        backgroundColor={dark ? COLORS.dark1 : "#FFFFFF"}
-      />
+      <StatusBar barStyle={"dark-content"} backgroundColor={"#FFFFFF"} />
       {renderHeader()}
       {renderContent()}
     </SafeAreaView>

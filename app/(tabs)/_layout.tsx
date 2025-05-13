@@ -1,84 +1,66 @@
+import React from "react";
 import { Tabs } from "expo-router";
-import { Image } from "expo-image";
 import { Paths } from "@/navigation";
 import { useTheme } from "@/theme/ThemeProvider";
-import { View, Text, Platform } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { COLORS } from "../../constants";
 
-import { icons, FONTS, SIZES, COLORS } from "../../constants";
-
-// Create a reusable tab icon component to avoid repetition
-interface TabIconProps {
-  focused: boolean;
-  icon: any;
-  outlineIcon: any;
-  label: string;
-  dark: boolean;
-}
-
-const TabIcon = ({ focused, icon, outlineIcon, label, dark }: TabIconProps) => {
-  return (
-    <View
-      style={{
-        alignItems: "center",
-        paddingTop: 16,
-        width: SIZES.width / 4,
-      }}
-    >
-      <Image
-        source={focused ? icon : outlineIcon}
-        contentFit="contain"
-        style={{
-          width: 24,
-          height: 24,
-          tintColor: focused
-            ? COLORS.primary
-            : dark
-              ? COLORS.gray3
-              : COLORS.gray3,
-        }}
-      />
-      <Text
-        style={{
-          ...FONTS.body4,
-          color: focused ? COLORS.primary : dark ? COLORS.gray3 : COLORS.gray3,
-        }}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-};
-
+// Clean Tab Bar component with better icons and NO borders
 const TabLayout = () => {
   const { dark } = useTheme();
+  const insets = useSafeAreaInsets();
+
+  // Generate styles based on theme
+  const tabBarBackground = dark ? COLORS.dark1 : COLORS.white;
+  const activeIconColor = COLORS.primary;
+  const inactiveIconColor = dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)";
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: Platform.OS !== "ios",
+        // Completely override all styles that might create borders
         tabBarStyle: {
           position: "absolute",
-          bottom: 0,
-          right: 0,
-          left: 0,
+          height: Platform.OS === "ios" ? 78 : 55,
+          paddingBottom: Platform.OS === "ios" ? insets.bottom : 8,
+          backgroundColor: tabBarBackground,
+          borderTopWidth: 0,
+          borderWidth: 0,
+          borderColor: "transparent",
+          borderTopColor: "transparent",
           elevation: 0,
-          height: Platform.OS === "ios" ? 90 : 60,
-          backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+          shadowColor: "transparent",
+          shadowOpacity: 0,
+          shadowOffset: { height: 0, width: 0 },
+          shadowRadius: 0,
         },
+        tabBarItemStyle: {
+          borderTopWidth: 0,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontFamily: "medium",
+          marginTop: 0,
+          marginBottom: 5,
+        },
+        tabBarActiveTintColor: activeIconColor,
+        tabBarInactiveTintColor: inactiveIconColor,
       }}
+      // Adding a sceneContainerStyle to ensure no margins/padding around screens
     >
       <Tabs.Screen
         name={Paths.Index}
         options={{
-          title: "",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.home}
-              outlineIcon={icons.home2Outline}
-              label="Home"
-              dark={dark}
+          title: "Accueil",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={24}
+              color={color}
             />
           ),
         }}
@@ -86,14 +68,12 @@ const TabLayout = () => {
       <Tabs.Screen
         name="Enfants"
         options={{
-          title: "",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.childrenFilled}
-              outlineIcon={icons.childrenOutline}
-              label="Enfant"
-              dark={dark}
+          title: "Enfants",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "people" : "people-outline"}
+              size={24}
+              color={color}
             />
           ),
         }}
@@ -101,14 +81,12 @@ const TabLayout = () => {
       <Tabs.Screen
         name={Paths.Support}
         options={{
-          title: "",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.chat}
-              outlineIcon={icons.chatOutline}
-              label="Support"
-              dark={dark}
+          title: "Support",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "chatbubble" : "chatbubble-outline"}
+              size={22}
+              color={color}
             />
           ),
         }}
@@ -116,14 +94,12 @@ const TabLayout = () => {
       <Tabs.Screen
         name={Paths.Profil}
         options={{
-          title: "",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.user}
-              outlineIcon={icons.userOutline}
-              label="Profil"
-              dark={dark}
+          title: "Profil",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={24}
+              color={color}
             />
           ),
         }}

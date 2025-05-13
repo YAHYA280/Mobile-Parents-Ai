@@ -77,7 +77,7 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({
         height: 70,
         backgroundColor: "white",
         position: "absolute",
-        bottom: -20,
+        bottom: -25,
         left: 0,
         right: 0,
         borderTopWidth: 1,
