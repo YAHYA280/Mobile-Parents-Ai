@@ -14,12 +14,21 @@ import { useRouter } from "expo-router";
 
 export default function ChildOverviewScreen() {
   const { id } = useLocalSearchParams();
+  const params = useLocalSearchParams();
   const router = useRouter();
-  const childId = Number(id);
+  const childId = typeof params.id === "string" ? parseInt(params.id, 10) : NaN;
   const { getChild, getChildSummary, loading } = useChildren();
-
+  console.log("Apercu params:", params);
   const child = getChild(childId);
   const summary = getChildSummary(childId);
+  if (isNaN(childId)) {
+    console.log("Invalid child ID:", params.id);
+  }
+  useEffect(() => {
+    if (!loading && !child) {
+      console.log("No child found for ID:", childId);
+    }
+  }, [loading, child, childId]);
 
   if (loading) {
     return (

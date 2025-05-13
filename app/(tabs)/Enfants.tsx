@@ -36,7 +36,9 @@ const EnfantsList: React.FC = () => {
   const router = useRouter();
 
   const handleChildPress = (childId: number) => {
-    router.push(`/Enfants/home?childId=${childId}`);
+    // Make sure this matches your route structure
+    console.log("Navigating to child:", childId);
+    router.push(`/Enfants/${childId}`);
   };
 
   // Render header with animated appearance

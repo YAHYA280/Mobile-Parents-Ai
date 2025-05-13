@@ -1,11 +1,17 @@
-// app/Enfants/[id]/_layout.tsx
 import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/theme";
+import { StyleSheet } from "react-native";
 
 export default function ChildTabsLayout() {
-  // No context usage at all to avoid any potential circular dependencies
+  const styles = StyleSheet.create({
+    tabBarLabel: {
+      fontSize: 12,
+      fontWeight: "500", // Using string with quotes
+    },
+  });
+
   return (
     <Tabs
       screenOptions={{
@@ -19,10 +25,7 @@ export default function ChildTabsLayout() {
           shadowOpacity: 0,
           backgroundColor: "#FFFFFF",
         },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "500",
-        },
+        tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
       <Tabs.Screen

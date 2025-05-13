@@ -4,6 +4,8 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
+  useMemo,
 } from "react";
 import { Child, ChildSummary, ChildPerformance } from "@/types/child";
 import { Activity } from "@/types/activity";
@@ -51,6 +53,42 @@ export const ChildrenProvider: React.FC<ChildrenProviderProps> = ({
     }));
   };
 
+  // Add this at the top of the useEffect in ChildrenProvider
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Simulate network request
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // Only update state if component is still mounted
+        if (isMounted) {
+          const processedData = processChildData(CHILDREN_DATA);
+          setChildren(processedData);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError("Failed to fetch children data");
+          setLoading(false);
+        }
+      }
+    };
+
+    if (!initialData) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
+
+    // Cleanup function to prevent updates on unmounted component
+    return () => {
+      isMounted = false;
+    };
+  }, [initialData]);
+
   // Fetch children data
   useEffect(() => {
     const fetchData = async () => {
@@ -78,66 +116,76 @@ export const ChildrenProvider: React.FC<ChildrenProviderProps> = ({
   }, [initialData]);
 
   // Get a specific child by ID
-  const getChild = (id: number) => {
-    return children.find((child) => child.id === id);
-  };
+  const getChild = useCallback(
+    (id: number) => {
+      console.log("Looking for child with ID:", id);
+      console.log("Available children:", children);
+      const child = children.find((child) => child.id === id);
+      console.log("Found child:", child);
+      return child;
+    },
+    [children]
+  );
 
   // Get summary data for a child
-  const getChildSummary = (id: number): ChildSummary | undefined => {
-    const child = getChild(id);
-    if (!child) return undefined;
+  const getChildSummary = useCallback(
+    (id: number): ChildSummary | undefined => {
+      const child = getChild(id);
+      if (!child) return undefined;
 
-    // Calculate summary data
-    const totalActivities = child.activitesRecentes.length;
+      // Calculate summary data
+      const totalActivities = child.activitesRecentes.length;
 
-    // Calculate total duration (mock implementation)
-    let totalMinutes = 0;
-    child.activitesRecentes.forEach((activity) => {
-      const duration = activity.duree;
-      const match = duration.match(/(\d+)/);
-      if (match) {
-        totalMinutes += parseInt(match[0], 10);
-      }
-    });
-    const totalDuration = `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}min`;
+      // Calculate total duration (mock implementation)
+      let totalMinutes = 0;
+      child.activitesRecentes.forEach((activity) => {
+        const duration = activity.duree;
+        const match = duration.match(/(\d+)/);
+        if (match) {
+          totalMinutes += parseInt(match[0], 10);
+        }
+      });
+      const totalDuration = `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}min`;
 
-    // Get last activity date
-    const lastActivityDate =
-      child.activitesRecentes.length > 0
-        ? child.activitesRecentes.sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-          )[0].date
-        : new Date().toISOString();
+      // Get last activity date
+      const lastActivityDate =
+        child.activitesRecentes.length > 0
+          ? child.activitesRecentes.sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            )[0].date
+          : new Date().toISOString();
 
-    // Get favorite subject (mock implementation)
-    const subjects = new Map<string, number>();
-    child.activitesRecentes.forEach((activity) => {
-      if (activity.matiere) {
-        subjects.set(
-          activity.matiere,
-          (subjects.get(activity.matiere) || 0) + 1
-        );
-      }
-    });
+      // Get favorite subject (mock implementation)
+      const subjects = new Map<string, number>();
+      child.activitesRecentes.forEach((activity) => {
+        if (activity.matiere) {
+          subjects.set(
+            activity.matiere,
+            (subjects.get(activity.matiere) || 0) + 1
+          );
+        }
+      });
 
-    let favoriteSubject: string | undefined;
-    let maxCount = 0;
-    subjects.forEach((count, subject) => {
-      if (count > maxCount) {
-        maxCount = count;
-        favoriteSubject = subject;
-      }
-    });
+      let favoriteSubject: string | undefined;
+      let maxCount = 0;
+      subjects.forEach((count, subject) => {
+        if (count > maxCount) {
+          maxCount = count;
+          favoriteSubject = subject;
+        }
+      });
 
-    return {
-      totalActivities,
-      totalDuration,
-      lastActivityDate,
-      favoriteSubject,
-      progress: child.progress,
-      evolutionRate: 5, // Mock evolution rate
-    };
-  };
+      return {
+        totalActivities,
+        totalDuration,
+        lastActivityDate,
+        favoriteSubject,
+        progress: child.progress,
+        evolutionRate: 5,
+      };
+    },
+    [getChild, children]
+  );
 
   // Get performance data for a child
   const getChildPerformance = (id: number): ChildPerformance | undefined => {
@@ -216,18 +264,32 @@ export const ChildrenProvider: React.FC<ChildrenProviderProps> = ({
     }
   };
 
-  const value = {
-    children,
-    loading,
-    error,
-    getChild,
-    getChildSummary,
-    getChildPerformance,
-    addChild,
-    updateChild,
-    deleteChild,
-    refreshChildren,
-  };
+  const value = useMemo(
+    () => ({
+      children,
+      loading,
+      error,
+      getChild,
+      getChildSummary,
+      getChildPerformance,
+      addChild,
+      updateChild,
+      deleteChild,
+      refreshChildren,
+    }),
+    [
+      children,
+      loading,
+      error,
+      getChild,
+      getChildSummary,
+      getChildPerformance,
+      addChild,
+      updateChild,
+      deleteChild,
+      refreshChildren,
+    ]
+  );
 
   return (
     <ChildrenContext.Provider value={value}>
