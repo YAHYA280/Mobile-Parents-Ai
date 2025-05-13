@@ -9,14 +9,15 @@ import {
   TouchableOpacity,
   Dimensions,
   StatusBar,
+  Animated,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faArrowLeft,
   faHome,
-  faList,
-  faChartBar,
+  faBookOpen,
+  faChartLine,
   faGraduationCap,
   faUser,
   faStar,
@@ -54,126 +55,185 @@ interface CustomTabBarProps {
 const CustomTabBar: React.FC<CustomTabBarProps> = ({
   activeTab,
   onTabPress,
-}) => (
-  <View
-    style={{
-      flexDirection: "row",
-      height: 60,
-      backgroundColor: "white",
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      borderTopWidth: 0.5,
-      borderTopColor: "rgba(0, 0, 0, 0.1)",
-      elevation: 10,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: -2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      zIndex: 999,
-    }}
-  >
-    {/* Aperçu Tab */}
-    <TouchableOpacity
-      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      onPress={() => onTabPress(0)}
-    >
-      <FontAwesomeIcon
-        icon={faHome}
-        size={20}
-        color={activeTab === 0 ? COLORS.primary : COLORS.greyscale900}
-      />
-      <Text
-        style={{
-          color: activeTab === 0 ? COLORS.primary : COLORS.greyscale900,
-          fontSize: 12,
-          fontWeight: "600",
-          marginTop: 4,
-        }}
-      >
-        Aperçu
-      </Text>
-      {activeTab === 0 && (
-        <View
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: 2.5,
-            backgroundColor: COLORS.primary,
-            marginTop: 2,
-          }}
-        />
-      )}
-    </TouchableOpacity>
+}) => {
+  // Animation values for tab indicator
+  const indicatorPosition = useRef(
+    new Animated.Value(activeTab * (width / 3))
+  ).current;
 
-    {/* Activités Tab */}
-    <TouchableOpacity
-      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      onPress={() => onTabPress(1)}
-    >
-      <FontAwesomeIcon
-        icon={faList}
-        size={20}
-        color={activeTab === 1 ? COLORS.primary : COLORS.greyscale900}
-      />
-      <Text
-        style={{
-          color: activeTab === 1 ? COLORS.primary : COLORS.greyscale900,
-          fontSize: 12,
-          fontWeight: "600",
-          marginTop: 4,
-        }}
-      >
-        Activités
-      </Text>
-      {activeTab === 1 && (
-        <View
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: 2.5,
-            backgroundColor: COLORS.primary,
-            marginTop: 2,
-          }}
-        />
-      )}
-    </TouchableOpacity>
+  // Animate tab indicator
+  useEffect(() => {
+    Animated.spring(indicatorPosition, {
+      toValue: activeTab * (width / 3),
+      tension: 60,
+      friction: 9,
+      useNativeDriver: true,
+    }).start();
+  }, [activeTab]);
 
-    {/* Suivi Tab */}
-    <TouchableOpacity
-      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      onPress={() => onTabPress(2)}
+  return (
+    <View
+      style={{
+        height: 70,
+        backgroundColor: "white",
+        position: "absolute",
+        bottom: -20,
+        left: 0,
+        right: 0,
+        borderTopWidth: 1,
+        borderTopColor: "rgba(0, 0, 0, 0.05)",
+        elevation: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        flexDirection: "row",
+        paddingBottom: 8,
+        paddingTop: 8,
+      }}
     >
-      <FontAwesomeIcon
-        icon={faChartBar}
-        size={20}
-        color={activeTab === 2 ? COLORS.primary : COLORS.greyscale900}
-      />
-      <Text
+      {/* Tab Indicator */}
+      <Animated.View
         style={{
-          color: activeTab === 2 ? COLORS.primary : COLORS.greyscale900,
-          fontSize: 12,
-          fontWeight: "600",
-          marginTop: 4,
+          position: "absolute",
+          top: 6,
+          left: 0,
+          width: width / 3,
+          height: "100%",
+          transform: [{ translateX: indicatorPosition }],
+          zIndex: 0,
         }}
       >
-        Suivi
-      </Text>
-      {activeTab === 2 && (
         <View
           style={{
-            width: 5,
-            height: 5,
-            borderRadius: 2.5,
-            backgroundColor: COLORS.primary,
-            marginTop: 2,
+            width: 50,
+            height: 50,
+            borderRadius: 25,
+            backgroundColor: "rgba(0, 149, 255, 0.08)",
+            marginHorizontal: (width / 3 - 50) / 2,
           }}
         />
-      )}
-    </TouchableOpacity>
-  </View>
-);
+      </Animated.View>
+
+      {/* Aperçu Tab */}
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1,
+        }}
+        onPress={() => onTabPress(0)}
+      >
+        <FontAwesomeIcon
+          icon={faHome}
+          size={22}
+          color={activeTab === 0 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
+        />
+        <Text
+          style={{
+            color: activeTab === 0 ? COLORS.primary : "rgba(0, 0, 0, 0.4)",
+            fontSize: 12,
+            fontWeight: "600",
+            marginTop: 4,
+          }}
+        >
+          Aperçu
+        </Text>
+        {activeTab === 0 && (
+          <View
+            style={{
+              position: "absolute",
+              bottom: -10,
+              width: 6,
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: COLORS.primary,
+            }}
+          />
+        )}
+      </TouchableOpacity>
+
+      {/* Activités Tab */}
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1,
+        }}
+        onPress={() => onTabPress(1)}
+      >
+        <FontAwesomeIcon
+          icon={faBookOpen}
+          size={22}
+          color={activeTab === 1 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
+        />
+        <Text
+          style={{
+            color: activeTab === 1 ? COLORS.primary : "rgba(0, 0, 0, 0.4)",
+            fontSize: 12,
+            fontWeight: "600",
+            marginTop: 4,
+          }}
+        >
+          Activités
+        </Text>
+        {activeTab === 1 && (
+          <View
+            style={{
+              position: "absolute",
+              bottom: -10,
+              width: 6,
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: COLORS.primary,
+            }}
+          />
+        )}
+      </TouchableOpacity>
+
+      {/* Suivi Tab */}
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1,
+        }}
+        onPress={() => onTabPress(2)}
+      >
+        <FontAwesomeIcon
+          icon={faChartLine}
+          size={22}
+          color={activeTab === 2 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
+        />
+        <Text
+          style={{
+            color: activeTab === 2 ? COLORS.primary : "rgba(0, 0, 0, 0.4)",
+            fontSize: 12,
+            fontWeight: "600",
+            marginTop: 4,
+          }}
+        >
+          Suivi
+        </Text>
+        {activeTab === 2 && (
+          <View
+            style={{
+              position: "absolute",
+              bottom: -10,
+              width: 6,
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: COLORS.primary,
+            }}
+          />
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 // Overview Component
 interface OverviewProps {
@@ -571,7 +631,7 @@ const EnfantsHome: React.FC = () => {
               paddingBottom: 20,
               alignItems: "center",
               justifyContent: "center",
-              height: 330,
+              height: 209,
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.05,
@@ -638,16 +698,16 @@ const EnfantsHome: React.FC = () => {
                 style={{
                   backgroundColor: "#FFFFFF",
                   width: "100%",
-                  paddingTop: 90,
+                  paddingTop: 60,
                   paddingBottom: 20,
                   alignItems: "center",
                   borderTopLeftRadius: 30,
                   borderTopRightRadius: 30,
                   shadowColor: "#000",
-                  shadowOffset: { width: 0, height: -2 },
+                  shadowOffset: { width: 0, height: -3 },
                   shadowOpacity: 0.05,
                   shadowRadius: 4,
-                  elevation: 3,
+                  elevation: 2,
                 }}
               >
                 <View
