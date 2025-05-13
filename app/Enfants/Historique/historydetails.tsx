@@ -1,44 +1,69 @@
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+// app/Enfants/Historique/historydetails.tsx
 
-import React, { useState, useEffect } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import React, { useState, useEffect, useRef } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  View, Text, Alert, Modal,
-  TextInput, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator
-} from 'react-native';
-import { faStar, faBook, faClock, faClose, faArrowLeft, faPaperPlane, faPlayCircle, faCheckCircle, faTimesCircle, faChevronRight, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+  faChalkboardTeacher,
+  faSearch,
+  faHome,
+  faRobot,
+} from "@fortawesome/free-solid-svg-icons";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
-import type { Child, Activity} from '../../../data/Enfants/CHILDREN_DATA';
+import {
+  View,
+  Text,
+  Alert,
+  Modal,
+  TextInput,
+  ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Animated,
+  Share,
+} from "react-native";
 
-import { COLORS } from '../../../constants/theme';
-import { useTheme } from '../../../theme/ThemeProvider';
-import styles from '../../../styles/HistorydetailsStyls';
-import { CHILDREN_DATA, enhanceActivity } from '../../../data/Enfants/CHILDREN_DATA';
-import { SUBJECT_THEME, ASSISTANT_THEME } from '../../../data/Enfants/historydetails';
+import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
-// Define an interface for the theme
-interface ThemeItem {
-  colors: readonly [string, string];
-  icon: IconDefinition;
-}
+import { COLORS } from "../../../constants/theme";
+import { useTheme } from "../../../theme/ThemeProvider";
+import {
+  CHILDREN_DATA,
+  enhanceActivity,
+} from "../../../data/Enfants/CHILDREN_DATA";
 
-// Mapping des assistants avec leurs couleurs et icônes
-interface AssistantThemeType {
-  colors: string[];
-  icon: any; // Utilisez le type IconDefinition si vous avez importé ce type
-}
-
-interface SubjectThemeType {
-  colors: string[];
-  icon: any; // Utilisez le type IconDefinition si vous avez importé ce type
-}
+// Assistant theme object
+const ASSISTANT_THEME: Record<
+  string,
+  { colors: [string, string]; icon: IconDefinition }
+> = {
+  "J'Apprends": {
+    colors: ["#4CAF50", "#2E7D32"],
+    icon: faChalkboardTeacher,
+  },
+  Recherche: {
+    colors: ["#2196F3", "#1565C0"],
+    icon: faSearch,
+  },
+  Accueil: {
+    colors: ["#FF9800", "#F57C00"],
+    icon: faHome,
+  },
+  Autre: {
+    colors: ["#9C27B0", "#7B1FA2"],
+    icon: faRobot,
+  },
+};
 
 const HistoryDetails = () => {
   const router = useRouter();
   const { dark, colors } = useTheme();
   const params = useLocalSearchParams();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
 
   // Récupérer les IDs
   const activityId = Number(params.activityId);
@@ -47,14 +72,18 @@ const HistoryDetails = () => {
   // États
   const [child, setChild] = useState<Child | null>(null);
   const [activity, setActivity] = useState<Activity | null>(null);
-  const [feedback, setFeedback] = useState('');
+  const [feedback, setFeedback] = useState("");
   const [blocageIdentified, setBlockageIdentified] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [parentFeedbacks, setParentFeedbacks] = useState<Array<{ text: string, date: Date }>>([]);
+  const [parentFeedbacks, setParentFeedbacks] = useState<
+    Array<{ text: string; date: Date }>
+  >([]);
   const [showAllChat, setShowAllChat] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [editingFeedback, setEditingFeedback] = useState('');
-  const [editingFeedbackIndex, setEditingFeedbackIndex] = useState<number | null>(null);
+  const [editingFeedback, setEditingFeedback] = useState("");
+  const [editingFeedbackIndex, setEditingFeedbackIndex] = useState<
+    number | null
+  >(null);
 
   // Récupérer les données
   useEffect(() => {
@@ -63,7 +92,7 @@ const HistoryDetails = () => {
         setIsLoading(true);
 
         // Trouver l'enfant
-        const foundChild = CHILDREN_DATA.find(c => c.id === childId);
+        const foundChild = CHILDREN_DATA.find((c) => c.id === childId);
         if (!foundChild) {
           Alert.alert("Erreur", "Enfant non trouvé");
           router.back();
@@ -72,7 +101,9 @@ const HistoryDetails = () => {
         setChild(foundChild);
 
         // Trouver l'activité
-        const foundActivity = foundChild.activitesRecentes.find(a => a.id === activityId);
+        const foundActivity = foundChild.activitesRecentes.find(
+          (a) => a.id === activityId
+        );
         if (!foundActivity) {
           Alert.alert("Erreur", "Activité non trouvée");
           router.back();
@@ -85,9 +116,27 @@ const HistoryDetails = () => {
 
         // Simuler des feedbacks
         setParentFeedbacks([
-          { text: "Bon travail sur cette activité. On voit des progrès!", date: new Date(2025, 2, 22) }
+          {
+            text: "Bon travail sur cette activité. On voit des progrès significatifs dans la compréhension des fractions!",
+            date: new Date(2025, 2, 22),
+          },
         ]);
 
+        // Start animations
+        setTimeout(() => {
+          Animated.parallel([
+            Animated.timing(fadeAnim, {
+              toValue: 1,
+              duration: 400,
+              useNativeDriver: true,
+            }),
+            Animated.timing(slideAnim, {
+              toValue: 0,
+              duration: 400,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        }, 100);
       } catch (error) {
         console.error("Erreur:", error);
         Alert.alert("Erreur", "Une erreur est survenue");
@@ -97,21 +146,34 @@ const HistoryDetails = () => {
     };
 
     fetchData();
-  }, [childId, activityId , router]);
+  }, [childId, activityId, router, fadeAnim, slideAnim]);
+
+  // Helper function to get color based on difficulty level or score
+  const getScoreColor = (score: string) => {
+    if (!score || !score.includes("/")) return COLORS.primary;
+
+    const [achieved, total] = score.split("/").map(Number);
+    const percentage = (achieved / total) * 100;
+
+    if (percentage < 30) return "#FC4E00"; // Rouge
+    if (percentage <= 50) return "#EBB016"; // Orange
+    if (percentage <= 70) return "#F3BB00"; // Jaune
+    return "#24D26D"; // Vert
+  };
 
   // Ajouter un feedback
   const addFeedback = () => {
-    if (feedback.trim() === '') {
-      Alert.alert("Erreur", "Veuillez saisir une commentaire");
+    if (feedback.trim() === "") {
+      Alert.alert("Erreur", "Veuillez saisir un commentaire");
       return;
     }
 
-    setParentFeedbacks(prev => [
+    setParentFeedbacks((prev) => [
       ...prev,
-      { text: feedback, date: new Date() }
+      { text: feedback, date: new Date() },
     ]);
 
-    setFeedback('');
+    setFeedback("");
     Alert.alert("Succès", "Votre commentaire a été ajouté");
   };
 
@@ -131,6 +193,20 @@ const HistoryDetails = () => {
     router.back();
   };
 
+  // Share activity
+  const handleShare = async () => {
+    if (!activity) return;
+
+    try {
+      await Share.share({
+        message: `Voici une activité intéressante: ${activity.activite}`,
+        title: activity.activite,
+      });
+    } catch (error) {
+      console.error("Erreur lors du partage:", error);
+    }
+  };
+
   // Ouvrir modal pour éditer un feedback
   const openEditFeedbackModal = (index: number) => {
     setEditingFeedbackIndex(index);
@@ -140,12 +216,12 @@ const HistoryDetails = () => {
 
   // Mettre à jour un feedback
   const updateFeedback = () => {
-    if (editingFeedbackIndex === null || editingFeedback.trim() === '') return;
+    if (editingFeedbackIndex === null || editingFeedback.trim() === "") return;
 
     const updatedFeedbacks = [...parentFeedbacks];
     updatedFeedbacks[editingFeedbackIndex] = {
       ...updatedFeedbacks[editingFeedbackIndex],
-      text: editingFeedback
+      text: editingFeedback,
     };
 
     setParentFeedbacks(updatedFeedbacks);
@@ -159,33 +235,110 @@ const HistoryDetails = () => {
 
     Alert.alert(
       "Confirmation",
-      "Êtes-vous sûr de vouloir supprimer cette commentaire ?",
+      "Êtes-vous sûr de vouloir supprimer ce commentaire ?",
       [
         {
           text: "Annuler",
-          style: "cancel"
+          style: "cancel",
         },
         {
           text: "Supprimer",
           onPress: () => {
-            const updatedFeedbacks = parentFeedbacks.filter((_, index) => index !== editingFeedbackIndex);
+            const updatedFeedbacks = parentFeedbacks.filter(
+              (_, index) => index !== editingFeedbackIndex
+            );
             setParentFeedbacks(updatedFeedbacks);
             setShowFeedbackModal(false);
             Alert.alert("Succès", "Votre commentaire a été supprimé");
           },
-          style: "destructive"
-        }
+          style: "destructive",
+        },
       ]
+    );
+  };
+
+  // Navigate to chat
+  const navigateToChat = () => {
+    if (activity && child) {
+      router.push(
+        `/Enfants/Historique/chat?activityId=${activity.id}&childId=${child.id}&fromDetails=true`
+      );
+    }
+  };
+
+  // Navigate to video details
+  const navigateToVideoDetails = () => {
+    router.push(
+      `/Enfants/Historique/Videodetails?resourceId=1&subject=${activity?.matiere || "Mathématiques"}`
+    );
+  };
+
+  // Navigate to fiche details
+  const navigateToFicheDetails = () => {
+    router.push(
+      `/Enfants/Historique/fichedetails?resourceId=1&subject=${activity?.matiere || "Mathématiques"}`
     );
   };
 
   // Affichage du chargement
   if (isLoading) {
     return (
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            padding: 16,
+            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            borderBottomWidth: 1,
+            borderBottomColor: dark
+              ? "rgba(255,255,255,0.1)"
+              : "rgba(0,0,0,0.05)",
+          }}
+        >
+          <TouchableOpacity
+            onPress={handleBack}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: dark
+                ? "rgba(255,255,255,0.08)"
+                : "rgba(0,0,0,0.05)",
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: 12,
+            }}
+          >
+            <FontAwesomeIcon
+              icon="arrow-left"
+              size={18}
+              color={dark ? COLORS.white : COLORS.black}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "bold",
+              color: dark ? COLORS.white : COLORS.black,
+            }}
+          >
+            Détails de l&apos;activité
+          </Text>
+        </View>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={{ marginTop: 20, color: dark ? COLORS.white : COLORS.black }}>
+          <Text
+            style={{
+              marginTop: 20,
+              color: dark ? COLORS.white : COLORS.black,
+              fontSize: 16,
+            }}
+          >
             Chargement des détails...
           </Text>
         </View>
@@ -196,21 +349,108 @@ const HistoryDetails = () => {
   // Données introuvables
   if (!activity || !child) {
     return (
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            padding: 16,
+            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            borderBottomWidth: 1,
+            borderBottomColor: dark
+              ? "rgba(255,255,255,0.1)"
+              : "rgba(0,0,0,0.05)",
+          }}
+        >
+          <TouchableOpacity
+            onPress={handleBack}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: dark
+                ? "rgba(255,255,255,0.08)"
+                : "rgba(0,0,0,0.05)",
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: 12,
+            }}
+          >
+            <FontAwesomeIcon
+              icon="arrow-left"
+              size={18}
+              color={dark ? COLORS.white : COLORS.black}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "bold",
+              color: dark ? COLORS.white : COLORS.black,
+            }}
+          >
+            Détails de l&apos;activité
+          </Text>
+        </View>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 24,
+          }}
+        >
           <FontAwesomeIcon
-            icon={faExclamationCircle}
+            icon="exclamation-circle"
             size={64}
             color={dark ? COLORS.white : COLORS.black}
           />
-          <Text style={{ marginTop: 20, color: dark ? COLORS.white : COLORS.black }}>
+          <Text
+            style={{
+              marginTop: 20,
+              color: dark ? COLORS.white : COLORS.black,
+              fontSize: 18,
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
             Données introuvables
           </Text>
+          <Text
+            style={{
+              marginTop: 10,
+              color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+              textAlign: "center",
+              marginBottom: 30,
+            }}
+          >
+            Les données que vous recherchez ne sont pas disponibles.
+          </Text>
           <TouchableOpacity
-            style={{ marginTop: 20, backgroundColor: COLORS.primary, padding: 12, borderRadius: 8 }}
+            style={{
+              backgroundColor: COLORS.primary,
+              paddingVertical: 14,
+              paddingHorizontal: 30,
+              borderRadius: 25,
+              shadowColor: COLORS.primary,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+              elevation: 4,
+            }}
             onPress={handleBack}
           >
-            <Text style={{ color: COLORS.white }}>Retour</Text>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontWeight: "600",
+                fontSize: 16,
+              }}
+            >
+              Retour
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -219,60 +459,153 @@ const HistoryDetails = () => {
 
   // Variables pour le thème
   const assistantName = activity.assistant || "Autre";
-  const assistantTheme = ASSISTANT_THEME[assistantName] || ASSISTANT_THEME.Autre;
-  const subjectName = activity.matiere || "Autre";
-  const subjectTheme = SUBJECT_THEME[subjectName] || SUBJECT_THEME.Autre;
+  const assistantTheme =
+    ASSISTANT_THEME[assistantName] || ASSISTANT_THEME.Autre;
 
   // Date formatée
   const activityDate = new Date(activity.date);
-  const formattedDate = activityDate.toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
+  const formattedDate = activityDate.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   });
 
   // Messages de conversation limités (3 premiers)
-  const limitedConversation = activity.conversation ? activity.conversation.slice(0, 3) : [];
+  const limitedConversation = activity.conversation
+    ? activity.conversation.slice(0, 3)
+    : [];
 
   const renderFeedbackModal = () => (
-    <Modal
-      visible={showFeedbackModal}
-      transparent
-      animationType="slide"
-    >
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-        <View style={{ width: '90%', backgroundColor: dark ? COLORS.dark1 : COLORS.white, borderRadius: 12, padding: 20 }}>
-          <TouchableOpacity onPress={() => setShowFeedbackModal(false)} style={{ alignSelf: 'flex-end' }}>
-            <FontAwesomeIcon icon={faClose} size={24} color={dark ? COLORS.white : COLORS.black} />
-          </TouchableOpacity>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: dark ? COLORS.white : COLORS.black, marginBottom: 20 }}>
-            Éditer le commentaire
-          </Text>
+    <Modal visible={showFeedbackModal} transparent animationType="fade">
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+      >
+        <View
+          style={{
+            width: "90%",
+            backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+            borderRadius: 16,
+            padding: 20,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.2,
+            shadowRadius: 20,
+            elevation: 10,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 20,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+                color: dark ? COLORS.white : COLORS.black,
+              }}
+            >
+              Éditer le commentaire
+            </Text>
+            <TouchableOpacity
+              onPress={() => setShowFeedbackModal(false)}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: dark
+                  ? "rgba(255,255,255,0.08)"
+                  : "rgba(0,0,0,0.05)",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <FontAwesomeIcon
+                icon="times"
+                size={16}
+                color={dark ? COLORS.white : COLORS.black}
+              />
+            </TouchableOpacity>
+          </View>
+
           <TextInput
             value={editingFeedback}
             onChangeText={setEditingFeedback}
             multiline
             style={{
-              backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-              borderRadius: 8,
-              padding: 12,
+              backgroundColor: dark
+                ? "rgba(255, 255, 255, 0.05)"
+                : "rgba(0, 0, 0, 0.03)",
+              borderRadius: 12,
+              padding: 16,
               color: dark ? COLORS.white : COLORS.black,
-              marginBottom: 20
+              marginBottom: 20,
+              minHeight: 120,
+              textAlignVertical: "top",
+              fontSize: 16,
             }}
+            placeholder="Votre commentaire..."
+            placeholderTextColor={
+              dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"
+            }
           />
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <TouchableOpacity
-              onPress={updateFeedback}
-              style={{ backgroundColor: COLORS.primary, padding: 12, borderRadius: 8, flex: 1, marginRight: 10 }}
-            >
-              <Text style={{ color: COLORS.white, textAlign: 'center' }}>Mettre à jour</Text>
-            </TouchableOpacity>
+
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
             <TouchableOpacity
               onPress={deleteFeedback}
-              style={{ backgroundColor: '#FF3B30', padding: 12, borderRadius: 8, flex: 1, marginLeft: 10 }}
+              style={{
+                backgroundColor: "#FF3B30",
+                padding: 16,
+                borderRadius: 12,
+                flex: 0.48,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <Text style={{ color: COLORS.white, textAlign: 'center' }}>Supprimer</Text>
+              <FontAwesomeIcon
+                icon="trash-alt"
+                size={16}
+                color="#FFFFFF"
+                style={{ marginRight: 8 }}
+              />
+              <Text style={{ color: COLORS.white, fontWeight: "600" }}>
+                Supprimer
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={updateFeedback}
+              style={{
+                backgroundColor: COLORS.primary,
+                padding: 16,
+                borderRadius: 12,
+                flex: 0.48,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <FontAwesomeIcon
+                icon="save"
+                size={16}
+                color="#FFFFFF"
+                style={{ marginRight: 8 }}
+              />
+              <Text style={{ color: COLORS.white, fontWeight: "600" }}>
+                Enregistrer
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -281,33 +614,118 @@ const HistoryDetails = () => {
   );
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
+    >
+      <View
+        style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
+      >
         {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <FontAwesomeIcon icon={faArrowLeft} size={24} color={dark ? COLORS.white : COLORS.black} />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            padding: 16,
+            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            borderBottomWidth: 1,
+            borderBottomColor: dark
+              ? "rgba(255,255,255,0.1)"
+              : "rgba(0,0,0,0.05)",
+            elevation: 2,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.1,
+            shadowRadius: 2,
+          }}
+        >
+          <TouchableOpacity
+            onPress={handleBack}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: dark
+                ? "rgba(255,255,255,0.08)"
+                : "rgba(0,0,0,0.05)",
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: 12,
+            }}
+          >
+            <FontAwesomeIcon
+              icon="arrow-left"
+              size={18}
+              color={dark ? COLORS.white : COLORS.black}
+            />
           </TouchableOpacity>
-          <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: dark ? COLORS.white : COLORS.black }}>
+
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+                color: dark ? COLORS.white : COLORS.black,
+              }}
+            >
               Détails de l&apos;activité
             </Text>
+            <Text
+              style={{
+                fontSize: 13,
+                color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+              }}
+            >
+              {child.name} • {formattedDate.split(" ")[0]}
+            </Text>
           </View>
+
           <TouchableOpacity
             style={{
               width: 40,
               height: 40,
               borderRadius: 20,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: blocageIdentified ? 'rgba(255, 0, 0, 0.2)' : 'transparent'
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: blocageIdentified
+                ? "rgba(255, 0, 0, 0.2)"
+                : dark
+                  ? "rgba(255,255,255,0.08)"
+                  : "rgba(0,0,0,0.05)",
+              marginLeft: 8,
             }}
             onPress={toggleBlockageIdentification}
           >
             <FontAwesomeIcon
-              icon={faExclamationCircle}
-              size={24}
-              color={blocageIdentified ? '#FF3B30' : (dark ? COLORS.secondaryWhite : COLORS.gray3)}
+              icon="exclamation-circle"
+              size={18}
+              color={
+                blocageIdentified
+                  ? "#FF3B30"
+                  : dark
+                    ? COLORS.secondaryWhite
+                    : COLORS.gray3
+              }
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: dark
+                ? "rgba(255,255,255,0.08)"
+                : "rgba(0,0,0,0.05)",
+              marginLeft: 8,
+            }}
+            onPress={handleShare}
+          >
+            <FontAwesomeIcon
+              icon="share-alt"
+              size={18}
+              color={dark ? COLORS.secondaryWhite : COLORS.gray3}
             />
           </TouchableOpacity>
         </View>
@@ -315,421 +733,1030 @@ const HistoryDetails = () => {
         <ScrollView
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 16 }}
         >
-          {/* Carte principale de l'activité */}
-          <View style={{
-            margin: 16,
-            padding: 16,
-            backgroundColor: dark ? COLORS.dark1 : COLORS.white,
-            borderRadius: 12,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            elevation: 2
-          }}>
-            {/* En-tête avec type d'assistant et date */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <LinearGradient
-                colors={assistantTheme.colors}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+          <Animated.View
+            style={{
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            }}
+          >
+            {/* Carte principale de l'activité */}
+            <View
+              style={{
+                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                borderRadius: 16,
+                padding: 20,
+                marginBottom: 16,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 2,
+              }}
+            >
+              {/* En-tête avec type d'assistant */}
+              <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 20
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
                 }}
               >
-                <FontAwesomeIcon icon={assistantTheme.icon} size={14} color="#FFF" style={{ marginRight: 6 }} />
-                <Text style={{ color: '#FFF', fontWeight: '600' }}>{assistantName}</Text>
-              </LinearGradient>
-              <Text style={{ color: dark ? COLORS.secondaryWhite : COLORS.gray3 }}>
-                {formattedDate}
-              </Text>
-            </View>
+                <LinearGradient
+                  colors={assistantTheme.colors}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 14,
+                    paddingVertical: 8,
+                    borderRadius: 20,
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={assistantTheme.icon}
+                    size={16}
+                    color="#FFF"
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text
+                    style={{
+                      color: "#FFF",
+                      fontWeight: "600",
+                      fontSize: 14,
+                    }}
+                  >
+                    {assistantName}
+                  </Text>
+                </LinearGradient>
 
-            {/* Titre de l'activité */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-              <LinearGradient
-                colors={subjectTheme.colors}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+                <Text
+                  style={{
+                    color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                    fontSize: 14,
+                  }}
+                >
+                  {formattedDate}
+                </Text>
+              </View>
+
+              {/* Titre de l'activité */}
+              <Text
                 style={{
-                  padding: 8,
-                  borderRadius: 8,
-                  marginRight: 12
+                  fontSize: 22,
+                  fontWeight: "bold",
+                  color: dark ? COLORS.white : COLORS.black,
+                  marginBottom: 16,
+                  lineHeight: 30,
                 }}
               >
-                <FontAwesomeIcon icon={subjectTheme.icon} size={16} color="#FFF" />
-              </LinearGradient>
-              <Text style={{
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: dark ? COLORS.white : COLORS.black,
-                flex: 1
-              }}>
                 {activity.activite}
               </Text>
-            </View>
 
-            {/* Détails de l'activité */}
-            <View style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              marginBottom: 16,
-              padding: 12,
-              backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-              borderRadius: 8
-            }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16, marginBottom: 8 }}>
-                <FontAwesomeIcon icon={faClock} size={16} color={COLORS.primary} style={{ marginRight: 4 }} />
-                <Text style={{ color: dark ? COLORS.secondaryWhite : COLORS.gray3 }}>{activity.duree}</Text>
+              {/* Détails de l'activité */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  marginBottom: 16,
+                  gap: 8,
+                }}
+              >
+                <View
+                  style={{
+                    backgroundColor: dark
+                      ? "rgba(255,255,255,0.08)"
+                      : "rgba(0,0,0,0.05)",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 16,
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon="clock"
+                    size={14}
+                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                    style={{ marginRight: 6 }}
+                  />
+                  <Text
+                    style={{
+                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                    }}
+                  >
+                    {activity.duree}
+                  </Text>
+                </View>
+
+                {activity.score && (
+                  <View
+                    style={{
+                      backgroundColor: `${getScoreColor(activity.score)}20`,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 16,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon="star"
+                      size={14}
+                      color={getScoreColor(activity.score)}
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text
+                      style={{
+                        color: getScoreColor(activity.score),
+                        fontWeight: "600",
+                      }}
+                    >
+                      {activity.score}
+                    </Text>
+                  </View>
+                )}
+
+                {activity.matiere && (
+                  <View
+                    style={{
+                      backgroundColor: dark
+                        ? "rgba(255,255,255,0.08)"
+                        : "rgba(0,0,0,0.05)",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 16,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon="book"
+                      size={14}
+                      color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text
+                      style={{
+                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      }}
+                    >
+                      {activity.matiere}
+                    </Text>
+                  </View>
+                )}
+
+                {activity.chapitre && (
+                  <View
+                    style={{
+                      backgroundColor: dark
+                        ? "rgba(255,255,255,0.08)"
+                        : "rgba(0,0,0,0.05)",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 16,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon="bookmark"
+                      size={14}
+                      color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text
+                      style={{
+                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      }}
+                    >
+                      {activity.chapitre}
+                    </Text>
+                  </View>
+                )}
               </View>
-              {activity.score && (
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                  <FontAwesomeIcon icon={faStar} size={16} color={COLORS.primary} style={{ marginRight: 4 }} />
-                  <Text style={{ color: dark ? COLORS.secondaryWhite : COLORS.gray3 }}>{activity.score}</Text>
+
+              {blocageIdentified && (
+                <View
+                  style={{
+                    backgroundColor: "rgba(255, 59, 48, 0.1)",
+                    borderRadius: 12,
+                    padding: 12,
+                    marginBottom: 16,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon="exclamation-triangle"
+                    size={16}
+                    color="#FF3B30"
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text
+                    style={{
+                      color: "#FF3B30",
+                      fontSize: 14,
+                      flex: 1,
+                    }}
+                  >
+                    Point de blocage identifié pour cette activité. Une
+                    attention particulière est recommandée.
+                  </Text>
+                </View>
+              )}
+
+              {/* Commentaires et recommandations */}
+              {activity.commentaires && (
+                <View style={{ marginBottom: 16 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginBottom: 10,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon="comment-alt"
+                      size={16}
+                      color={COLORS.primary}
+                      style={{ marginRight: 8 }}
+                    />
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "600",
+                        color: dark ? COLORS.white : COLORS.black,
+                      }}
+                    >
+                      Commentaires
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      backgroundColor: dark
+                        ? "rgba(255,255,255,0.05)"
+                        : "rgba(0,0,0,0.03)",
+                      borderRadius: 12,
+                      padding: 16,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                        lineHeight: 22,
+                        fontSize: 15,
+                      }}
+                    >
+                      {activity.commentaires}
+                    </Text>
+                  </View>
+                </View>
+              )}
+
+              {activity.recommandations &&
+                activity.recommandations.length > 0 && (
+                  <View style={{ marginBottom: 16 }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginBottom: 10,
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon="lightbulb"
+                        size={16}
+                        color={COLORS.primary}
+                        style={{ marginRight: 8 }}
+                      />
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: "600",
+                          color: dark ? COLORS.white : COLORS.black,
+                        }}
+                      >
+                        Recommandations
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        backgroundColor: dark
+                          ? "rgba(255,255,255,0.05)"
+                          : "rgba(0,0,0,0.03)",
+                        borderRadius: 12,
+                        padding: 16,
+                      }}
+                    >
+                      {activity.recommandations.map((rec, index) => (
+                        <View
+                          key={index}
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "flex-start",
+                            marginBottom:
+                              index < activity.recommandations!.length - 1
+                                ? 12
+                                : 0,
+                          }}
+                        >
+                          <View
+                            style={{
+                              width: 24,
+                              height: 24,
+                              borderRadius: 12,
+                              backgroundColor: "#24D26D",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              marginRight: 12,
+                              marginTop: 2,
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon="check"
+                              size={12}
+                              color="#FFFFFF"
+                            />
+                          </View>
+                          <Text
+                            style={{
+                              color: dark
+                                ? COLORS.secondaryWhite
+                                : COLORS.gray3,
+                              lineHeight: 22,
+                              flex: 1,
+                              fontSize: 15,
+                            }}
+                          >
+                            {rec}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+
+              {/* Exercices */}
+              {activity.exercices && activity.exercices.length > 0 && (
+                <View style={{ marginBottom: 16 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginBottom: 10,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon="tasks"
+                      size={16}
+                      color={COLORS.primary}
+                      style={{ marginRight: 8 }}
+                    />
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "600",
+                        color: dark ? COLORS.white : COLORS.black,
+                      }}
+                    >
+                      Exercices
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      backgroundColor: dark
+                        ? "rgba(255,255,255,0.05)"
+                        : "rgba(0,0,0,0.03)",
+                      borderRadius: 12,
+                      padding: 16,
+                    }}
+                  >
+                    {activity.exercices.map((ex, index) => (
+                      <View
+                        key={index}
+                        style={{
+                          marginBottom:
+                            index < activity.exercices!.length - 1 ? 16 : 0,
+                        }}
+                      >
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            marginBottom: 6,
+                          }}
+                        >
+                          <View
+                            style={{
+                              width: 24,
+                              height: 24,
+                              borderRadius: 12,
+                              backgroundColor: ex.reussite
+                                ? "#24D26D"
+                                : "#FF3B30",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              marginRight: 12,
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={ex.reussite ? "check" : "times"}
+                              size={12}
+                              color="#FFFFFF"
+                            />
+                          </View>
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontWeight: "500",
+                              color: dark ? COLORS.white : COLORS.black,
+                            }}
+                          >
+                            Exercice {index + 1}
+                          </Text>
+                          <View
+                            style={{
+                              marginLeft: "auto",
+                              backgroundColor: ex.reussite
+                                ? "rgba(36, 210, 109, 0.1)"
+                                : "rgba(255, 59, 48, 0.1)",
+                              paddingHorizontal: 10,
+                              paddingVertical: 3,
+                              borderRadius: 12,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: ex.reussite ? "#24D26D" : "#FF3B30",
+                                fontSize: 13,
+                                fontWeight: "500",
+                              }}
+                            >
+                              {ex.reussite ? "Réussi" : "Échoué"}
+                            </Text>
+                          </View>
+                        </View>
+                        {ex.commentaire && (
+                          <View
+                            style={{
+                              backgroundColor: dark
+                                ? "rgba(255,255,255,0.08)"
+                                : "rgba(0,0,0,0.05)",
+                              borderRadius: 8,
+                              padding: 12,
+                              marginLeft: 36,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: dark
+                                  ? COLORS.secondaryWhite
+                                  : COLORS.gray3,
+                                fontSize: 14,
+                                lineHeight: 20,
+                              }}
+                            >
+                              {ex.commentaire}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    ))}
+                  </View>
                 </View>
               )}
             </View>
 
-            {/* Conversations (limitées) */}
-            <View style={{ marginBottom: 16 }}>
-              <Text style={{
-                fontSize: 16,
-                fontWeight: '600',
-                color: dark ? COLORS.white : COLORS.black,
-                marginBottom: 8,
-                paddingHorizontal: 12
-              }}>
-                Conversation avec l&apos;assistant
-              </Text>
-
-              <TouchableOpacity
-                onPress={() => {
-                  if (activity && child) {
-                    router.push(`/Enfants/Historique/chat?activityId=${activity.id}&childId=${child.id}&fromDetails=true`);
-                  }
-                }}
+            {/* Conversations Card */}
+            <View
+              style={{
+                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                borderRadius: 16,
+                padding: 20,
+                marginBottom: 16,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 2,
+              }}
+            >
+              <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: 12,
-                  marginBottom: 8
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 16,
                 }}
               >
-                <Text style={{ color: COLORS.primary, marginRight: 4 }}>Voir tout</Text>
-                <FontAwesomeIcon icon={faChevronRight} size={16} color={COLORS.primary} />
-              </TouchableOpacity>
-
-              <View style={{
-                backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                borderRadius: 8,
-                padding: 12
-              }}>
-                {limitedConversation.map((msg, index) => (
-                  <View
-                    key={index}
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <FontAwesomeIcon
+                    icon="comments"
+                    size={16}
+                    color={COLORS.primary}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text
                     style={{
-                      marginBottom: index < limitedConversation.length - 1 ? 12 : 0,
-                      alignItems: msg.sender === 'assistant' ? 'flex-start' : 'flex-end'
+                      fontSize: 16,
+                      fontWeight: "600",
+                      color: dark ? COLORS.white : COLORS.black,
                     }}
                   >
-                    <View style={{
-                      backgroundColor: msg.sender === 'assistant'
-                        ? (dark ? 'rgba(0, 149, 255, 0.2)' : 'rgba(0, 149, 255, 0.1)')
-                        : (dark ? 'rgba(66, 66, 66, 0.8)' : '#E1E1E1'),
-                      padding: 12,
-                      borderRadius: 12,
-                      maxWidth: '80%'
-                    }}>
-                      <Text style={{
-                        color: msg.sender === 'assistant'
-                          ? COLORS.primary
-                          : (dark ? COLORS.white : COLORS.black)
-                      }}>
-                        {msg.message}
-                      </Text>
-                      <Text style={{
-                        fontSize: 12,
-                        color: dark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-                        alignSelf: 'flex-end',
-                        marginTop: 4
-                      }}>
-                        {msg.timestamp}
-                      </Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </View>
-
-            {/* Commentaires et recommandations */}
-            {activity.commentaires && (
-              <View style={{ marginBottom: 16 }}>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: dark ? COLORS.white : COLORS.black,
-                  marginBottom: 8
-                }}>
-                  Commentaires
-                </Text>
-                <View style={{
-                  backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                  borderRadius: 8,
-                  padding: 12
-                }}>
-                  <Text style={{ color: dark ? COLORS.secondaryWhite : COLORS.gray3 }}>
-                    {activity.commentaires}
+                    Conversation avec l&apos;assistant
                   </Text>
                 </View>
-              </View>
-            )}
 
-            {activity.recommandations && activity.recommandations.length > 0 && (
-              <View style={{ marginBottom: 16 }}>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: dark ? COLORS.white : COLORS.black,
-                  marginBottom: 8
-                }}>
-                  Commentaire
-                </Text>
-                <View style={{
-                  backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                  borderRadius: 8,
-                  padding: 12
-                }}>
-                  {activity.recommandations.map((rec, index) => (
-                    <View
-                      key={index}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginBottom: index < activity.recommandations!.length - 1 ? 8 : 0
-                      }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faCheckCircle}
-                        size={18}
-                        color={COLORS.primary}
-                        style={{ marginRight: 8 }}
-                      />
-                      <Text style={{ color: dark ? COLORS.secondaryWhite : COLORS.gray3 }}>
-                        {rec}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
+                <TouchableOpacity
+                  onPress={navigateToChat}
+                  style={{
+                    backgroundColor: COLORS.primary,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 16,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: COLORS.white,
+                      marginRight: 4,
+                      fontSize: 13,
+                      fontWeight: "500",
+                    }}
+                  >
+                    Voir tout
+                  </Text>
+                  <FontAwesomeIcon
+                    icon="chevron-right"
+                    size={12}
+                    color="#FFFFFF"
+                  />
+                </TouchableOpacity>
               </View>
-            )}
 
-            {/* Exercices */}
-            {activity.exercices && activity.exercices.length > 0 && (
-              <View style={{ marginBottom: 16 }}>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: dark ? COLORS.white : COLORS.black,
-                  marginBottom: 8
-                }}>
-                  Exercices
-                </Text>
-                <View style={{
-                  backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                  borderRadius: 8,
-                  padding: 12
-                }}>
-                  {activity.exercices.map((ex, index) => (
-                    <View
-                      key={index}
-                      style={{
-                        marginBottom: index < activity.exercices!.length - 1 ? 12 : 0
-                      }}
-                    >
-                      <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginBottom: 4
-                      }}>
-                        <FontAwesomeIcon
-                          icon={ex.reussite ? faCheckCircle : faTimesCircle}
-                          size={18}
-                          color={ex.reussite ? '#4CAF50' : '#F44336'}
-                          style={{ marginRight: 8 }}
-                        />
+              {limitedConversation.length > 0 ? (
+                <View
+                  style={{
+                    backgroundColor: dark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.03)",
+                    borderRadius: 12,
+                    padding: 16,
+                  }}
+                >
+                  {limitedConversation.map((msg, index) => {
+                    const isAssistant = msg.sender === "assistant";
+                    return (
+                      <View
+                        key={index}
+                        style={{
+                          marginBottom:
+                            index < limitedConversation.length - 1 ? 16 : 0,
+                          alignItems: isAssistant ? "flex-start" : "flex-end",
+                        }}
+                      >
+                        <View
+                          style={{
+                            backgroundColor: isAssistant
+                              ? dark
+                                ? "rgba(0, 149, 255, 0.2)"
+                                : "rgba(0, 149, 255, 0.08)"
+                              : dark
+                                ? "rgba(66, 66, 66, 0.8)"
+                                : "#F0F0F0",
+                            padding: 12,
+                            borderRadius: 16,
+                            maxWidth: "85%",
+                            borderTopLeftRadius: isAssistant ? 4 : 16,
+                            borderTopRightRadius: isAssistant ? 16 : 4,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: isAssistant
+                                ? dark
+                                  ? COLORS.white
+                                  : "#0066CC"
+                                : dark
+                                  ? COLORS.white
+                                  : COLORS.black,
+                              fontSize: 14,
+                              lineHeight: 20,
+                            }}
+                          >
+                            {msg.message}
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 11,
+                              color: dark
+                                ? "rgba(255, 255, 255, 0.5)"
+                                : "rgba(0, 0, 0, 0.4)",
+                              alignSelf: "flex-end",
+                              marginTop: 4,
+                            }}
+                          >
+                            {msg.timestamp}
+                          </Text>
+                        </View>
                       </View>
-                      {ex.commentaire && (
-                        <Text style={{
-                          color: dark ? COLORS.secondaryWhite : COLORS.gray3,
-                          marginLeft: 26
-                        }}>
-                          {ex.commentaire}
-                        </Text>
-                      )}
-                    </View>
-                  ))}
+                    );
+                  })}
                 </View>
-              </View>
-            )}
+              ) : (
+                <View
+                  style={{
+                    backgroundColor: dark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.03)",
+                    borderRadius: 12,
+                    padding: 16,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    Aucune conversation enregistrée pour cette activité
+                  </Text>
+                </View>
+              )}
+            </View>
 
-            {/* Feedback des parents */}
-            <View style={{ marginBottom: 16 }}>
-              <Text style={{
-                fontSize: 16,
-                fontWeight: '600',
-                color: dark ? COLORS.white : COLORS.black,
-                marginBottom: 8
-              }}>
-                Commentaires des parents
-              </Text>
-              <View style={{
-                backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                borderRadius: 8,
-                padding: 12,
-                marginBottom: 12
-              }}>
-                {parentFeedbacks.length > 0 ? (
-                  parentFeedbacks.map((fb, index) => (
+            {/* Parent Feedback Card */}
+            <View
+              style={{
+                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                borderRadius: 16,
+                padding: 20,
+                marginBottom: 16,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 2,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 16,
+                }}
+              >
+                <FontAwesomeIcon
+                  icon="comment-dots"
+                  size={16}
+                  color={COLORS.primary}
+                  style={{ marginRight: 8 }}
+                />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "600",
+                    color: dark ? COLORS.white : COLORS.black,
+                  }}
+                >
+                  Commentaires des parents
+                </Text>
+              </View>
+
+              {parentFeedbacks.length > 0 ? (
+                <View>
+                  {parentFeedbacks.map((fb, index) => (
                     <TouchableOpacity
                       key={index}
                       style={{
-                        marginBottom: index < parentFeedbacks.length - 1 ? 12 : 0
+                        backgroundColor: dark
+                          ? "rgba(255,255,255,0.05)"
+                          : "rgba(0,0,0,0.03)",
+                        borderRadius: 12,
+                        padding: 16,
+                        marginBottom:
+                          index < parentFeedbacks.length - 1 ? 12 : 16,
                       }}
                       onPress={() => openEditFeedbackModal(index)}
                     >
-                      <Text style={{ color: dark ? COLORS.secondaryWhite : COLORS.gray3 }}>
+                      <Text
+                        style={{
+                          color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                          lineHeight: 22,
+                          fontSize: 15,
+                        }}
+                      >
                         {fb.text}
                       </Text>
-                      <Text style={{
-                        fontSize: 12,
-                        color: dark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-                        alignSelf: 'flex-end',
-                        marginTop: 4
-                      }}>
-                        {fb.date.toLocaleDateString()}
-                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginTop: 8,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            color: dark
+                              ? "rgba(255, 255, 255, 0.5)"
+                              : "rgba(0, 0, 0, 0.4)",
+                          }}
+                        >
+                          {fb.date.toLocaleDateString("fr-FR", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </Text>
+                        <View
+                          style={{
+                            backgroundColor: dark
+                              ? "rgba(255,255,255,0.1)"
+                              : "rgba(0,0,0,0.07)",
+                            paddingHorizontal: 8,
+                            paddingVertical: 4,
+                            borderRadius: 12,
+                            flexDirection: "row",
+                            alignItems: "center",
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            icon="pen"
+                            size={10}
+                            color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                            style={{ marginRight: 4 }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 11,
+                              color: dark
+                                ? COLORS.secondaryWhite
+                                : COLORS.gray3,
+                            }}
+                          >
+                            Modifier
+                          </Text>
+                        </View>
+                      </View>
                     </TouchableOpacity>
-                  ))
-                ) : (
-                  <Text style={{ color: dark ? COLORS.secondaryWhite : COLORS.gray3, fontStyle: 'italic' }}>
+                  ))}
+                </View>
+              ) : (
+                <View
+                  style={{
+                    backgroundColor: dark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.03)",
+                    borderRadius: 12,
+                    padding: 16,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 16,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      fontStyle: "italic",
+                    }}
+                  >
                     Aucun commentaire pour le moment
                   </Text>
-                )}
-
-                {/* Ajouter un feedback */}
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                  borderRadius: 8,
-                  padding: 8
-                }}>
-                  <TextInput
-                    placeholder="Ajouter une commentaire ..."
-                    placeholderTextColor={dark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'}
-                    value={feedback}
-                    onChangeText={setFeedback}
-                    multiline
-                    style={{
-                      flex: 1,
-                      color: dark ? COLORS.white : COLORS.black,
-                      paddingHorizontal: 8
-                    }}
-                  />
-                  <TouchableOpacity
-                    onPress={addFeedback}
-                    style={{
-                      padding: 8,
-                      backgroundColor: COLORS.primary,
-                      borderRadius: 8
-                    }}
-                    disabled={feedback.trim() === ''}
-                  >
-                    <FontAwesomeIcon icon={faPaperPlane} size={20} color="#FFF" />
-                  </TouchableOpacity>
                 </View>
+              )}
+
+              {/* Add Feedback Input */}
+              <View
+                style={{
+                  backgroundColor: dark
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.03)",
+                  borderRadius: 12,
+                  padding: 16,
+                }}
+              >
+                <TextInput
+                  placeholder="Ajouter un commentaire..."
+                  placeholderTextColor={
+                    dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"
+                  }
+                  value={feedback}
+                  onChangeText={setFeedback}
+                  multiline
+                  style={{
+                    color: dark ? COLORS.white : COLORS.black,
+                    fontSize: 15,
+                    minHeight: 80,
+                    textAlignVertical: "top",
+                  }}
+                />
+
+                <TouchableOpacity
+                  onPress={addFeedback}
+                  style={{
+                    backgroundColor: COLORS.primary,
+                    paddingVertical: 12,
+                    paddingHorizontal: 20,
+                    borderRadius: 25,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    alignSelf: "flex-end",
+                    marginTop: 12,
+                    opacity: feedback.trim() === "" ? 0.6 : 1,
+                  }}
+                  disabled={feedback.trim() === ""}
+                >
+                  <FontAwesomeIcon
+                    icon="paper-plane"
+                    size={16}
+                    color="#FFFFFF"
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text
+                    style={{
+                      color: COLORS.white,
+                      fontWeight: "600",
+                      fontSize: 15,
+                    }}
+                  >
+                    Envoyer
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
 
             {/* Ressources pédagogiques */}
             {assistantName === "J'Apprends" && (
-              <View style={{ marginBottom: 16 }}>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: dark ? COLORS.white : COLORS.black,
-                  marginBottom: 8
-                }}>
-                  Ressources pédagogiques
-                </Text>
-                <TouchableOpacity
-                  onPress={() => router.push(`/Enfants/Historique/fichedetails?resourceId=1&subject=${subjectName}`)}
+              <View
+                style={{
+                  backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                  borderRadius: 16,
+                  padding: 20,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 2,
+                }}
+              >
+                <View
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                    borderRadius: 8,
-                    padding: 12,
-                    marginBottom: 8
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 16,
                   }}
                 >
                   <FontAwesomeIcon
-                    icon={faBook}
-                    size={24}
+                    icon="graduation-cap"
+                    size={16}
                     color={COLORS.primary}
-                    style={{ marginRight: 12 }}
+                    style={{ marginRight: 8 }}
                   />
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "600",
+                      color: dark ? COLORS.white : COLORS.black,
+                    }}
+                  >
+                    Ressources pédagogiques
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  onPress={navigateToFicheDetails}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: dark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.03)",
+                    borderRadius: 12,
+                    padding: 16,
+                    marginBottom: 12,
+                  }}
+                >
+                  <LinearGradient
+                    colors={["#FF8E69", "#FF7862"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 10,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginRight: 16,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon="file-pdf"
+                      size={22}
+                      color="#FFFFFF"
+                    />
+                  </LinearGradient>
+
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
-                      Fiche pédagogique - {subjectName}
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "500",
+                        color: dark ? COLORS.white : COLORS.black,
+                        marginBottom: 4,
+                      }}
+                    >
+                      Fiche pédagogique - {activity.matiere || "Mathématiques"}
                     </Text>
-                    <Text style={{ color: dark ? COLORS.secondaryWhite : COLORS.gray3, fontSize: 12 }}>
+                    <Text
+                      style={{
+                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                        fontSize: 14,
+                      }}
+                    >
                       Ressource complémentaire pour approfondir
                     </Text>
                   </View>
-                  <FontAwesomeIcon icon={faChevronRight} size={24} color={dark ? COLORS.secondaryWhite : COLORS.gray3} />
+
+                  <FontAwesomeIcon
+                    icon="chevron-right"
+                    size={16}
+                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                  />
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() => router.push({
-                    pathname: '/Enfants/Historique/Videodetails',
-                    params: {
-                      resourceId: '1',
-                      subject: subjectName
-                    }
-                  })}
+                  onPress={navigateToVideoDetails}
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    backgroundColor: dark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                    borderRadius: 8,
-                    padding: 12
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: dark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.03)",
+                    borderRadius: 12,
+                    padding: 16,
                   }}
                 >
-                  <FontAwesomeIcon
-                    icon={faPlayCircle}
-                    size={24}
-                    color={COLORS.primary}
-                    style={{ marginRight: 12 }}
-                  />
+                  <LinearGradient
+                    colors={["#2196F3", "#1565C0"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 10,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginRight: 16,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon="play-circle"
+                      size={22}
+                      color="#FFFFFF"
+                    />
+                  </LinearGradient>
+
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
-                      Vidéo explicative - {subjectName}
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "500",
+                        color: dark ? COLORS.white : COLORS.black,
+                        marginBottom: 4,
+                      }}
+                    >
+                      Vidéo explicative - {activity.matiere || "Mathématiques"}
                     </Text>
-                    <Text style={{ color: dark ? COLORS.secondaryWhite : COLORS.gray3, fontSize: 12 }}>
+                    <Text
+                      style={{
+                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                        fontSize: 14,
+                      }}
+                    >
                       10:24 minutes
                     </Text>
                   </View>
-                  <FontAwesomeIcon icon={faChevronRight} size={24} color={dark ? COLORS.secondaryWhite : COLORS.gray3} />
+
+                  <FontAwesomeIcon
+                    icon="chevron-right"
+                    size={16}
+                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                  />
                 </TouchableOpacity>
               </View>
             )}
-          </View>
+          </Animated.View>
         </ScrollView>
         {renderFeedbackModal()}
       </View>

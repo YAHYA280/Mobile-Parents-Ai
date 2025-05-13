@@ -1,7 +1,8 @@
-// Type fixes for app/Enfants/Historique/home.tsx
+// app/Enfants/Historique/home.tsx - Type fixes
 
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "expo-router";
+import { Calendar } from "react-native-calendars";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
@@ -11,253 +12,112 @@ import {
   TextInput,
   SafeAreaView,
   ActivityIndicator,
+  Animated,
+  Dimensions,
+  StatusBar,
+  Modal,
+  Image,
   ListRenderItemInfo,
-  ColorValue,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import {
-  faArrowLeft,
-  faArrowRight,
-  faStar,
-  faClock,
-  faSearch,
-  faFilter,
-  faCalendar,
-  faTimesCircle,
-  faChevronRight,
-  faHourglassEmpty,
-} from "@fortawesome/free-solid-svg-icons";
 
-import { COLORS } from "../../../constants/theme";
-import { enhanceActivity } from "../../../data/Enfants/CHILDREN_DATA";
 import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
-// Interface for date range
-interface DateRange {
-  startDate: string | null;
-  endDate: string | null;
-}
+import { COLORS } from "../../../constants/theme";
+import { useTheme } from "../../../theme/ThemeProvider";
+import { useActivityFilters } from "./filtre";
+import {
+  SearchBar,
+  DateRangeIndicator,
+  AssistantTypeFilters,
+  SubjectFilters,
+  ChapterFilters,
+  ExerciseFilters,
+  FilterModal,
+} from "./filtres";
 
-// Interface for activity theme with proper ColorValue and IconProp types
-interface ActivityTheme {
-  colors: readonly [ColorValue, ColorValue];
-  icon: IconProp;
-}
-
-// Interface for theme result
-interface ThemeResult {
-  assistant: ActivityTheme;
-  subject: ActivityTheme;
-}
-
-// Helper to get activity theme colors
-const getActivityTheme = (activity: Activity): ThemeResult => {
-  // Default colors for various activities
-  const assistantThemes: Record<string, ActivityTheme> = {
-    "J'Apprends": {
-      colors: ["#4CAF50", "#2E7D32"] as readonly [ColorValue, ColorValue],
-      icon: "chalkboard-teacher" as IconProp,
-    },
-    Recherche: {
-      colors: ["#2196F3", "#1565C0"] as readonly [ColorValue, ColorValue],
-      icon: "search" as IconProp,
-    },
-    Accueil: {
-      colors: ["#FF9800", "#F57C00"] as readonly [ColorValue, ColorValue],
-      icon: "home" as IconProp,
-    },
-    Autre: {
-      colors: ["#9C27B0", "#7B1FA2"] as readonly [ColorValue, ColorValue],
-      icon: "robot" as IconProp,
-    },
-  };
-
-  const subjectThemes: Record<string, ActivityTheme> = {
-    Mathématiques: {
-      colors: ["#E91E63", "#C2185B"] as readonly [ColorValue, ColorValue],
-      icon: "calculator" as IconProp,
-    },
-    Français: {
-      colors: ["#3F51B5", "#303F9F"] as readonly [ColorValue, ColorValue],
-      icon: "book" as IconProp,
-    },
-    Sciences: {
-      colors: ["#009688", "#00796B"] as readonly [ColorValue, ColorValue],
-      icon: "flask" as IconProp,
-    },
-    Histoire: {
-      colors: ["#795548", "#5D4037"] as readonly [ColorValue, ColorValue],
-      icon: "landmark" as IconProp,
-    },
-    Anglais: {
-      colors: ["#673AB7", "#512DA8"] as readonly [ColorValue, ColorValue],
-      icon: "language" as IconProp,
-    },
-    Autre: {
-      colors: ["#607D8B", "#455A64"] as readonly [ColorValue, ColorValue],
-      icon: "book-open" as IconProp,
-    },
-  };
-
-  // Determine assistant type
-  let assistantName = "Autre";
-  if (activity.activite.toLowerCase().includes("j'apprends")) {
-    assistantName = "J'Apprends";
-  } else if (activity.activite.toLowerCase().includes("recherche")) {
-    assistantName = "Recherche";
-  } else if (activity.activite.toLowerCase().includes("accueil")) {
-    assistantName = "Accueil";
-  }
-
-  // Determine subject
-  let subjectName = "Autre";
-  const activityLower = activity.activite.toLowerCase();
-  if (
-    activityLower.includes("mathématiques") ||
-    activityLower.includes("géométrie")
-  ) {
-    subjectName = "Mathématiques";
-  } else if (
-    activityLower.includes("français") ||
-    activityLower.includes("lecture") ||
-    activityLower.includes("vocabulaire") ||
-    activityLower.includes("conjugaison") ||
-    activityLower.includes("grammaire")
-  ) {
-    subjectName = "Français";
-  } else if (
-    activityLower.includes("sciences") ||
-    activityLower.includes("écologie")
-  ) {
-    subjectName = "Sciences";
-  } else if (activityLower.includes("histoire")) {
-    subjectName = "Histoire";
-  } else if (activityLower.includes("anglais")) {
-    subjectName = "Anglais";
-  }
-
-  return {
-    assistant: assistantThemes[assistantName] || assistantThemes.Autre,
-    subject: subjectThemes[subjectName] || subjectThemes.Autre,
-  };
-};
-
-// Type guard to check if activity has a valid ID
-const isValidActivity = (
-  activity: Activity
-): activity is Activity & { id: number | string } => {
-  return activity.id !== undefined && activity.id !== null;
-};
-
-// Props interface for component
 interface HistoriqueActivitesProps {
   isTabComponent?: boolean;
   childData: Child;
 }
 
-// Main Component
+// Safely set filters with proper type
+const setFilters = (prev: any, newState: any) => ({ ...prev, ...newState });
+
 const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
   isTabComponent = false,
   childData,
 }) => {
   const router = useRouter();
+  const { dark, colors } = useTheme();
   const flatListRef = useRef<FlatList<Activity>>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
 
-  // Base states
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
-  const [searchKeyword, setSearchKeyword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  // Date filter states
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: null,
-    endDate: null,
-  });
+  // States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showEmptyTips, setShowEmptyTips] = useState(false);
 
   // Constants
-  const ACTIVITIES_PER_PAGE = 3;
+  const ACTIVITIES_PER_PAGE = 4;
 
-  // Initialize activities from childData
+  // Activity filters
+  const {
+    searchKeyword,
+    activityDateRange,
+    showActivityCalendar,
+    activityCalendarMode,
+    advancedFilters,
+    filteredActivities,
+    availableSubjects,
+    availableChapters,
+    availableExercises,
+    setSearchKeyword,
+    setActivityDateRange,
+    toggleActivityCalendar,
+    handleActivityDayPress,
+    setAdvancedFilters,
+    resetActivityFilters,
+    getUniqueAssistantTypes,
+    hasActiveFilters,
+  } = useActivityFilters(childData?.activitesRecentes || []);
+
+  // Load data and start animations
   useEffect(() => {
-    if (childData?.activitesRecentes) {
-      setIsLoading(true);
-
-      // Map activities and enhance them
-      const enhancedActivities = childData.activitesRecentes.map((activity) =>
-        enhanceActivity(activity)
-      );
-
-      setActivities(enhancedActivities);
-      setFilteredActivities(enhancedActivities);
+    setIsLoading(true);
+    const timer = setTimeout(() => {
       setIsLoading(false);
-    }
-  }, [childData]);
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 500);
 
-  // Apply filters when search or date range changes
-  useEffect(() => {
-    if (!activities.length) return;
+    return () => clearTimeout(timer);
+  }, [fadeAnim, slideAnim]);
 
-    let result = [...activities];
-
-    // Apply search filter
-    if (searchKeyword.trim() !== "") {
-      const keyword = searchKeyword.toLowerCase();
-      result = result.filter(
-        (activity) =>
-          activity.activite.toLowerCase().includes(keyword) ||
-          (activity.matiere && activity.matiere.toLowerCase().includes(keyword))
-      );
-    }
-
-    // Apply date range filter
-    if (dateRange.startDate && dateRange.endDate) {
-      result = result.filter((activity) => {
-        const activityDate = new Date(activity.date);
-        const startDate = new Date(dateRange.startDate as string);
-        const endDate = new Date(dateRange.endDate as string);
-        endDate.setHours(23, 59, 59, 999); // Include the entire end date
-
-        return activityDate >= startDate && activityDate <= endDate;
-      });
-    } else if (dateRange.startDate) {
-      result = result.filter((activity) => {
-        const activityDate = new Date(activity.date);
-        const startDate = new Date(dateRange.startDate as string);
-
-        return activityDate >= startDate;
-      });
-    } else if (dateRange.endDate) {
-      result = result.filter((activity) => {
-        const activityDate = new Date(activity.date);
-        const endDate = new Date(dateRange.endDate as string);
-        endDate.setHours(23, 59, 59, 999); // Include the entire end date
-
-        return activityDate <= endDate;
-      });
-    }
-
-    setFilteredActivities(result);
-    // Reset to first page when filters change
-    setCurrentPage(1);
-  }, [searchKeyword, dateRange, activities]);
-
-  // Reset filters
-  const resetFilters = useCallback((): void => {
-    setSearchKeyword("");
-    setDateRange({ startDate: null, endDate: null });
-  }, []);
+  // Get unique assistant types
+  const uniqueAssistantTypes = getUniqueAssistantTypes();
 
   // Go back
-  const handleBack = useCallback((): void => {
+  const handleBack = useCallback(() => {
     router.back();
   }, [router]);
 
   // Handle page change
   const handlePageChange = useCallback(
-    (newPage: number): void => {
+    (newPage: number) => {
       if (newPage === currentPage) return;
 
       setCurrentPage(newPage);
@@ -274,9 +134,8 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
 
   // View activity details
   const viewActivityDetails = useCallback(
-    (activity: Activity): void => {
-      // Use the type guard to check for valid ID
-      if (!isValidActivity(activity)) {
+    (activity: Activity) => {
+      if (activity.id === undefined) {
         console.warn("Activity missing ID, cannot navigate to details");
         return;
       }
@@ -292,197 +151,329 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
     [router, childData]
   );
 
+  // Toggle advanced filters
+  const toggleAdvancedFilters = () => {
+    setShowAdvancedFilters(!showAdvancedFilters);
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return {
+      day: date.getDate(),
+      month: date.toLocaleDateString("fr-FR", { month: "short" }),
+      weekday: date.toLocaleDateString("fr-FR", { weekday: "short" }),
+      full: date.toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+    };
+  };
+
+  // Helper function to get color based on difficulty level or score
+  const getScoreColor = (score: string) => {
+    if (!score || !score.includes("/")) return COLORS.primary;
+
+    const [achieved, total] = score.split("/").map(Number);
+    const percentage = (achieved / total) * 100;
+
+    if (percentage < 30) return "#FC4E00"; // Rouge
+    if (percentage <= 50) return "#EBB016"; // Orange
+    if (percentage <= 70) return "#F3BB00"; // Jaune
+    return "#24D26D"; // Vert
+  };
+
   // Render an activity item
   const renderActivityItem = useCallback(
     ({ item, index }: ListRenderItemInfo<Activity>) => {
-      const theme = getActivityTheme(item);
-      const dateObj = new Date(item.date);
-      const formattedDate = dateObj.toLocaleDateString("fr-FR", {
-        day: "numeric",
-        month: "short",
-      });
-      const dayName = dateObj.toLocaleDateString("fr-FR", { weekday: "short" });
+      const formattedDate = formatDate(item.date);
+      const assistant = item.assistant || "Autre";
+      const assistantColors: { [key: string]: [string, string] } = {
+        "J'Apprends": ["#4CAF50", "#2E7D32"],
+        Recherche: ["#2196F3", "#1565C0"],
+        Accueil: ["#FF9800", "#F57C00"],
+        Autre: ["#9C27B0", "#7B1FA2"],
+      };
+      const colors = assistantColors[assistant] || assistantColors.Autre;
 
       return (
         <TouchableOpacity
           onPress={() => viewActivityDetails(item)}
           style={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
             borderRadius: 16,
             marginBottom: 16,
-            padding: 16,
-            flexDirection: "row",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
             elevation: 3,
+            overflow: "hidden",
           }}
         >
-          {/* Date Column */}
-          <View style={{ marginRight: 16, alignItems: "center" }}>
-            <LinearGradient
-              colors={theme.assistant.colors}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+          {/* Top Bar with Assistant Type */}
+          <LinearGradient
+            colors={colors}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{
+              paddingVertical: 4,
+              paddingHorizontal: 16,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Text
               style={{
-                width: 48,
-                height: 48,
-                borderRadius: 12,
-                justifyContent: "center",
-                alignItems: "center",
-                marginBottom: 6,
+                fontSize: 12,
+                fontWeight: "500",
+                color: "#FFFFFF",
               }}
             >
-              <Text
-                style={{ fontSize: 18, fontWeight: "bold", color: "#FFFFFF" }}
-              >
-                {formattedDate.split(" ")[0]}
-              </Text>
-            </LinearGradient>
-            <Text style={{ fontSize: 12, fontWeight: "500", color: "#666666" }}>
-              {formattedDate.split(" ")[1]}
+              {assistant}
             </Text>
-            <Text style={{ fontSize: 12, color: "#9E9E9E" }}>{dayName}</Text>
-          </View>
+          </LinearGradient>
 
-          {/* Content Column */}
-          <View style={{ flex: 1 }}>
-            {/* Subject Badge */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 8,
-              }}
-            >
-              <LinearGradient
-                colors={theme.subject.colors}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  paddingHorizontal: 8,
-                  paddingVertical: 4,
-                  borderRadius: 12,
-                  marginRight: 8,
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={theme.subject.icon}
-                  color="#FFFFFF"
-                  size={12}
-                />
-              </LinearGradient>
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "600",
-                  color: "#333333",
-                  flex: 1,
-                }}
-              >
-                {item.activite}
-              </Text>
-            </View>
-
-            {/* Duration and Score */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 8,
-              }}
-            >
-              <FontAwesomeIcon
-                icon={faClock as IconProp}
-                color={COLORS.primary}
-                size={14}
-                style={{ marginRight: 6 }}
-              />
-              <Text style={{ fontSize: 14, color: "#666666" }}>
-                {item.duree}
-              </Text>
-
-              {item.score && (
-                <>
-                  <View
-                    style={{
-                      width: 1,
-                      height: 12,
-                      backgroundColor: "#E0E0E0",
-                      marginHorizontal: 8,
-                    }}
-                  />
-                  <FontAwesomeIcon
-                    icon={faStar as IconProp}
-                    color={COLORS.primary}
-                    size={14}
-                    style={{ marginRight: 6 }}
-                  />
+          <View style={{ padding: 16 }}>
+            {/* Date and Content */}
+            <View style={{ flexDirection: "row" }}>
+              {/* Date Column */}
+              <View style={{ alignItems: "center", marginRight: 16 }}>
+                <LinearGradient
+                  colors={colors}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 12,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: 6,
+                  }}
+                >
                   <Text
                     style={{
-                      fontSize: 14,
-                      fontWeight: "600",
-                      color: COLORS.primary,
+                      fontSize: 22,
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
                     }}
                   >
-                    {item.score}
+                    {formattedDate.day}
                   </Text>
-                </>
-              )}
-            </View>
-
-            {/* Comments if any */}
-            {item.commentaires && (
-              <View
-                style={{
-                  backgroundColor: "rgba(0, 0, 0, 0.03)",
-                  padding: 12,
-                  borderRadius: 8,
-                  marginBottom: 8,
-                }}
-              >
-                <Text style={{ fontSize: 14, color: "#666666" }}>
-                  {item.commentaires}
+                </LinearGradient>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: dark ? COLORS.secondaryWhite : "#666666",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {formattedDate.month}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: dark ? "rgba(255,255,255,0.6)" : "#9E9E9E",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {formattedDate.weekday}
                 </Text>
               </View>
-            )}
 
-            {/* View Details Button */}
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                alignItems: "center",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "500",
-                  color: COLORS.primary,
-                  marginRight: 6,
-                }}
-              >
-                Voir les détails
-              </Text>
-              <FontAwesomeIcon
-                icon={faChevronRight as IconProp}
-                color={COLORS.primary}
-                size={12}
-              />
+              {/* Content Column */}
+              <View style={{ flex: 1 }}>
+                {/* Activity Title */}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "600",
+                    color: dark ? COLORS.white : "#333333",
+                    marginBottom: 10,
+                    lineHeight: 22,
+                  }}
+                >
+                  {item.activite}
+                </Text>
+
+                {/* Tags Section */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    marginBottom: 12,
+                    gap: 8,
+                  }}
+                >
+                  {/* Duration */}
+                  <View
+                    style={{
+                      backgroundColor: dark
+                        ? "rgba(255,255,255,0.1)"
+                        : "rgba(0,0,0,0.05)",
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      borderRadius: 12,
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={"clock" as IconProp}
+                      size={12}
+                      color={dark ? COLORS.secondaryWhite : "#666666"}
+                      style={{ marginRight: 4 }}
+                    />
+                    <Text
+                      style={{
+                        color: dark ? COLORS.secondaryWhite : "#666666",
+                        fontSize: 12,
+                      }}
+                    >
+                      {item.duree}
+                    </Text>
+                  </View>
+
+                  {/* Score if available */}
+                  {item.score && (
+                    <View
+                      style={{
+                        backgroundColor: `${getScoreColor(item.score)}20`,
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        borderRadius: 12,
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={"star" as IconProp}
+                        size={12}
+                        color={getScoreColor(item.score)}
+                        style={{ marginRight: 4 }}
+                      />
+                      <Text
+                        style={{
+                          color: getScoreColor(item.score),
+                          fontSize: 12,
+                          fontWeight: "600",
+                        }}
+                      >
+                        {item.score}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Subject if available */}
+                  {item.matiere && (
+                    <View
+                      style={{
+                        backgroundColor: dark
+                          ? "rgba(255,255,255,0.1)"
+                          : "rgba(0,0,0,0.05)",
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        borderRadius: 12,
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={"book" as IconProp}
+                        size={12}
+                        color={dark ? COLORS.secondaryWhite : "#666666"}
+                        style={{ marginRight: 4 }}
+                      />
+                      <Text
+                        style={{
+                          color: dark ? COLORS.secondaryWhite : "#666666",
+                          fontSize: 12,
+                        }}
+                      >
+                        {item.matiere}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                {/* Comments if any */}
+                {item.commentaires && (
+                  <View
+                    style={{
+                      backgroundColor: dark
+                        ? "rgba(255,255,255,0.05)"
+                        : "rgba(0, 0, 0, 0.03)",
+                      padding: 12,
+                      borderRadius: 8,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: dark ? COLORS.secondaryWhite : "#666666",
+                        lineHeight: 18,
+                      }}
+                    >
+                      {item.commentaires.length > 100
+                        ? `${item.commentaires.substring(0, 100)}...`
+                        : item.commentaires}
+                    </Text>
+                  </View>
+                )}
+
+                {/* View Details Button */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: `${colors[0]}15`,
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 16,
+                    }}
+                    onPress={() => viewActivityDetails(item)}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "500",
+                        color: colors[0],
+                        marginRight: 4,
+                      }}
+                    >
+                      Voir les détails
+                    </Text>
+                    <FontAwesomeIcon
+                      icon={"chevron-right" as IconProp}
+                      color={colors[0]}
+                      size={12}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
           </View>
         </TouchableOpacity>
       );
     },
-    [viewActivityDetails]
+    [dark, viewActivityDetails]
   );
 
   // Calculate pagination
-  const totalPages = Math.ceil(
-    (filteredActivities?.length || 0) / ACTIVITIES_PER_PAGE
-  );
+  const totalActivities = filteredActivities?.length || 0;
+  const totalPages = Math.ceil(totalActivities / ACTIVITIES_PER_PAGE);
   const currentActivities = filteredActivities.slice(
     (currentPage - 1) * ACTIVITIES_PER_PAGE,
     currentPage * ACTIVITIES_PER_PAGE
@@ -497,9 +488,17 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         style={{
           flexDirection: "row",
           alignItems: "center",
-          marginBottom: 20,
-          paddingHorizontal: 16,
-          paddingVertical: 12,
+          padding: 16,
+          backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+          borderBottomWidth: 1,
+          borderBottomColor: dark
+            ? "rgba(255,255,255,0.1)"
+            : "rgba(0,0,0,0.05)",
+          elevation: 2,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.1,
+          shadowRadius: 2,
         }}
       >
         <TouchableOpacity
@@ -508,25 +507,38 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
             width: 40,
             height: 40,
             borderRadius: 20,
+            backgroundColor: dark
+              ? "rgba(255,255,255,0.08)"
+              : "rgba(0,0,0,0.05)",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.05)",
             marginRight: 16,
           }}
         >
           <FontAwesomeIcon
-            icon={faArrowLeft as IconProp}
-            size={20}
-            color="#333333"
+            icon={"arrow-left" as IconProp}
+            size={18}
+            color={dark ? COLORS.white : COLORS.black}
           />
         </TouchableOpacity>
 
         <View>
-          <Text style={{ fontSize: 20, fontWeight: "bold", color: "#333333" }}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "bold",
+              color: dark ? COLORS.white : COLORS.black,
+            }}
+          >
             Historique d'activités
           </Text>
           {childData && (
-            <Text style={{ fontSize: 14, color: "#666666" }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: dark ? COLORS.secondaryWhite : "#666666",
+              }}
+            >
               {childData.name} • {childData.classe}
             </Text>
           )}
@@ -535,255 +547,547 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
     );
   };
 
-  // Main content
-  const renderContent = () => (
-    <View style={{ flex: 1 }}>
-      {/* Search and Filter Bar */}
-      <View
+  // Empty activities view
+  const renderEmptyActivities = () => (
+    <View
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 30,
+        backgroundColor: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
+        borderRadius: 16,
+        marginBottom: 20,
+      }}
+    >
+      <Text
         style={{
-          backgroundColor: "#FFFFFF",
-          borderRadius: 12,
-          padding: 16,
-          marginHorizontal: 16,
-          marginBottom: 16,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 8,
-          elevation: 3,
+          color: dark ? COLORS.white : COLORS.black,
+          fontSize: 18,
+          fontWeight: "600",
+          marginBottom: 10,
+          textAlign: "center",
         }}
       >
-        {/* Search Box */}
-        <View
+        Aucune activité trouvée
+      </Text>
+      <Text
+        style={{
+          color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+          fontSize: 15,
+          textAlign: "center",
+          marginBottom: 16,
+        }}
+      >
+        {hasActiveFilters()
+          ? "Essayez de modifier vos filtres pour voir plus d'activités."
+          : "Il n'y a pas encore d'activités à afficher pour cet enfant."}
+      </Text>
+
+      {hasActiveFilters() && (
+        <TouchableOpacity
+          style={{
+            backgroundColor: COLORS.primary,
+            paddingHorizontal: 20,
+            paddingVertical: 12,
+            borderRadius: 25,
+            elevation: 2,
+            shadowColor: COLORS.primary,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+          }}
+          onPress={resetActivityFilters}
+        >
+          <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>
+            Réinitialiser les filtres
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      {!hasActiveFilters() && (
+        <TouchableOpacity
           style={{
             flexDirection: "row",
             alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.05)",
-            borderRadius: 8,
-            paddingHorizontal: 12,
-            marginBottom: 12,
+            marginTop: 5,
           }}
+          onPress={() => setShowEmptyTips(true)}
         >
           <FontAwesomeIcon
-            icon={faSearch as IconProp}
-            color="#9E9E9E"
+            icon={"lightbulb" as IconProp}
             size={16}
+            color={COLORS.primary}
+            style={{ marginRight: 8 }}
           />
-          <TextInput
-            placeholder="Rechercher une activité..."
-            value={searchKeyword}
-            onChangeText={setSearchKeyword}
-            style={{
-              flex: 1,
-              paddingVertical: 10,
-              paddingHorizontal: 12,
-              color: "#333333",
-            }}
-          />
-          {searchKeyword ? (
-            <TouchableOpacity onPress={() => setSearchKeyword("")}>
-              <FontAwesomeIcon
-                icon={faTimesCircle as IconProp}
-                color="#9E9E9E"
-                size={16}
-              />
-            </TouchableOpacity>
-          ) : null}
-        </View>
+          <Text style={{ color: COLORS.primary, fontWeight: "500" }}>
+            Conseils pour démarrer
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 
-        {/* Filter Buttons */}
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "rgba(0,0,0,0.05)",
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              borderRadius: 8,
-              marginRight: 8,
-              flex: 1,
-            }}
-          >
-            <FontAwesomeIcon
-              icon={faCalendar as IconProp}
-              color="#9E9E9E"
-              size={16}
-              style={{ marginRight: 8 }}
-            />
-            <Text style={{ color: "#666666", fontSize: 14 }}>
-              Filtrer par date
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "rgba(0,0,0,0.05)",
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              borderRadius: 8,
-              marginLeft: 8,
-              flex: 1,
-            }}
-          >
-            <FontAwesomeIcon
-              icon={faFilter as IconProp}
-              color="#9E9E9E"
-              size={16}
-              style={{ marginRight: 8 }}
-            />
-            <Text style={{ color: "#666666", fontSize: 14 }}>
-              Plus de filtres
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Active Filters - show only if filters are applied */}
-        {(searchKeyword || dateRange.startDate || dateRange.endDate) && (
+  // Empty tips modal
+  const renderEmptyTipsModal = () => (
+    <Modal
+      visible={showEmptyTips}
+      transparent
+      animationType="fade"
+      onRequestClose={() => setShowEmptyTips(false)}
+    >
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <View
+          style={{
+            width: "90%",
+            maxHeight: "80%",
+            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            borderRadius: 16,
+            padding: 20,
+            elevation: 5,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 8,
+          }}
+        >
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              backgroundColor: "rgba(255, 142, 105, 0.1)",
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              borderRadius: 8,
-              marginTop: 12,
+              marginBottom: 20,
             }}
           >
-            <Text style={{ color: COLORS.primary, fontSize: 14 }}>
-              {filteredActivities.length} résultat(s) trouvé(s)
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+                color: dark ? COLORS.white : COLORS.black,
+              }}
+            >
+              Conseils pour démarrer
             </Text>
-            <TouchableOpacity onPress={resetFilters}>
-              <Text
-                style={{
-                  color: COLORS.primary,
-                  fontSize: 14,
-                  fontWeight: "600",
-                }}
-              >
-                Réinitialiser
-              </Text>
+            <TouchableOpacity
+              onPress={() => setShowEmptyTips(false)}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: dark
+                  ? "rgba(255,255,255,0.1)"
+                  : "rgba(0,0,0,0.05)",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <FontAwesomeIcon
+                icon={"times" as IconProp}
+                size={16}
+                color={dark ? COLORS.white : COLORS.black}
+              />
             </TouchableOpacity>
           </View>
+
+          <FlatList
+            data={[
+              {
+                id: "1",
+                title: "Encouragez l'utilisation des assistants",
+                description:
+                  "Les assistants intelligents proposent des exercices adaptés au niveau de l'enfant. Plus ils sont utilisés, plus l'historique sera riche.",
+                icon: "robot" as IconProp,
+              },
+              {
+                id: "2",
+                title: "Planifiez des sessions régulières",
+                description:
+                  "Établissez un calendrier d'apprentissage régulier pour maintenir l'engagement et voir les progrès dans l'historique.",
+                icon: "calendar-alt" as IconProp,
+              },
+              {
+                id: "3",
+                title: "Explorez différentes matières",
+                description:
+                  "Encouragez l'enfant à explorer diverses matières pour développer un apprentissage équilibré et varié.",
+                icon: "book" as IconProp,
+              },
+              {
+                id: "4",
+                title: "Suivez les progrès régulièrement",
+                description:
+                  "Consultez régulièrement l'historique pour identifier les forces et les points à améliorer.",
+                icon: "chart-line" as IconProp,
+              },
+            ]}
+            renderItem={({ item }) => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginBottom: 16,
+                  backgroundColor: dark
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.02)",
+                  padding: 16,
+                  borderRadius: 12,
+                }}
+              >
+                <View
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
+                    backgroundColor: COLORS.primary,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginRight: 16,
+                  }}
+                >
+                  <FontAwesomeIcon icon={item.icon} size={20} color="#FFFFFF" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "600",
+                      color: dark ? COLORS.white : COLORS.black,
+                      marginBottom: 6,
+                    }}
+                  >
+                    {item.title}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      lineHeight: 20,
+                    }}
+                  >
+                    {item.description}
+                  </Text>
+                </View>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+          />
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: COLORS.primary,
+              paddingVertical: 14,
+              borderRadius: 12,
+              alignItems: "center",
+              marginTop: 10,
+              elevation: 2,
+              shadowColor: COLORS.primary,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+            }}
+            onPress={() => setShowEmptyTips(false)}
+          >
+            <Text
+              style={{
+                color: "#FFFFFF",
+                fontWeight: "600",
+                fontSize: 16,
+              }}
+            >
+              Compris
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
+  // Main content
+  const renderContent = () => (
+    <Animated.View
+      style={{
+        flex: 1,
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }],
+      }}
+    >
+      {/* Search and Filter Bar */}
+      <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+        <SearchBar
+          searchKeyword={searchKeyword}
+          setSearchKeyword={setSearchKeyword}
+          dark={dark}
+          activityDateRange={activityDateRange}
+          toggleActivityCalendar={() => toggleActivityCalendar("start")}
+          resetAllFilters={resetActivityFilters}
+          hasFilters={hasActiveFilters()}
+        />
+
+        {/* Date Range Indicator */}
+        {(activityDateRange.startDate || activityDateRange.endDate) && (
+          <DateRangeIndicator
+            activityDateRange={activityDateRange}
+            setActivityDateRange={(range: {
+              startDate: string | null;
+              endDate: string | null;
+            }) => {
+              setActivityDateRange(range);
+            }}
+            dark={dark}
+          />
+        )}
+
+        {/* Assistant Type Filters */}
+        {uniqueAssistantTypes.length > 0 && (
+          <AssistantTypeFilters
+            uniqueAssistantTypes={uniqueAssistantTypes}
+            selectedAssistantTypes={advancedFilters.selectedAssistants}
+            setSelectedAssistantTypes={(assistantsUpdater) => {
+              if (typeof assistantsUpdater === "function") {
+                const newAssistants = assistantsUpdater(
+                  advancedFilters.selectedAssistants
+                );
+                setAdvancedFilters({ selectedAssistants: newAssistants });
+              } else {
+                setAdvancedFilters({ selectedAssistants: assistantsUpdater });
+              }
+            }}
+            dark={dark}
+          />
+        )}
+
+        {/* Subject Filters - Only show if J'Apprends is selected */}
+        {advancedFilters.selectedAssistants.includes("J'Apprends") &&
+          availableSubjects.length > 0 && (
+            <SubjectFilters
+              availableSubjects={availableSubjects}
+              selectedSubjects={advancedFilters.selectedSubjects}
+              setSelectedSubjects={(subjects) =>
+                setAdvancedFilters({ selectedSubjects: subjects })
+              }
+              dark={dark}
+            />
+          )}
+
+        {/* Advanced Filter Toggle Button */}
+        {advancedFilters.selectedAssistants.includes("J'Apprends") &&
+          (availableChapters.length > 0 || availableExercises.length > 0) && (
+            <TouchableOpacity
+              style={{
+                backgroundColor: dark
+                  ? "rgba(255,255,255,0.08)"
+                  : "rgba(0,0,0,0.05)",
+                borderRadius: 25,
+                paddingVertical: 10,
+                paddingHorizontal: 16,
+                marginBottom: 16,
+                alignSelf: "center",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+              onPress={toggleAdvancedFilters}
+            >
+              <FontAwesomeIcon
+                icon={
+                  (showAdvancedFilters
+                    ? "chevron-up"
+                    : "chevron-down") as IconProp
+                }
+                size={14}
+                color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={{
+                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  fontSize: 14,
+                }}
+              >
+                {showAdvancedFilters
+                  ? "Masquer les filtres avancés"
+                  : "Afficher plus de filtres"}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+        {/* Advanced Filters - Chapters and Exercises */}
+        {showAdvancedFilters && (
+          <>
+            {/* Chapters Filter */}
+            {advancedFilters.selectedSubjects.length > 0 &&
+              availableChapters.length > 0 && (
+                <ChapterFilters
+                  availableChapters={availableChapters}
+                  selectedChapters={advancedFilters.selectedChapters}
+                  setSelectedChapters={(chapters) =>
+                    setAdvancedFilters({ selectedChapters: chapters })
+                  }
+                  dark={dark}
+                />
+              )}
+
+            {/* Exercises Filter */}
+            {advancedFilters.selectedChapters.length > 0 &&
+              availableExercises.length > 0 && (
+                <ExerciseFilters
+                  availableExercises={availableExercises}
+                  selectedExercises={advancedFilters.selectedExercises}
+                  setSelectedExercises={(exercises) =>
+                    setAdvancedFilters({ selectedExercises: exercises })
+                  }
+                  dark={dark}
+                />
+              )}
+          </>
         )}
       </View>
 
       {/* Activities List */}
-      <View
-        style={{
-          flex: 1,
-          marginHorizontal: 16,
-          backgroundColor: isLoading ? "transparent" : "#FFFFFF",
-          borderRadius: 12,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 8,
-          elevation: 3,
-        }}
-      >
+      <View style={{ flex: 1, paddingHorizontal: 16, marginTop: 16 }}>
         {isLoading ? (
           <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: dark
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(0,0,0,0.02)",
+              borderRadius: 16,
+              padding: 30,
+              marginBottom: 20,
+            }}
           >
             <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={{ marginTop: 16, color: "#666666" }}>
+            <Text
+              style={{
+                marginTop: 16,
+                color: dark ? COLORS.white : COLORS.black,
+                fontSize: 16,
+              }}
+            >
               Chargement des activités...
             </Text>
           </View>
         ) : (
           <>
+            {/* Results Counter */}
+            {hasActiveFilters() && (
+              <View
+                style={{
+                  backgroundColor: dark
+                    ? "rgba(255, 142, 105, 0.2)"
+                    : "rgba(255, 142, 105, 0.1)",
+                  borderRadius: 12,
+                  padding: 12,
+                  marginBottom: 16,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text
+                  style={{
+                    color: COLORS.primary,
+                    fontWeight: "500",
+                    fontSize: 14,
+                  }}
+                >
+                  {filteredActivities.length}{" "}
+                  {filteredActivities.length > 1
+                    ? "activités trouvées"
+                    : "activité trouvée"}
+                </Text>
+                <TouchableOpacity onPress={resetActivityFilters}>
+                  <Text
+                    style={{
+                      color: COLORS.primary,
+                      fontWeight: "600",
+                      fontSize: 14,
+                    }}
+                  >
+                    Réinitialiser
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
             <FlatList
               ref={flatListRef}
               data={currentActivities}
               renderItem={renderActivityItem}
-              keyExtractor={(item) => `activity-${item.id || "unknown"}`}
+              keyExtractor={(item, index) => `activity-${item.id || index}`}
               contentContainerStyle={{
-                padding: 16,
-                paddingBottom: isTabComponent ? 80 : 16,
+                paddingBottom: isTabComponent ? 100 : 20,
               }}
               showsVerticalScrollIndicator={false}
-              ListEmptyComponent={() => (
-                <View
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: 30,
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faHourglassEmpty as IconProp}
-                    size={50}
-                    color="#CCCCCC"
-                  />
-                  <Text
-                    style={{ marginTop: 16, color: "#666666", fontSize: 16 }}
-                  >
-                    Aucune activité trouvée
-                  </Text>
-                </View>
-              )}
+              ListEmptyComponent={renderEmptyActivities}
             />
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
+            {/* Pagination Controls - Only show if there are activities and multiple pages */}
+            {totalActivities > 0 && totalPages > 1 && (
               <View
                 style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  borderTopWidth: 1,
-                  borderTopColor: "rgba(0, 0, 0, 0.05)",
-                  backgroundColor: "#FFFFFF",
-                  borderBottomLeftRadius: 12,
-                  borderBottomRightRadius: 12,
+                  paddingVertical: 16,
+                  backgroundColor: dark ? COLORS.dark1 : "transparent",
                 }}
               >
                 {/* Previous Page Button */}
                 <TouchableOpacity
                   style={{
-                    width: 40,
-                    height: 40,
+                    width: 44,
+                    height: 44,
                     justifyContent: "center",
                     alignItems: "center",
-                    borderRadius: 20,
+                    borderRadius: 22,
                     backgroundColor:
                       currentPage === 1
-                        ? "rgba(0, 0, 0, 0.05)"
+                        ? dark
+                          ? "rgba(255,255,255,0.1)"
+                          : "rgba(0, 0, 0, 0.05)"
                         : "rgba(255, 142, 105, 0.1)",
+                    opacity: currentPage === 1 ? 0.5 : 1,
                   }}
                   onPress={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage <= 1}
                 >
                   <FontAwesomeIcon
-                    icon={faArrowLeft as IconProp}
-                    color={currentPage === 1 ? "#CCCCCC" : COLORS.primary}
-                    size={16}
+                    icon={"chevron-left" as IconProp}
+                    color={
+                      currentPage === 1
+                        ? dark
+                          ? "#CCCCCC"
+                          : "#999999"
+                        : COLORS.primary
+                    }
+                    size={18}
                   />
                 </TouchableOpacity>
 
                 {/* Page Number Indicator */}
                 <View
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "rgba(0, 0, 0, 0.05)",
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    borderRadius: 16,
+                    backgroundColor: dark
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(0, 0, 0, 0.05)",
+                    paddingHorizontal: 20,
+                    paddingVertical: 10,
+                    borderRadius: 25,
                   }}
                 >
                   <Text
                     style={{
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: "600",
-                      color: "#333333",
+                      color: dark ? COLORS.white : COLORS.black,
                     }}
                   >
                     {currentPage} / {totalPages}
@@ -793,25 +1097,32 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                 {/* Next Page Button */}
                 <TouchableOpacity
                   style={{
-                    width: 40,
-                    height: 40,
+                    width: 44,
+                    height: 44,
                     justifyContent: "center",
                     alignItems: "center",
-                    borderRadius: 20,
+                    borderRadius: 22,
                     backgroundColor:
                       currentPage === totalPages
-                        ? "rgba(0, 0, 0, 0.05)"
+                        ? dark
+                          ? "rgba(255,255,255,0.1)"
+                          : "rgba(0, 0, 0, 0.05)"
                         : "rgba(255, 142, 105, 0.1)",
+                    opacity: currentPage === totalPages ? 0.5 : 1,
                   }}
                   onPress={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage >= totalPages}
                 >
                   <FontAwesomeIcon
-                    icon={faArrowRight as IconProp}
+                    icon={"chevron-right" as IconProp}
                     color={
-                      currentPage === totalPages ? "#CCCCCC" : COLORS.primary
+                      currentPage === totalPages
+                        ? dark
+                          ? "#CCCCCC"
+                          : "#999999"
+                        : COLORS.primary
                     }
-                    size={16}
+                    size={18}
                   />
                 </TouchableOpacity>
               </View>
@@ -820,18 +1131,66 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         )}
       </View>
 
-      {/* Bottom space for tab mode */}
-      {isTabComponent && <View style={{ height: 80 }} />}
-    </View>
+      {/* Filter Modal */}
+      <FilterModal
+        showActivityCalendar={showActivityCalendar}
+        toggleActivityCalendar={toggleActivityCalendar}
+        dark={dark}
+        searchKeyword={searchKeyword}
+        setSearchKeyword={setSearchKeyword}
+        uniqueAssistantTypes={uniqueAssistantTypes}
+        selectedAssistantTypes={advancedFilters.selectedAssistants}
+        setSelectedAssistantTypes={(assistantsUpdater) => {
+          if (typeof assistantsUpdater === "function") {
+            const newAssistants = assistantsUpdater(
+              advancedFilters.selectedAssistants
+            );
+            setAdvancedFilters({ selectedAssistants: newAssistants });
+          } else {
+            setAdvancedFilters({ selectedAssistants: assistantsUpdater });
+          }
+        }}
+        activityCalendarMode={activityCalendarMode}
+        activityDateRange={activityDateRange}
+        handleActivityDayPress={handleActivityDayPress}
+        resetAllFilters={resetActivityFilters}
+        availableSubjects={availableSubjects}
+        availableChapters={availableChapters}
+        availableExercises={availableExercises}
+        advancedFilters={advancedFilters}
+        setAdvancedFilters={setAdvancedFilters}
+      />
+
+      {/* Empty Tips Modal */}
+      {renderEmptyTipsModal()}
+    </Animated.View>
   );
 
   // Component layout varies based on isTabComponent
   if (isTabComponent) {
-    return <>{renderContent()}</>;
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: dark ? COLORS.dark1 : "#F8F8F8",
+        }}
+      >
+        {renderContent()}
+      </View>
+    );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: dark ? COLORS.dark1 : "#F8F8F8",
+      }}
+    >
+      <StatusBar
+        barStyle={dark ? "light-content" : "dark-content"}
+        backgroundColor={dark ? COLORS.dark1 : "#FFFFFF"}
+      />
       {renderHeader()}
       {renderContent()}
     </SafeAreaView>
