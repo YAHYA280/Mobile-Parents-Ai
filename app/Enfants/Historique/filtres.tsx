@@ -932,6 +932,7 @@ interface FilterModalProps {
   setAdvancedFilters: (filters: any) => void;
 }
 
+// Modified FilterModal component for filtres.tsx
 export const FilterModal: React.FC<FilterModalProps> = ({
   showActivityCalendar,
   toggleActivityCalendar,
@@ -945,9 +946,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   activityDateRange,
   handleActivityDayPress,
   resetAllFilters,
-  availableSubjects,
-  availableChapters,
-  availableExercises,
   advancedFilters,
   setAdvancedFilters,
 }) => {
@@ -992,7 +990,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       ? "Sélectionner une date de début"
       : "Sélectionner une date de fin";
 
-  // Improved getMarkedDates function for FilterModal
   const getMarkedDates = () => {
     const marked: { [date: string]: any } = {};
 
@@ -1191,8 +1188,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 </TouchableOpacity>
               )}
             </View>
-            {/* CALENDAR SECTION */}
-            // Modified Calendar Section for FilterModal in filtres.tsx
+
             {/* CALENDAR SECTION */}
             <View style={{ marginBottom: 24 }}>
               <View
@@ -1330,7 +1326,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 enableSwipeMonths
               />
             </View>
-            {/* ADVANCED FILTERS */}
+
+            {/* ONLY KEEPING ASSISTANT TYPE FILTERS */}
             {uniqueAssistantTypes.length > 0 && (
               <AssistantTypeFilters
                 uniqueAssistantTypes={uniqueAssistantTypes}
@@ -1356,48 +1353,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 dark={dark}
               />
             )}
-            {advancedFilters.selectedAssistants?.includes("J'Apprends") &&
-              availableSubjects.length > 0 && (
-                <SubjectFilters
-                  availableSubjects={availableSubjects}
-                  selectedSubjects={advancedFilters.selectedSubjects || []}
-                  setSelectedSubjects={(subjects) =>
-                    setAdvancedFilters({
-                      ...advancedFilters,
-                      selectedSubjects: subjects,
-                    })
-                  }
-                  dark={dark}
-                />
-              )}
-            {advancedFilters.selectedSubjects?.length > 0 &&
-              availableChapters.length > 0 && (
-                <ChapterFilters
-                  availableChapters={availableChapters}
-                  selectedChapters={advancedFilters.selectedChapters || []}
-                  setSelectedChapters={(chapters) =>
-                    setAdvancedFilters({
-                      ...advancedFilters,
-                      selectedChapters: chapters,
-                    })
-                  }
-                  dark={dark}
-                />
-              )}
-            {advancedFilters.selectedChapters?.length > 0 &&
-              availableExercises.length > 0 && (
-                <ExerciseFilters
-                  availableExercises={availableExercises}
-                  selectedExercises={advancedFilters.selectedExercises || []}
-                  setSelectedExercises={(exercises) =>
-                    setAdvancedFilters({
-                      ...advancedFilters,
-                      selectedExercises: exercises,
-                    })
-                  }
-                  dark={dark}
-                />
-              )}
           </ScrollView>
 
           {/* ACTION BUTTONS */}

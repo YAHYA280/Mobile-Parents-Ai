@@ -808,6 +808,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
   );
 
   // Main content
+  // Fixed renderContent function to ensure all text is properly wrapped
   const renderContent = () => (
     <Animated.View
       style={{
@@ -842,7 +843,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
           />
         )}
 
-        {/* Assistant Type Filters */}
+        {/* Assistant Type Filters - ONLY KEEPING THIS FILTER */}
         {uniqueAssistantTypes.length > 0 && (
           <AssistantTypeFilters
             uniqueAssistantTypes={uniqueAssistantTypes}
@@ -861,90 +862,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
           />
         )}
 
-        {/* Subject Filters - Only show if J'Apprends is selected */}
-        {advancedFilters.selectedAssistants.includes("J'Apprends") &&
-          availableSubjects.length > 0 && (
-            <SubjectFilters
-              availableSubjects={availableSubjects}
-              selectedSubjects={advancedFilters.selectedSubjects}
-              setSelectedSubjects={(subjects) =>
-                setAdvancedFilters({ selectedSubjects: subjects })
-              }
-              dark={dark}
-            />
-          )}
-
-        {/* Advanced Filter Toggle Button */}
-        {advancedFilters.selectedAssistants.includes("J'Apprends") &&
-          (availableChapters.length > 0 || availableExercises.length > 0) && (
-            <TouchableOpacity
-              style={{
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(0,0,0,0.05)",
-                borderRadius: 25,
-                paddingVertical: 10,
-                paddingHorizontal: 16,
-                marginBottom: 16,
-                alignSelf: "center",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-              onPress={toggleAdvancedFilters}
-            >
-              <FontAwesomeIcon
-                icon={
-                  (showAdvancedFilters
-                    ? "chevron-up"
-                    : "chevron-down") as IconProp
-                }
-                size={14}
-                color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-                style={{ marginRight: 8 }}
-              />
-              <Text
-                style={{
-                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
-                  fontSize: 14,
-                }}
-              >
-                {showAdvancedFilters
-                  ? "Masquer les filtres avancés"
-                  : "Afficher plus de filtres"}
-              </Text>
-            </TouchableOpacity>
-          )}
-
-        {/* Advanced Filters - Chapters and Exercises */}
-        {showAdvancedFilters && (
-          <>
-            {/* Chapters Filter */}
-            {advancedFilters.selectedSubjects.length > 0 &&
-              availableChapters.length > 0 && (
-                <ChapterFilters
-                  availableChapters={availableChapters}
-                  selectedChapters={advancedFilters.selectedChapters}
-                  setSelectedChapters={(chapters) =>
-                    setAdvancedFilters({ selectedChapters: chapters })
-                  }
-                  dark={dark}
-                />
-              )}
-
-            {/* Exercises Filter */}
-            {advancedFilters.selectedChapters.length > 0 &&
-              availableExercises.length > 0 && (
-                <ExerciseFilters
-                  availableExercises={availableExercises}
-                  selectedExercises={advancedFilters.selectedExercises}
-                  setSelectedExercises={(exercises) =>
-                    setAdvancedFilters({ selectedExercises: exercises })
-                  }
-                  dark={dark}
-                />
-              )}
-          </>
-        )}
+        {/* All other filters have been removed */}
       </View>
 
       {/* Activities List */}
@@ -1090,7 +1008,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                       color: dark ? COLORS.white : COLORS.black,
                     }}
                   >
-                    {currentPage} / {totalPages}
+                    {`${currentPage} / ${totalPages}`}
                   </Text>
                 </View>
 
@@ -1131,7 +1049,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         )}
       </View>
 
-      {/* Filter Modal */}
+      {/* Use the fixed FilterModal component here */}
       <FilterModal
         showActivityCalendar={showActivityCalendar}
         toggleActivityCalendar={toggleActivityCalendar}
@@ -1154,9 +1072,9 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         activityDateRange={activityDateRange}
         handleActivityDayPress={handleActivityDayPress}
         resetAllFilters={resetActivityFilters}
-        availableSubjects={availableSubjects}
-        availableChapters={availableChapters}
-        availableExercises={availableExercises}
+        availableSubjects={[]}
+        availableChapters={[]}
+        availableExercises={[]}
         advancedFilters={advancedFilters}
         setAdvancedFilters={setAdvancedFilters}
       />

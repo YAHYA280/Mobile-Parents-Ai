@@ -22,8 +22,10 @@ interface ActivityFiltersState {
   };
 }
 
+// Modified useActivityFilters hook in filtre.ts
 export const useActivityFilters = (activities: Activity[]) => {
   // Initialize filter state with proper default values for all properties
+  // Only keeping basic filters and the assistants filter
   const [filters, setFilters] = useState<ActivityFiltersState>({
     searchKeyword: "",
     activityDateRange: {
@@ -33,21 +35,16 @@ export const useActivityFilters = (activities: Activity[]) => {
     showActivityCalendar: false,
     activityCalendarMode: "start",
     advancedFilters: {
-      selectedAssistants: [], // Initialize as empty array, not undefined
-      selectedSubjects: [],
-      selectedChapters: [],
-      selectedExercises: [],
+      selectedAssistants: [], // Only keeping this filter
+      selectedSubjects: [], // These will not be used in the UI anymore
+      selectedChapters: [], // These will not be used in the UI anymore
+      selectedExercises: [], // These will not be used in the UI anymore
     },
   });
 
   const [filteredActivities, setFilteredActivities] = useState<Activity[]>(
     activities || []
   );
-
-  // Options state with default values
-  const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
-  const [availableChapters, setAvailableChapters] = useState<string[]>([]);
-  const [availableExercises, setAvailableExercises] = useState<string[]>([]);
 
   // Get available assistants from activities
   const getAvailableAssistants = () => {
@@ -64,137 +61,6 @@ export const useActivityFilters = (activities: Activity[]) => {
 
     return assistants;
   };
-
-  // Update available subjects when selected assistants change
-  useEffect(() => {
-    // Ensure selectedAssistants exists before trying to use it
-    if (!filters.advancedFilters.selectedAssistants) {
-      return;
-    }
-
-    if (filters.advancedFilters.selectedAssistants.includes("J'Apprends")) {
-      // Filter activities by the selected assistant
-      const enhancedActivities = activities.map((activity) =>
-        enhanceActivity(activity)
-      );
-      const assistantActivities = enhancedActivities.filter(
-        (activity) => activity.assistant === "J'Apprends"
-      );
-
-      // Extract unique subjects
-      const subjects = assistantActivities
-        .map((activity) => activity.matiere)
-        .filter(
-          (value, index, self) =>
-            value && typeof value === "string" && self.indexOf(value) === index
-        ) as string[];
-
-      setAvailableSubjects(subjects);
-    } else {
-      setAvailableSubjects([]);
-      // Reset cascade filters when J'Apprends is not selected
-      setFilters((prev) => ({
-        ...prev,
-        advancedFilters: {
-          ...prev.advancedFilters,
-          selectedSubjects: [],
-          selectedChapters: [],
-          selectedExercises: [],
-        },
-      }));
-    }
-  }, [filters.advancedFilters.selectedAssistants, activities]);
-
-  // Update available chapters when selected subjects change
-  useEffect(() => {
-    if (
-      !filters.advancedFilters.selectedSubjects ||
-      filters.advancedFilters.selectedSubjects.length === 0
-    ) {
-      setAvailableChapters([]);
-      return;
-    }
-
-    const enhancedActivities = activities.map((activity) =>
-      enhanceActivity(activity)
-    );
-    const subjectActivities = enhancedActivities.filter(
-      (activity) =>
-        activity.assistant === "J'Apprends" &&
-        activity.matiere &&
-        filters.advancedFilters.selectedSubjects.includes(activity.matiere)
-    );
-
-    // Extract unique chapters
-    const chapters = subjectActivities
-      .map((activity) => activity.chapitre)
-      .filter(
-        (value, index, self) =>
-          value && typeof value === "string" && self.indexOf(value) === index
-      ) as string[];
-
-    setAvailableChapters(chapters);
-
-    // Reset exercise selection when subjects change
-    if (filters.advancedFilters.selectedChapters.length > 0) {
-      setFilters((prev) => ({
-        ...prev,
-        advancedFilters: {
-          ...prev.advancedFilters,
-          selectedChapters: [],
-          selectedExercises: [],
-        },
-      }));
-    }
-  }, [filters.advancedFilters.selectedSubjects, activities]);
-
-  // Update available exercises when selected chapters change
-  useEffect(() => {
-    if (
-      !filters.advancedFilters.selectedChapters ||
-      filters.advancedFilters.selectedChapters.length === 0
-    ) {
-      setAvailableExercises([]);
-      return;
-    }
-
-    const enhancedActivities = activities.map((activity) =>
-      enhanceActivity(activity)
-    );
-    const chapterActivities = enhancedActivities.filter(
-      (activity) =>
-        activity.assistant === "J'Apprends" &&
-        activity.matiere &&
-        filters.advancedFilters.selectedSubjects.includes(activity.matiere) &&
-        activity.chapitre &&
-        filters.advancedFilters.selectedChapters.includes(activity.chapitre)
-    );
-
-    // Extract unique exercises
-    const exercises = chapterActivities
-      .map((activity) => activity.typeExercice)
-      .filter(
-        (value, index, self) =>
-          value && typeof value === "string" && self.indexOf(value) === index
-      ) as string[];
-
-    setAvailableExercises(exercises);
-
-    // Reset exercise selection when chapters change
-    if (filters.advancedFilters.selectedExercises.length > 0) {
-      setFilters((prev) => ({
-        ...prev,
-        advancedFilters: {
-          ...prev.advancedFilters,
-          selectedExercises: [],
-        },
-      }));
-    }
-  }, [
-    filters.advancedFilters.selectedChapters,
-    filters.advancedFilters.selectedSubjects,
-    activities,
-  ]);
 
   // Apply filters whenever activities or filter state changes
   useEffect(() => {
@@ -254,7 +120,7 @@ export const useActivityFilters = (activities: Activity[]) => {
       });
     }
 
-    // Apply assistant filter
+    // Apply assistant filter - THE ONLY ADVANCED FILTER WE'RE KEEPING
     if (
       filters.advancedFilters.selectedAssistants &&
       filters.advancedFilters.selectedAssistants.length > 0
@@ -268,43 +134,7 @@ export const useActivityFilters = (activities: Activity[]) => {
       );
     }
 
-    // Apply subject filter
-    if (
-      filters.advancedFilters.selectedSubjects &&
-      filters.advancedFilters.selectedSubjects.length > 0
-    ) {
-      result = result.filter(
-        (activity) =>
-          activity.matiere &&
-          filters.advancedFilters.selectedSubjects.includes(activity.matiere)
-      );
-    }
-
-    // Apply chapter filter
-    if (
-      filters.advancedFilters.selectedChapters &&
-      filters.advancedFilters.selectedChapters.length > 0
-    ) {
-      result = result.filter(
-        (activity) =>
-          activity.chapitre &&
-          filters.advancedFilters.selectedChapters.includes(activity.chapitre)
-      );
-    }
-
-    // Apply exercise filter
-    if (
-      filters.advancedFilters.selectedExercises &&
-      filters.advancedFilters.selectedExercises.length > 0
-    ) {
-      result = result.filter(
-        (activity) =>
-          activity.typeExercice &&
-          filters.advancedFilters.selectedExercises.includes(
-            activity.typeExercice
-          )
-      );
-    }
+    // Removed other advanced filters (subjects, chapters, exercises)
 
     setFilteredActivities(result);
   }, [activities, filters]);
@@ -328,8 +158,6 @@ export const useActivityFilters = (activities: Activity[]) => {
     }));
   };
 
-  // Toggle calendar visibility with mode
-  // Fixed toggleActivityCalendar function for filtre.ts
   // Toggle calendar visibility with mode
   const toggleActivityCalendar = (mode: "start" | "end" = "start") => {
     setFilters((prev) => {
@@ -363,8 +191,8 @@ export const useActivityFilters = (activities: Activity[]) => {
       };
     });
   };
+
   // Handle date selection
-  // Fixed handleActivityDayPress function for filtre.ts
   const handleActivityDayPress = (day: { dateString: string }) => {
     const selectedDate = day.dateString;
 
@@ -418,9 +246,11 @@ export const useActivityFilters = (activities: Activity[]) => {
       }
     });
   };
-  // Set advanced filters - with safe type checking
+
+  // Simplified setAdvancedFilters to only handle assistant selection
   const setAdvancedFilters = (newFilters: {
     selectedAssistants?: string[];
+    // Removed other filters, but kept the interface for compatibility
     selectedSubjects?: string[];
     selectedChapters?: string[];
     selectedExercises?: string[];
@@ -432,6 +262,7 @@ export const useActivityFilters = (activities: Activity[]) => {
         ...(newFilters.selectedAssistants !== undefined
           ? { selectedAssistants: newFilters.selectedAssistants }
           : {}),
+        // Keep these for backward compatibility but they won't be used
         ...(newFilters.selectedSubjects !== undefined
           ? { selectedSubjects: newFilters.selectedSubjects }
           : {}),
@@ -471,13 +302,8 @@ export const useActivityFilters = (activities: Activity[]) => {
       filters.activityDateRange.startDate !== null ||
       filters.activityDateRange.endDate !== null ||
       (filters.advancedFilters.selectedAssistants &&
-        filters.advancedFilters.selectedAssistants.length > 0) ||
-      (filters.advancedFilters.selectedSubjects &&
-        filters.advancedFilters.selectedSubjects.length > 0) ||
-      (filters.advancedFilters.selectedChapters &&
-        filters.advancedFilters.selectedChapters.length > 0) ||
-      (filters.advancedFilters.selectedExercises &&
-        filters.advancedFilters.selectedExercises.length > 0)
+        filters.advancedFilters.selectedAssistants.length > 0)
+      // Removed other filter checks
     );
   };
 
@@ -492,9 +318,6 @@ export const useActivityFilters = (activities: Activity[]) => {
       searchKeyword: filters.searchKeyword,
       dateRange: filters.activityDateRange,
       advancedFilters: filters.advancedFilters,
-      availableSubjects,
-      availableChapters,
-      availableExercises,
     });
   };
 
@@ -505,10 +328,10 @@ export const useActivityFilters = (activities: Activity[]) => {
     activityCalendarMode: filters.activityCalendarMode,
     advancedFilters: filters.advancedFilters,
     filteredActivities,
-    // Return available options for UI
-    availableSubjects,
-    availableChapters,
-    availableExercises,
+    // No longer needed but kept for compatibility
+    availableSubjects: [],
+    availableChapters: [],
+    availableExercises: [],
     // Functions
     setSearchKeyword,
     toggleActivityCalendar,
@@ -518,6 +341,6 @@ export const useActivityFilters = (activities: Activity[]) => {
     getUniqueAssistantTypes,
     hasActiveFilters,
     setActivityDateRange,
-    logFilterState, // Add debug function
+    logFilterState,
   };
 };
