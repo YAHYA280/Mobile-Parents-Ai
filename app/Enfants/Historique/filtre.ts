@@ -329,15 +329,42 @@ export const useActivityFilters = (activities: Activity[]) => {
   };
 
   // Toggle calendar visibility with mode
+  // Fixed toggleActivityCalendar function for filtre.ts
+  // Toggle calendar visibility with mode
   const toggleActivityCalendar = (mode: "start" | "end" = "start") => {
-    setFilters((prev) => ({
-      ...prev,
-      showActivityCalendar: !prev.showActivityCalendar,
-      activityCalendarMode: mode,
-    }));
-  };
+    setFilters((prev) => {
+      // If opening the calendar and no start date is set, always default to start mode
+      if (!prev.showActivityCalendar && !prev.activityDateRange.startDate) {
+        return {
+          ...prev,
+          showActivityCalendar: true, // Open calendar
+          activityCalendarMode: "start", // Always start with selecting start date
+        };
+      }
 
+      // If opening the calendar and start date is set but no end date, default to end mode
+      if (
+        !prev.showActivityCalendar &&
+        prev.activityDateRange.startDate &&
+        !prev.activityDateRange.endDate
+      ) {
+        return {
+          ...prev,
+          showActivityCalendar: true,
+          activityCalendarMode: "end", // Set to end date selection
+        };
+      }
+
+      // Otherwise toggle calendar and set specified mode
+      return {
+        ...prev,
+        showActivityCalendar: !prev.showActivityCalendar,
+        activityCalendarMode: mode || prev.activityCalendarMode, // Use provided mode or keep current
+      };
+    });
+  };
   // Handle date selection
+  // Fixed handleActivityDayPress function for filtre.ts
   const handleActivityDayPress = (day: { dateString: string }) => {
     const selectedDate = day.dateString;
 
@@ -345,35 +372,52 @@ export const useActivityFilters = (activities: Activity[]) => {
       let newStartDate = prev.activityDateRange.startDate;
       let newEndDate = prev.activityDateRange.endDate;
 
+      // If we're selecting the start date
       if (prev.activityCalendarMode === "start") {
+        // Set the start date
         newStartDate = selectedDate;
 
-        // If end date is before start date, reset end date
+        // If end date exists and is before new start date, reset end date
         if (newEndDate && new Date(selectedDate) > new Date(newEndDate)) {
           newEndDate = null;
         }
+
+        // Change mode to end for next selection
+        return {
+          ...prev,
+          activityDateRange: {
+            startDate: newStartDate,
+            endDate: newEndDate,
+          },
+          activityCalendarMode: "end", // Change to end mode
+          // Don't close calendar yet so user can select end date
+          showActivityCalendar: true,
+        };
       } else {
+        // We're selecting the end date
         newEndDate = selectedDate;
 
-        // If start date is after end date, reset start date
+        // If start date exists and is after new end date, update
         if (newStartDate && new Date(selectedDate) < new Date(newStartDate)) {
-          newStartDate = null;
+          // If the selected end date is before start date,
+          // we swap them to ensure a valid range
+          newEndDate = newStartDate;
+          newStartDate = selectedDate;
         }
-      }
 
-      return {
-        ...prev,
-        activityDateRange: {
-          startDate: newStartDate,
-          endDate: newEndDate,
-        },
-        activityCalendarMode:
-          prev.activityCalendarMode === "start" ? "end" : "start",
-        showActivityCalendar: false, // Close calendar after selection
-      };
+        // After selecting both dates, close the calendar
+        return {
+          ...prev,
+          activityDateRange: {
+            startDate: newStartDate,
+            endDate: newEndDate,
+          },
+          activityCalendarMode: "start", // Reset to start mode for next time
+          showActivityCalendar: false, // Close calendar after selecting both dates
+        };
+      }
     });
   };
-
   // Set advanced filters - with safe type checking
   const setAdvancedFilters = (newFilters: {
     selectedAssistants?: string[];

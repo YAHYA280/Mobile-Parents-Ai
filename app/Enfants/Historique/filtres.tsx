@@ -992,41 +992,68 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       ? "Sélectionner une date de début"
       : "Sélectionner une date de fin";
 
+  // Improved getMarkedDates function for FilterModal
   const getMarkedDates = () => {
     const marked: { [date: string]: any } = {};
 
-    if (activityDateRange.startDate) {
+    // No dates selected
+    if (!activityDateRange.startDate && !activityDateRange.endDate) {
+      return marked;
+    }
+
+    // Only start date selected
+    if (activityDateRange.startDate && !activityDateRange.endDate) {
+      marked[activityDateRange.startDate] = {
+        selected: true,
+        startingDay: true,
+        endingDay: true, // Single day selection looks like a complete circle
+        color: COLORS.primary,
+        textColor: "#FFFFFF",
+      };
+      return marked;
+    }
+
+    // Both dates selected - show full range
+    if (activityDateRange.startDate && activityDateRange.endDate) {
+      // Mark start date
       marked[activityDateRange.startDate] = {
         selected: true,
         startingDay: true,
         color: COLORS.primary,
         textColor: "#FFFFFF",
       };
-    }
-    if (activityDateRange.endDate) {
+
+      // Mark end date
       marked[activityDateRange.endDate] = {
         selected: true,
         endingDay: true,
         color: COLORS.primary,
         textColor: "#FFFFFF",
       };
-    }
 
-    if (activityDateRange.startDate && activityDateRange.endDate) {
+      // Handle case where start == end (single day)
+      if (activityDateRange.startDate === activityDateRange.endDate) {
+        marked[activityDateRange.startDate].endingDay = true;
+        return marked;
+      }
+
+      // Mark all days in between
       const start = new Date(activityDateRange.startDate);
       const end = new Date(activityDateRange.endDate);
       const current = new Date(start);
       current.setDate(current.getDate() + 1);
+
       while (current < end) {
         const dateStr = current.toISOString().split("T")[0];
         marked[dateStr] = {
           selected: true,
-          color: `${COLORS.primary}80`,
+          color: `${COLORS.primary}80`, // Use semi-transparent color for days in between
           textColor: "#FFFFFF",
         };
         current.setDate(current.getDate() + 1);
       }
     }
+
     return marked;
   };
 
@@ -1164,7 +1191,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 </TouchableOpacity>
               )}
             </View>
-
+            {/* CALENDAR SECTION */}
+            // Modified Calendar Section for FilterModal in filtres.tsx
             {/* CALENDAR SECTION */}
             <View style={{ marginBottom: 24 }}>
               <View
@@ -1212,21 +1240,56 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     ? "Choisissez une date de début pour la période"
                     : "Choisissez une date de fin pour la période"}
                 </Text>
-                {activityDateRange.startDate &&
-                  activityCalendarMode === "end" && (
+
+                {/* Show current selection status */}
+                {activityDateRange.startDate && (
+                  <Text
+                    style={{
+                      color: COLORS.primary,
+                      textAlign: "center",
+                      marginTop: 4,
+                      fontWeight: "500",
+                    }}
+                  >
+                    Date de début:{" "}
+                    {new Date(activityDateRange.startDate).toLocaleDateString(
+                      "fr-FR",
+                      { day: "numeric", month: "long", year: "numeric" }
+                    )}
+                  </Text>
+                )}
+
+                {activityDateRange.endDate && (
+                  <Text
+                    style={{
+                      color: COLORS.primary,
+                      textAlign: "center",
+                      marginTop: 4,
+                      fontWeight: "500",
+                    }}
+                  >
+                    Date de fin:{" "}
+                    {new Date(activityDateRange.endDate).toLocaleDateString(
+                      "fr-FR",
+                      { day: "numeric", month: "long", year: "numeric" }
+                    )}
+                  </Text>
+                )}
+
+                {/* Instructions for second selection */}
+                {activityCalendarMode === "end" &&
+                  activityDateRange.startDate &&
+                  !activityDateRange.endDate && (
                     <Text
                       style={{
-                        color: COLORS.primary,
+                        color: dark ? "rgba(255,255,255,0.7)" : COLORS.gray3,
                         textAlign: "center",
-                        marginTop: 4,
-                        fontWeight: "500",
+                        marginTop: 8,
+                        fontStyle: "italic",
                       }}
                     >
-                      Date de début:{" "}
-                      {new Date(activityDateRange.startDate).toLocaleDateString(
-                        "fr-FR",
-                        { day: "numeric", month: "long", year: "numeric" }
-                      )}
+                      Sélectionnez maintenant une date de fin pour compléter la
+                      période
                     </Text>
                   )}
               </View>
@@ -1267,7 +1330,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 enableSwipeMonths
               />
             </View>
-
             {/* ADVANCED FILTERS */}
             {uniqueAssistantTypes.length > 0 && (
               <AssistantTypeFilters
@@ -1294,7 +1356,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 dark={dark}
               />
             )}
-
             {advancedFilters.selectedAssistants?.includes("J'Apprends") &&
               availableSubjects.length > 0 && (
                 <SubjectFilters
@@ -1309,7 +1370,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   dark={dark}
                 />
               )}
-
             {advancedFilters.selectedSubjects?.length > 0 &&
               availableChapters.length > 0 && (
                 <ChapterFilters
@@ -1324,7 +1384,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   dark={dark}
                 />
               )}
-
             {advancedFilters.selectedChapters?.length > 0 &&
               availableExercises.length > 0 && (
                 <ExerciseFilters
