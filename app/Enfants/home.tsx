@@ -1,10 +1,5 @@
-import { LinearGradient } from 'expo-linear-gradient';
-import React, { useRef, useState, useEffect } from "react";
-import { faRocket } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBook, faCheck, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { faUser, faHome, faList, faStar, faClock, faBarChart, faArrowLeft, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import {
   View,
   Text,
@@ -12,160 +7,213 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
-  useWindowDimensions
+  Dimensions,
+  StatusBar,
 } from "react-native";
-
-import type { Child } from "../../data/Enfants/CHILDREN_DATA";
+import { LinearGradient } from "expo-linear-gradient";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faArrowLeft,
+  faHome,
+  faList,
+  faChartBar,
+  faGraduationCap,
+  faUser,
+  faStar,
+  faCheck,
+  faExclamationTriangle,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { COLORS } from "../../constants/theme";
-import KidsStyles from "../../styles/KidsStyles";
 import HistoriqueActivites from "./Historique/home";
-import { useTheme } from "../../theme/ThemeProvider";
 import PerformanceComponent from "./Performance/home";
-import { CHILDREN_DATA, enhanceActivity } from "../../data/Enfants/CHILDREN_DATA";
+import {
+  CHILDREN_DATA,
+  enhanceActivity,
+} from "../../data/Enfants/CHILDREN_DATA";
+import type { Child } from "../../data/Enfants/CHILDREN_DATA";
+
+// Constants
+const { width } = Dimensions.get("window");
 
 // Progress color function
-function getProgressColor(progress: number) {
-  const colorMap = [
-    { threshold: 30, color: '#FC4E00', startColor: '#FF6B35', endColor: '#FF8E4A' },
-    { threshold: 50, color: '#EBB016', startColor: '#FFD700', endColor: '#FFC107' },
-    { threshold: 70, color: '#F3BB00', startColor: '#FFC107', endColor: '#FFD54F' },
-    { threshold: 100, color: '#24D26D', startColor: '#2ECC71', endColor: '#27AE60' }
-  ];
-
-  const progressConfig = colorMap.find(config => progress <= config.threshold) || colorMap[colorMap.length - 1];
-  return progressConfig;
+function getProgressColor(progress: number): string {
+  if (progress < 30) return "#FC4E00";
+  if (progress <= 50) return "#EBB016";
+  if (progress <= 70) return "#F3BB00";
+  return "#24D26D";
 }
 
-// Define interface for CustomTabBar props
+// Custom Tab Bar Component
 interface CustomTabBarProps {
   activeTab: number;
-  onTabPress: (index: number) => void;
+  onTabPress: (tabIndex: number) => void;
 }
 
-// Composant personnalisé pour la barre de tabs
-const CustomTabBar: React.FC<CustomTabBarProps> = ({ activeTab, onTabPress }) => {
-  const { dark } = useTheme();
-  
-  return (
-    <View style={{
-      flexDirection: 'row',
+const CustomTabBar: React.FC<CustomTabBarProps> = ({
+  activeTab,
+  onTabPress,
+}) => (
+  <View
+    style={{
+      flexDirection: "row",
       height: 60,
-      backgroundColor: dark ? COLORS.black : COLORS.white,
-      position: 'absolute',
+      backgroundColor: "white",
+      position: "absolute",
       bottom: 0,
       left: 0,
       right: 0,
       borderTopWidth: 0.5,
-      borderTopColor: dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      elevation: 2,
+      borderTopColor: "rgba(0, 0, 0, 0.1)",
+      elevation: 10,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: -2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
-      zIndex: 999, // Ajoutez un zIndex élevé
-    }}>
-      {/* Bouton pour l'onglet "Aperçu" */}
-      <TouchableOpacity 
-        style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        onPress={() => onTabPress(0)}
-      >
-        <FontAwesomeIcon
-          icon={faHome}
-          size={20}
-          color={activeTab === 0 ? COLORS.primary : (dark ? COLORS.secondaryWhite : COLORS.greyscale900)}
-        />
-        <Text style={{
-          color: activeTab === 0 ? COLORS.primary : (dark ? COLORS.secondaryWhite : COLORS.greyscale900),
+      zIndex: 999,
+    }}
+  >
+    {/* Aperçu Tab */}
+    <TouchableOpacity
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      onPress={() => onTabPress(0)}
+    >
+      <FontAwesomeIcon
+        icon={faHome}
+        size={20}
+        color={activeTab === 0 ? COLORS.primary : COLORS.greyscale900}
+      />
+      <Text
+        style={{
+          color: activeTab === 0 ? COLORS.primary : COLORS.greyscale900,
           fontSize: 12,
-          fontFamily: "bold",
-        }}>
-          Aperçu
-        </Text>
-        {activeTab === 0 && (
-          <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: COLORS.primary, marginTop: 2 }} />
-        )}
-      </TouchableOpacity>
-      
-      {/* Bouton pour l'onglet "Activités" */}
-      <TouchableOpacity 
-        style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        onPress={() => onTabPress(1)}
+          fontWeight: "600",
+          marginTop: 4,
+        }}
       >
-        <FontAwesomeIcon
-          icon={faList}
-          size={20}
-          color={activeTab === 1 ? COLORS.primary : (dark ? COLORS.secondaryWhite : COLORS.greyscale900)}
+        Aperçu
+      </Text>
+      {activeTab === 0 && (
+        <View
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: 2.5,
+            backgroundColor: COLORS.primary,
+            marginTop: 2,
+          }}
         />
-        <Text style={{
-          color: activeTab === 1 ? COLORS.primary : (dark ? COLORS.secondaryWhite : COLORS.greyscale900),
-          fontSize: 12,
-          fontFamily: "bold",
-        }}>
-          Activités
-        </Text>
-        {activeTab === 1 && (
-          <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: COLORS.primary, marginTop: 2 }} />
-        )}
-      </TouchableOpacity>
-      
-      {/* Bouton pour l'onglet "Suivi" */}
-      <TouchableOpacity 
-        style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        onPress={() => onTabPress(2)}
-      >
-        <FontAwesomeIcon
-          icon={faBarChart}
-          size={20}
-          color={activeTab === 2 ? COLORS.primary : (dark ? COLORS.secondaryWhite : COLORS.greyscale900)}
-        />
-        <Text style={{
-          color: activeTab === 2 ? COLORS.primary : (dark ? COLORS.secondaryWhite : COLORS.greyscale900),
-          fontSize: 12,
-          fontFamily: "bold",
-        }}>
-          Suivi
-        </Text>
-        {activeTab === 2 && (
-          <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: COLORS.primary, marginTop: 2 }} />
-        )}
-      </TouchableOpacity>
-    </View>
-  );
-};
+      )}
+    </TouchableOpacity>
 
+    {/* Activités Tab */}
+    <TouchableOpacity
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      onPress={() => onTabPress(1)}
+    >
+      <FontAwesomeIcon
+        icon={faList}
+        size={20}
+        color={activeTab === 1 ? COLORS.primary : COLORS.greyscale900}
+      />
+      <Text
+        style={{
+          color: activeTab === 1 ? COLORS.primary : COLORS.greyscale900,
+          fontSize: 12,
+          fontWeight: "600",
+          marginTop: 4,
+        }}
+      >
+        Activités
+      </Text>
+      {activeTab === 1 && (
+        <View
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: 2.5,
+            backgroundColor: COLORS.primary,
+            marginTop: 2,
+          }}
+        />
+      )}
+    </TouchableOpacity>
+
+    {/* Suivi Tab */}
+    <TouchableOpacity
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      onPress={() => onTabPress(2)}
+    >
+      <FontAwesomeIcon
+        icon={faChartBar}
+        size={20}
+        color={activeTab === 2 ? COLORS.primary : COLORS.greyscale900}
+      />
+      <Text
+        style={{
+          color: activeTab === 2 ? COLORS.primary : COLORS.greyscale900,
+          fontSize: 12,
+          fontWeight: "600",
+          marginTop: 4,
+        }}
+      >
+        Suivi
+      </Text>
+      {activeTab === 2 && (
+        <View
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: 2.5,
+            backgroundColor: COLORS.primary,
+            marginTop: 2,
+          }}
+        />
+      )}
+    </TouchableOpacity>
+  </View>
+);
+
+// Overview Component
 interface OverviewProps {
   child: Child;
-  scrollViewRef: React.RefObject<ScrollView>;
+  scrollViewRef: React.RefObject<ScrollView | null>;
 }
 
 const Overview: React.FC<OverviewProps> = ({ child, scrollViewRef }) => {
-  const { dark } = useTheme();
-  const progressValue = parseFloat(child.progress.replace('%', ''));
+  const progressValue = parseFloat(child.progress.replace("%", ""));
   const progressConfig = getProgressColor(progressValue);
   const recentActivity = enhanceActivity(child.activitesRecentes[0]);
 
+  // Helper function to render subject tags
   const renderSubjectTag = (matiere: string, isStrong: boolean) => {
-    const tagStyle = isStrong
-      ? { backgroundColor: 'rgba(36, 210, 109, 0.1)', color: '#24D26D' }
-      : { backgroundColor: 'rgba(252, 78, 0, 0.1)', color: '#FC4E00' };
+    const tagColor = isStrong ? "#24D26D" : "#FC4E00";
+    const tagBgColor = isStrong
+      ? "rgba(36, 210, 109, 0.1)"
+      : "rgba(252, 78, 0, 0.1)";
 
     return (
       <View
         key={matiere}
-        style={[
-          KidsStyles.tag,
-          {backgroundColor: tagStyle.backgroundColor, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10,
-            paddingVertical: 5, borderRadius: 20}
-        ]}
+        style={{
+          backgroundColor: tagBgColor,
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: 10,
+          paddingVertical: 5,
+          borderRadius: 20,
+          marginRight: 8,
+          marginBottom: 8,
+        }}
       >
         <FontAwesomeIcon
           icon={isStrong ? faCheck : faExclamationTriangle}
-          color={tagStyle.color}
+          color={tagColor}
           size={16}
           style={{ marginRight: 5 }}
         />
-        <Text style={[KidsStyles.tagText, { color: tagStyle.color }]}>{matiere}</Text>
+        <Text style={{ color: tagColor, fontWeight: "600" }}>{matiere}</Text>
       </View>
     );
   };
@@ -173,123 +221,269 @@ const Overview: React.FC<OverviewProps> = ({ child, scrollViewRef }) => {
   return (
     <ScrollView
       ref={scrollViewRef}
-      style={{ flex: 1, paddingHorizontal: 16, paddingTop: 20  }}
+      style={{ flex: 1, paddingHorizontal: 16, paddingTop: 20 }}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingBottom: 100
-      }}
+      contentContainerStyle={{ paddingBottom: 100 }}
     >
+      {/* Progress Card */}
       <LinearGradient
-        colors={[progressConfig.startColor, progressConfig.endColor]}
+        colors={["#FF8E69", "#FF7862"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={[{
-          backgroundColor: progressConfig.color,
-          borderRadius: 12,
-          padding: 16,
-          marginBottom: 16,
-          shadowColor: progressConfig.color,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 2
-        }]}
+        style={{
+          borderRadius: 16,
+          padding: 20,
+          marginBottom: 20,
+          shadowColor: "#FF8E69",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 8,
+          elevation: 6,
+        }}
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={[KidsStyles.cardTitle, { color: COLORS.white }]}>Progression Globale</Text>
-          <FontAwesomeIcon icon={faRocket} size={24} color={COLORS.white} />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: "#FFFFFF" }}>
+            Progression Globale
+          </Text>
+          <View
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <FontAwesomeIcon icon={faStar} size={18} color="#FFFFFF" />
+          </View>
         </View>
-        <View style={KidsStyles.progressSection}>
-          <Text style={[KidsStyles.progressText, { color: COLORS.white, fontSize: 24 }]}>
+
+        <View style={{ marginTop: 16 }}>
+          <Text
+            style={{
+              fontSize: 28,
+              fontWeight: "bold",
+              color: "#FFFFFF",
+              marginBottom: 8,
+            }}
+          >
             {child.progress}
           </Text>
-          <View style={KidsStyles.progressContainer}>
+          <View
+            style={{
+              height: 12,
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+              borderRadius: 6,
+              overflow: "hidden",
+            }}
+          >
             <View
-              style={[
-                KidsStyles.progressBar,
-                {
-                  width: `${progressValue}%`,
-                  backgroundColor: COLORS.white
-                }
-              ]}
+              style={{
+                width: `${progressValue}%`,
+                height: "100%",
+                backgroundColor: "#FFFFFF",
+                borderRadius: 6,
+              }}
             />
           </View>
         </View>
       </LinearGradient>
 
-      <View style={[{
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 16,
-        marginTop: 15,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-        backgroundColor: dark ? COLORS.black : COLORS.white
-      }]}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={[KidsStyles.cardTitle, { color: dark ? COLORS.white : COLORS.black }]}>Domaines d&apos;Apprentissage</Text>
-          <FontAwesomeIcon icon={faBook} size={24} color={COLORS.primary} />
-        </View>
-
-        <View style={KidsStyles.subjectSection}>
-          <Text style={[KidsStyles.subheading, { color: '#24D26D', marginBottom: 10 }]}>
-            Points Forts
+      {/* Strengths and Weaknesses Card */}
+      <View
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: 16,
+          padding: 20,
+          marginBottom: 20,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 4,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 16,
+          }}
+        >
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: "#333333" }}>
+            Domaines d'Apprentissage
           </Text>
-          <View style={KidsStyles.tagContainer}>
-            {child.matieresFortes.map(matiere => renderSubjectTag(matiere, true))}
+          <View
+            style={{
+              backgroundColor: "rgba(255, 142, 105, 0.1)",
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faGraduationCap}
+              size={18}
+              color={COLORS.primary}
+            />
           </View>
         </View>
 
-        <View style={[KidsStyles.subjectSection, { marginTop: 15 }]}>
-          <Text style={[KidsStyles.subheading, { color: '#FC4E00', marginBottom: 10 }]}>
+        <View style={{ marginBottom: 16 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "600",
+              color: "#24D26D",
+              marginBottom: 10,
+            }}
+          >
+            Points Forts
+          </Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {child.matieresFortes.map((matiere) =>
+              renderSubjectTag(matiere, true)
+            )}
+          </View>
+        </View>
+
+        <View>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "600",
+              color: "#FC4E00",
+              marginBottom: 10,
+            }}
+          >
             À Améliorer
           </Text>
-          <View style={KidsStyles.tagContainer}>
-            {child.matieresAmeliorer.map(matiere => renderSubjectTag(matiere.replace(/^\?/, '').trim(), false))}
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {child.matieresAmeliorer.map((matiere) =>
+              renderSubjectTag(matiere.replace(/^\?/, "").trim(), false)
+            )}
           </View>
         </View>
       </View>
 
-      <View style={[{
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 16,
-        marginTop: 15,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-        backgroundColor: dark ? COLORS.black : COLORS.white
-      }]}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={[KidsStyles.cardTitle, { color: dark ? COLORS.white : COLORS.black }]}>Dernière Activité</Text>
+      {/* Recent Activity Card */}
+      <View
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: 16,
+          padding: 20,
+          marginBottom: 20,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 4,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 16,
+          }}
+        >
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: "#333333" }}>
+            Dernière Activité
+          </Text>
         </View>
 
-        <View style={KidsStyles.activityItem}>
-          <View style={KidsStyles.activityDate}>
-            <Text style={[KidsStyles.dateText, { color: dark ? COLORS.secondaryWhite : COLORS.gray }]}>{recentActivity.date}</Text>
-          </View>
+        <View
+          style={{
+            flexDirection: "row",
+            borderLeftWidth: 3,
+            borderLeftColor: COLORS.primary,
+            paddingLeft: 12,
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 12, color: "#9E9E9E", marginBottom: 4 }}>
+              {recentActivity.date}
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                color: "#333333",
+                marginBottom: 8,
+              }}
+            >
+              {recentActivity.activite}
+            </Text>
 
-          <View style={KidsStyles.activityDetails}>
-            <Text style={[KidsStyles.activityTitle, { color: dark ? COLORS.white : COLORS.black }]}>{recentActivity.activite}</Text>
-            <View style={KidsStyles.activityMeta}>
-              <FontAwesomeIcon icon={faClock} size={14} color={COLORS.primary} />
-              <Text style={[KidsStyles.metaText, { color: dark ? COLORS.secondaryWhite : COLORS.gray }]}>{recentActivity.duree}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 8,
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faClock}
+                size={14}
+                color="#9E9E9E"
+                style={{ marginRight: 6 }}
+              />
+              <Text style={{ fontSize: 14, color: "#9E9E9E" }}>
+                {recentActivity.duree}
+              </Text>
+
               {recentActivity.score && (
                 <>
-                  <FontAwesomeIcon icon={faStar} size={14} color={COLORS.primary} style={{ marginLeft: 12 }} />
-                  <Text style={[KidsStyles.metaText, { color: dark ? COLORS.secondaryWhite : COLORS.gray }]}>{recentActivity.score}</Text>
+                  <View
+                    style={{
+                      width: 1,
+                      height: 12,
+                      backgroundColor: "#E0E0E0",
+                      marginHorizontal: 8,
+                    }}
+                  />
+                  <FontAwesomeIcon
+                    icon={faStar}
+                    size={14}
+                    color={COLORS.primary}
+                    style={{ marginRight: 6 }}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: COLORS.primary,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {recentActivity.score}
+                  </Text>
                 </>
               )}
             </View>
 
             {recentActivity.commentaires && (
-              <View style={KidsStyles.commentSection}>
-                <Text style={[KidsStyles.commentText, { color: dark ? COLORS.secondaryWhite : COLORS.gray }]}>{recentActivity.commentaires}</Text>
+              <View
+                style={{
+                  backgroundColor: "rgba(0, 0, 0, 0.03)",
+                  padding: 12,
+                  borderRadius: 8,
+                  marginTop: 4,
+                }}
+              >
+                <Text style={{ fontSize: 14, color: "#666666" }}>
+                  {recentActivity.commentaires}
+                </Text>
               </View>
             )}
           </View>
@@ -299,52 +493,45 @@ const Overview: React.FC<OverviewProps> = ({ child, scrollViewRef }) => {
   );
 };
 
-const Home: React.FC = () => {
+// Main Component
+const EnfantsHome: React.FC = () => {
   const router = useRouter();
-  const { dark, colors } = useTheme();
   const params = useLocalSearchParams();
-  const layout = useWindowDimensions();
+  const scrollViewRef = useRef<ScrollView | null>(null);
 
-  // Références pour la fonctionnalité "jump to"
-  const scrollViewRef = useRef<ScrollView>(null);
-  const firstSectionRef = useRef<View>(null);
-  const secondSectionRef = useRef<View>(null);
-  const thirdSectionRef = useRef<View>(null);
-  
-  const childId = typeof params.childId === 'string' ? parseInt(params.childId, 10) : 0;
-  const [child, setChild] = useState<Child | undefined>(undefined);
+  // Get child ID from params
+  const childId =
+    typeof params.childId === "string" ? parseInt(params.childId, 10) : 0;
 
-  // Utilisation d'un état pour gérer l'onglet actif
-  const [activeTab, setActiveTab] = useState(0);
+  // States
+  const [child, setChild] = useState<Child | null>(null);
+  const [activeTab, setActiveTab] = useState<number>(0);
 
+  // Fetch child data only once when component mounts or childId changes
   useEffect(() => {
-    const foundChild = CHILDREN_DATA.find(c => c.id === childId);
+    const foundChild = CHILDREN_DATA.find((c) => c.id === childId) || null;
     setChild(foundChild);
   }, [childId]);
 
-  const handleBack = () => {
+  // Handle back navigation
+  const handleBack = (): void => {
     router.back();
   };
 
-  // Fonction pour gérer les clics sur les tabs
-  const handleTabPress = (tabIndex: number) => {
+  // Handle tab selection
+  const handleTabPress = (tabIndex: number): void => {
     setActiveTab(tabIndex);
   };
 
-  // Fonction pour rendre le contenu en fonction de l'onglet actif
+  // Render tab content based on active tab
   const renderContent = () => {
     if (!child) return null;
-    
+
     switch (activeTab) {
       case 0:
         return <Overview child={child} scrollViewRef={scrollViewRef} />;
       case 1:
-        // Pour l'onglet d'historique, on peut maintenant laisser la pagination être gérée naturellement
-        return (
-          <View style={{ flex: 1, position: 'relative' }}>
-            <HistoriqueActivites isTabComponent childData={child} />
-          </View>
-        );
+        return <HistoriqueActivites isTabComponent childData={child} />;
       case 2:
         return <PerformanceComponent isTabComponent childData={child} />;
       default:
@@ -352,143 +539,163 @@ const Home: React.FC = () => {
     }
   };
 
+  // If child data not found
   if (!child) {
     return (
-      <SafeAreaView style={[KidsStyles.safeArea, { backgroundColor: colors.background }]}>
-        <View style={KidsStyles.container}>
-          <Text style={{ color: dark ? COLORS.white : COLORS.dark1 }}>Enfant non trouvé</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text style={{ color: "#333333" }}>Enfant non trouvé</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={[KidsStyles.safeArea, { backgroundColor: colors.background }]}>
-      <View style={[KidsStyles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+      <StatusBar
+        backgroundColor="transparent"
+        barStyle="dark-content"
+        translucent
+      />
+
+      <View style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
+        {/* Header Profile Section - Only show on Overview tab */}
         {activeTab === 0 && (
-          <View style={[
-            KidsStyles.header,
-            {
-              position: 'relative',
-              top: 0,
-              left: 0,
-              right: 0,
+          <View
+            style={{
+              position: "relative",
               zIndex: 10,
-              backgroundColor: colors.background,
+              backgroundColor: "#FFFFFF",
               paddingBottom: 20,
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: 350
-            }
-          ]}>
+              alignItems: "center",
+              justifyContent: "center",
+              height: 330,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
+            }}
+          >
             <TouchableOpacity
               onPress={handleBack}
-              style={[
-                KidsStyles.backButton,
-                {
-                  position: 'absolute',
-                  left: 16,
-                  top: 16
-                }
-              ]}
+              style={{
+                position: "absolute",
+                left: 16,
+                top: 16,
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: "rgba(0,0,0,0.05)",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 20,
+              }}
             >
-              <FontAwesomeIcon
-                icon={faArrowLeft}
-                size={24}
-                color={dark ? COLORS.white : COLORS.black}
-              />
+              <FontAwesomeIcon icon={faArrowLeft} size={20} color="#333333" />
             </TouchableOpacity>
 
-            <View style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              alignItems: 'center'
-            }}>
-              <View style={[
-                KidsStyles.avatarContainer,
-                {
-                  width: 160,
-                  height: 160,
-                  borderRadius: 80,
-                  borderWidth: 3,
-                  borderColor: dark ? COLORS.dark1 : COLORS.white,
-                  overflow: 'hidden',
-                  position: 'absolute',
+            <View
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  width: 140,
+                  height: 140,
+                  borderRadius: 70,
+                  borderWidth: 4,
+                  borderColor: "#FFFFFF",
+                  overflow: "hidden",
+                  position: "absolute",
                   top: -60,
                   zIndex: 10,
-                  elevation: 5,
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 4,
-                }
-              ]}>
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.15,
+                  shadowRadius: 8,
+                  elevation: 10,
+                }}
+              >
                 <Image
-                  source={CHILDREN_DATA[0].profileImage}
-                  resizeMode="cover"
+                  source={child.profileImage}
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: 60
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 70,
                   }}
                 />
               </View>
 
-              <View style={{
-                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
-                width: '100%',
-                paddingTop: 85,
-                paddingBottom: 20,
-                alignItems: 'center',
-                borderTopLeftRadius: 30,
-                borderTopRightRadius: 30,
-                shadowColor: COLORS.white,
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 3
-              }}>
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: 5,
-                  marginTop: 40
-                }}>
+              <View
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  width: "100%",
+                  paddingTop: 90,
+                  paddingBottom: 20,
+                  alignItems: "center",
+                  borderTopLeftRadius: 30,
+                  borderTopRightRadius: 30,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: -2 },
+                  shadowOpacity: 0.05,
+                  shadowRadius: 4,
+                  elevation: 3,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 5,
+                    marginTop: 20,
+                  }}
+                >
                   <FontAwesomeIcon
                     icon={faUser}
-                    size={20}
-                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-                    style={{ marginRight: 5 }}
+                    size={16}
+                    color="#9E9E9E"
+                    style={{ marginRight: 8 }}
                   />
-                  <Text style={[
-                    KidsStyles.childName,
-                    {
-                      color: dark ? COLORS.white : COLORS.black,
-                      textAlign: 'center'
-                    }
-                  ]}>
+                  <Text
+                    style={{
+                      fontSize: 22,
+                      fontWeight: "bold",
+                      color: "#333333",
+                      textAlign: "center",
+                    }}
+                  >
                     {child.name}
                   </Text>
                 </View>
 
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center'
-                }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
                   <FontAwesomeIcon
                     icon={faGraduationCap}
-                    size={20}
-                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-                    style={{ marginRight: 5 }}
+                    size={16}
+                    color="#9E9E9E"
+                    style={{ marginRight: 8 }}
                   />
-                  <Text style={[
-                    KidsStyles.childClass,
-                    {
-                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
-                      textAlign: 'center'
-                    }
-                  ]}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "500",
+                      color: "#666666",
+                      textAlign: "center",
+                    }}
+                  >
                     {child.classe} • {child.age} ans
                   </Text>
                 </View>
@@ -497,19 +704,16 @@ const Home: React.FC = () => {
           </View>
         )}
 
+        {/* Main Content Area */}
         <View style={{ flex: 1 }}>
-          {/* Afficher le contenu en fonction de l'onglet actif */}
           {renderContent()}
-          
-          {/* Afficher la barre de tabs personnalisée */}
-          <CustomTabBar 
-            activeTab={activeTab} 
-            onTabPress={handleTabPress}
-          />
+
+          {/* Custom Tab Bar */}
+          <CustomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
         </View>
       </View>
     </SafeAreaView>
   );
 };
 
-export default Home;
+export default EnfantsHome;
