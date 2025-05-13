@@ -1,6 +1,6 @@
-// app/Enfants/Historique/filtres.tsx
-import React from "react";
-import { Calendar } from "react-native-calendars";
+// app/Enfants/Historique/filtres.tsx – fully fixed and compilable version
+import React, { useState, useEffect } from "react";
+import { Calendar, DateData } from "react-native-calendars";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   View,
@@ -12,6 +12,7 @@ import {
   Animated,
   Dimensions,
   StyleSheet,
+  Platform,
 } from "react-native";
 import {
   faSync,
@@ -23,13 +24,18 @@ import {
   faBook,
   faChalkboardTeacher,
   faFilter,
+  faChevronDown,
+  faChevronUp,
 } from "@fortawesome/free-solid-svg-icons";
 
 import type { Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
 import { COLORS } from "../../../constants/theme";
 
-// Définition des interfaces pour les thèmes
+// -----------------------------------------------------------------------------
+// TYPE & CONSTANT DEFINITIONS
+// -----------------------------------------------------------------------------
+
 interface AssistantThemeType {
   colors: readonly [string, string, ...string[]];
   icon: any;
@@ -40,7 +46,7 @@ interface SubjectThemeType {
   icon: any;
 }
 
-// Thèmes pour les assistants
+// Themes for assistants
 export const ASSISTANT_THEME: {
   "J'Apprends": AssistantThemeType;
   Recherche: AssistantThemeType;
@@ -66,7 +72,7 @@ export const ASSISTANT_THEME: {
   },
 };
 
-// Thèmes pour les matières
+// Themes for subjects
 export const SUBJECT_THEME: {
   Mathématiques: SubjectThemeType;
   Français: SubjectThemeType;
@@ -102,51 +108,53 @@ export const SUBJECT_THEME: {
   },
 };
 
-// Function to get progress color
-function getProgressColor(progress: number) {
+// -----------------------------------------------------------------------------
+// HELPER FUNCTIONS
+// -----------------------------------------------------------------------------
+
+export function getProgressColor(progress: number) {
   if (progress < 30) return "#FC4E00"; // Rouge
   if (progress <= 50) return "#EBB016"; // Orange
   if (progress <= 70) return "#F3BB00"; // Jaune
   return "#24D26D"; // Vert
 }
 
-// Fonction pour obtenir le thème basé sur l'activité
 export const getActivityTheme = (activity: Activity) => {
-  // Déterminer le type d'assistant
   let assistantName = "Autre";
-  if (activity.activite.toLowerCase().includes("j'apprends")) {
+  if (activity.activite?.toLowerCase().includes("j'apprends")) {
     assistantName = "J'Apprends";
-  } else if (activity.activite.toLowerCase().includes("recherche")) {
+  } else if (activity.activite?.toLowerCase().includes("recherche")) {
     assistantName = "Recherche";
-  } else if (activity.activite.toLowerCase().includes("accueil")) {
+  } else if (activity.activite?.toLowerCase().includes("accueil")) {
     assistantName = "Accueil";
   }
 
-  // Déterminer la matière
   let subjectName = "Autre";
-  const activityLower = activity.activite.toLowerCase();
-  if (
-    activityLower.includes("mathématiques") ||
-    activityLower.includes("géométrie")
-  ) {
-    subjectName = "Mathématiques";
-  } else if (
-    activityLower.includes("français") ||
-    activityLower.includes("lecture") ||
-    activityLower.includes("vocabulaire") ||
-    activityLower.includes("conjugaison") ||
-    activityLower.includes("grammaire")
-  ) {
-    subjectName = "Français";
-  } else if (
-    activityLower.includes("sciences") ||
-    activityLower.includes("écologie")
-  ) {
-    subjectName = "Sciences";
-  } else if (activityLower.includes("histoire")) {
-    subjectName = "Histoire";
-  } else if (activityLower.includes("anglais")) {
-    subjectName = "Anglais";
+  if (activity.activite) {
+    const activityLower = activity.activite.toLowerCase();
+    if (
+      activityLower.includes("mathématiques") ||
+      activityLower.includes("géométrie")
+    ) {
+      subjectName = "Mathématiques";
+    } else if (
+      activityLower.includes("français") ||
+      activityLower.includes("lecture") ||
+      activityLower.includes("vocabulaire") ||
+      activityLower.includes("conjugaison") ||
+      activityLower.includes("grammaire")
+    ) {
+      subjectName = "Français";
+    } else if (
+      activityLower.includes("sciences") ||
+      activityLower.includes("écologie")
+    ) {
+      subjectName = "Sciences";
+    } else if (activityLower.includes("histoire")) {
+      subjectName = "Histoire";
+    } else if (activityLower.includes("anglais")) {
+      subjectName = "Anglais";
+    }
   }
 
   return {
@@ -155,34 +163,29 @@ export const getActivityTheme = (activity: Activity) => {
   };
 };
 
-// Fonction pour extraire le type d'assistant à partir de l'activité
 export const extractAssistantType = (activity: Activity): string => {
-  if (activity.activite.toLowerCase().includes("j'apprends")) {
-    return "J'Apprends";
-  }
-  if (activity.activite.toLowerCase().includes("recherche")) {
-    return "Recherche";
-  }
-  if (activity.activite.toLowerCase().includes("accueil")) {
-    return "Accueil";
-  }
+  if (!activity.activite) return "Autre";
+  const activiteLower = activity.activite.toLowerCase();
+  if (activiteLower.includes("j'apprends")) return "J'Apprends";
+  if (activiteLower.includes("recherche")) return "Recherche";
+  if (activiteLower.includes("accueil")) return "Accueil";
   return "Autre";
 };
+
+// -----------------------------------------------------------------------------
+// SEARCH BAR COMPONENT
+// -----------------------------------------------------------------------------
 
 interface SearchBarProps {
   searchKeyword: string;
   setSearchKeyword: (value: string) => void;
   dark: boolean;
-  activityDateRange: {
-    startDate: string | null;
-    endDate: string | null;
-  };
+  activityDateRange: { startDate: string | null; endDate: string | null };
   toggleActivityCalendar: () => void;
   resetAllFilters: () => void;
   hasFilters: boolean;
 }
 
-// Composant pour la barre de recherche moderne
 export const SearchBar: React.FC<SearchBarProps> = ({
   searchKeyword,
   setSearchKeyword,
@@ -241,7 +244,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             fontSize: 15,
           }}
         />
-        {searchKeyword ? (
+        {searchKeyword && (
           <TouchableOpacity
             onPress={() => setSearchKeyword("")}
             style={{
@@ -261,11 +264,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               size={16}
             />
           </TouchableOpacity>
-        ) : null}
+        )}
       </View>
 
+      {/* Date Filter & Reset Buttons */}
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        {/* Date Filter Button */}
         <TouchableOpacity
           style={{
             backgroundColor: isDateFilterActive
@@ -281,7 +284,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             flex: 1,
             marginRight: 8,
           }}
-          onPress={() => toggleActivityCalendar()}
+          onPress={toggleActivityCalendar}
         >
           <FontAwesomeIcon
             icon={faCalendar}
@@ -310,7 +313,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </Text>
         </TouchableOpacity>
 
-        {/* Reset Button - only visible when filters are active */}
         {hasFilters && (
           <TouchableOpacity
             style={{
@@ -347,11 +349,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
+// -----------------------------------------------------------------------------
+// DATE RANGE INDICATOR COMPONENT
+// -----------------------------------------------------------------------------
+
 interface DateRangeIndicatorProps {
-  activityDateRange: {
-    startDate: string | null;
-    endDate: string | null;
-  };
+  activityDateRange: { startDate: string | null; endDate: string | null };
   setActivityDateRange: (value: {
     startDate: string | null;
     endDate: string | null;
@@ -359,23 +362,19 @@ interface DateRangeIndicatorProps {
   dark: boolean;
 }
 
-// Composant élégant pour afficher la plage de dates sélectionnée
 export const DateRangeIndicator: React.FC<DateRangeIndicatorProps> = ({
   activityDateRange,
   setActivityDateRange,
   dark,
 }) => {
-  if (!activityDateRange.startDate) return null;
+  if (!activityDateRange.startDate && !activityDateRange.endDate) return null;
 
-  // Format dates for display in French locale
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("fr-FR", {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("fr-FR", {
       day: "numeric",
       month: "short",
       year: "numeric",
     });
-  };
 
   const startDateFormatted = activityDateRange.startDate
     ? formatDate(activityDateRange.startDate)
@@ -392,8 +391,7 @@ export const DateRangeIndicator: React.FC<DateRangeIndicatorProps> = ({
           : "rgba(0, 149, 255, 0.1)",
         borderRadius: 12,
         padding: 12,
-        marginTop: 10,
-        marginBottom: 15,
+        marginVertical: 12,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
@@ -407,11 +405,7 @@ export const DateRangeIndicator: React.FC<DateRangeIndicatorProps> = ({
           style={{ marginRight: 10 }}
         />
         <Text
-          style={{
-            color: COLORS.primary,
-            fontSize: 14,
-            fontWeight: "500",
-          }}
+          style={{ color: COLORS.primary, fontSize: 14, fontWeight: "500" }}
         >
           Période: {startDateFormatted}
           {activityDateRange.endDate ? ` - ${endDateFormatted}` : ""}
@@ -439,20 +433,28 @@ export const DateRangeIndicator: React.FC<DateRangeIndicatorProps> = ({
   );
 };
 
+// -----------------------------------------------------------------------------
+// ASSISTANT TYPE FILTERS COMPONENT
+// -----------------------------------------------------------------------------
+
 interface AssistantTypeFiltersProps {
   uniqueAssistantTypes: string[];
   selectedAssistantTypes: string[];
-  setSelectedAssistantTypes: (value: (prev: string[]) => string[]) => void;
+  setSelectedAssistantTypes: (
+    value: ((prev: string[]) => string[]) | string[]
+  ) => void;
   dark: boolean;
 }
 
-// Composant amélioré pour les filtres de type d'assistant
 export const AssistantTypeFilters: React.FC<AssistantTypeFiltersProps> = ({
   uniqueAssistantTypes,
   selectedAssistantTypes,
   setSelectedAssistantTypes,
   dark,
 }) => {
+  if (!uniqueAssistantTypes || uniqueAssistantTypes.length === 0) return null;
+  const safeSelectedTypes = selectedAssistantTypes || [];
+
   return (
     <View style={{ marginBottom: 15 }}>
       <Text
@@ -472,7 +474,7 @@ export const AssistantTypeFilters: React.FC<AssistantTypeFiltersProps> = ({
         contentContainerStyle={{ paddingBottom: 4 }}
       >
         {uniqueAssistantTypes.map((type) => {
-          const isSelected = selectedAssistantTypes.includes(type);
+          const isSelected = safeSelectedTypes.includes(type);
           const theme = ASSISTANT_THEME[type] || ASSISTANT_THEME.Autre;
           return (
             <TouchableOpacity
@@ -496,11 +498,14 @@ export const AssistantTypeFilters: React.FC<AssistantTypeFiltersProps> = ({
                 shadowRadius: 3,
               }}
               onPress={() => {
-                setSelectedAssistantTypes((prev) =>
-                  prev.includes(type)
-                    ? prev.filter((t) => t !== type)
-                    : [...prev, type]
-                );
+                if (typeof setSelectedAssistantTypes === "function") {
+                  setSelectedAssistantTypes((prev: string[]) => {
+                    const safeArray = prev || [];
+                    return safeArray.includes(type)
+                      ? safeArray.filter((t) => t !== type)
+                      : [...safeArray, type];
+                  });
+                }
               }}
             >
               <FontAwesomeIcon
@@ -550,7 +555,10 @@ export const AssistantTypeFilters: React.FC<AssistantTypeFiltersProps> = ({
   );
 };
 
-// Nouveau composant pour les filtres de matières
+// -----------------------------------------------------------------------------
+// SUBJECT FILTERS COMPONENT
+// -----------------------------------------------------------------------------
+
 interface SubjectFiltersProps {
   availableSubjects: string[];
   selectedSubjects: string[];
@@ -564,7 +572,8 @@ export const SubjectFilters: React.FC<SubjectFiltersProps> = ({
   setSelectedSubjects,
   dark,
 }) => {
-  if (availableSubjects.length === 0) return null;
+  if (!availableSubjects || availableSubjects.length === 0) return null;
+  const safeSelectedSubjects = selectedSubjects || [];
 
   return (
     <View style={{ marginBottom: 15 }}>
@@ -585,7 +594,7 @@ export const SubjectFilters: React.FC<SubjectFiltersProps> = ({
         contentContainerStyle={{ paddingBottom: 4 }}
       >
         {availableSubjects.map((subject) => {
-          const isSelected = selectedSubjects.includes(subject);
+          const isSelected = safeSelectedSubjects.includes(subject);
           const theme = SUBJECT_THEME[subject] || SUBJECT_THEME.Autre;
           return (
             <TouchableOpacity
@@ -610,8 +619,8 @@ export const SubjectFilters: React.FC<SubjectFiltersProps> = ({
               }}
               onPress={() => {
                 const newSelection = isSelected
-                  ? selectedSubjects.filter((s) => s !== subject)
-                  : [...selectedSubjects, subject];
+                  ? safeSelectedSubjects.filter((s) => s !== subject)
+                  : [...safeSelectedSubjects, subject];
                 setSelectedSubjects(newSelection);
               }}
             >
@@ -662,7 +671,10 @@ export const SubjectFilters: React.FC<SubjectFiltersProps> = ({
   );
 };
 
-// Nouveau composant pour les filtres de chapitres
+// -----------------------------------------------------------------------------
+// CHAPTER FILTERS COMPONENT
+// -----------------------------------------------------------------------------
+
 interface ChapterFiltersProps {
   availableChapters: string[];
   selectedChapters: string[];
@@ -676,7 +688,8 @@ export const ChapterFilters: React.FC<ChapterFiltersProps> = ({
   setSelectedChapters,
   dark,
 }) => {
-  if (availableChapters.length === 0) return null;
+  if (!availableChapters || availableChapters.length === 0) return null;
+  const safeSelectedChapters = selectedChapters || [];
 
   return (
     <View style={{ marginBottom: 15 }}>
@@ -697,7 +710,7 @@ export const ChapterFilters: React.FC<ChapterFiltersProps> = ({
         contentContainerStyle={{ paddingBottom: 4 }}
       >
         {availableChapters.map((chapter) => {
-          const isSelected = selectedChapters.includes(chapter);
+          const isSelected = safeSelectedChapters.includes(chapter);
           return (
             <TouchableOpacity
               key={chapter}
@@ -721,8 +734,8 @@ export const ChapterFilters: React.FC<ChapterFiltersProps> = ({
               }}
               onPress={() => {
                 const newSelection = isSelected
-                  ? selectedChapters.filter((c) => c !== chapter)
-                  : [...selectedChapters, chapter];
+                  ? safeSelectedChapters.filter((c) => c !== chapter)
+                  : [...safeSelectedChapters, chapter];
                 setSelectedChapters(newSelection);
               }}
             >
@@ -773,7 +786,10 @@ export const ChapterFilters: React.FC<ChapterFiltersProps> = ({
   );
 };
 
-// Nouveau composant pour les filtres d'exercices
+// -----------------------------------------------------------------------------
+// EXERCISE FILTERS COMPONENT
+// -----------------------------------------------------------------------------
+
 interface ExerciseFiltersProps {
   availableExercises: string[];
   selectedExercises: string[];
@@ -787,7 +803,8 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
   setSelectedExercises,
   dark,
 }) => {
-  if (availableExercises.length === 0) return null;
+  if (!availableExercises || availableExercises.length === 0) return null;
+  const safeSelectedExercises = selectedExercises || [];
 
   return (
     <View style={{ marginBottom: 15 }}>
@@ -800,7 +817,7 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
           paddingHorizontal: 4,
         }}
       >
-        Types d&apos;exercices
+        Types d'exercices
       </Text>
       <ScrollView
         horizontal
@@ -808,7 +825,7 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
         contentContainerStyle={{ paddingBottom: 4 }}
       >
         {availableExercises.map((exercise) => {
-          const isSelected = selectedExercises.includes(exercise);
+          const isSelected = safeSelectedExercises.includes(exercise);
           return (
             <TouchableOpacity
               key={exercise}
@@ -832,8 +849,8 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
               }}
               onPress={() => {
                 const newSelection = isSelected
-                  ? selectedExercises.filter((e) => e !== exercise)
-                  : [...selectedExercises, exercise];
+                  ? safeSelectedExercises.filter((e) => e !== exercise)
+                  : [...safeSelectedExercises, exercise];
                 setSelectedExercises(newSelection);
               }}
             >
@@ -884,6 +901,10 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
   );
 };
 
+// -----------------------------------------------------------------------------
+// FILTER MODAL COMPONENT
+// -----------------------------------------------------------------------------
+
 interface FilterModalProps {
   showActivityCalendar: boolean;
   toggleActivityCalendar: (mode?: "start" | "end") => void;
@@ -892,15 +913,13 @@ interface FilterModalProps {
   setSearchKeyword: (value: string) => void;
   uniqueAssistantTypes: string[];
   selectedAssistantTypes: string[];
-  setSelectedAssistantTypes: (value: (prev: string[]) => string[]) => void;
+  setSelectedAssistantTypes: (
+    value: ((prev: string[]) => string[]) | string[]
+  ) => void;
   activityCalendarMode: "start" | "end";
-  activityDateRange: {
-    startDate: string | null;
-    endDate: string | null;
-  };
-  handleActivityDayPress: (day: any) => void;
+  activityDateRange: { startDate: string | null; endDate: string | null };
+  handleActivityDayPress: (day: DateData) => void;
   resetAllFilters: () => void;
-  // Nouvelles props pour les filtres avancés
   availableSubjects: string[];
   availableChapters: string[];
   availableExercises: string[];
@@ -913,7 +932,6 @@ interface FilterModalProps {
   setAdvancedFilters: (filters: any) => void;
 }
 
-// Composant de modal de filtrage amélioré avec animation
 export const FilterModal: React.FC<FilterModalProps> = ({
   showActivityCalendar,
   toggleActivityCalendar,
@@ -927,7 +945,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   activityDateRange,
   handleActivityDayPress,
   resetAllFilters,
-  // Nouvelles props utilisées
   availableSubjects,
   availableChapters,
   availableExercises,
@@ -939,9 +956,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   ).current;
   const opacity = React.useRef(new Animated.Value(0)).current;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (showActivityCalendar) {
-      // Animate modal in
       Animated.parallel([
         Animated.timing(opacity, {
           toValue: 1,
@@ -956,7 +972,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
         }),
       ]).start();
     } else {
-      // Animate modal out
       Animated.parallel([
         Animated.timing(opacity, {
           toValue: 0,
@@ -972,30 +987,24 @@ export const FilterModal: React.FC<FilterModalProps> = ({
     }
   }, [showActivityCalendar, opacity, translateY]);
 
-  // Get currently selected mode label
-  const getModeTitleText = () => {
-    if (activityCalendarMode === "start") {
-      return "Sélectionner une date de début";
-    } else {
-      return "Sélectionner une date de fin";
-    }
-  };
+  const getModeTitleText = () =>
+    activityCalendarMode === "start"
+      ? "Sélectionner une date de début"
+      : "Sélectionner une date de fin";
 
-  // Prepare date range for calendar
   const getMarkedDates = () => {
-    const markedDates: { [date: string]: any } = {};
+    const marked: { [date: string]: any } = {};
 
     if (activityDateRange.startDate) {
-      markedDates[activityDateRange.startDate] = {
+      marked[activityDateRange.startDate] = {
         selected: true,
         startingDay: true,
         color: COLORS.primary,
         textColor: "#FFFFFF",
       };
     }
-
     if (activityDateRange.endDate) {
-      markedDates[activityDateRange.endDate] = {
+      marked[activityDateRange.endDate] = {
         selected: true,
         endingDay: true,
         color: COLORS.primary,
@@ -1003,18 +1012,14 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       };
     }
 
-    // If both dates are set, mark the dates between them
     if (activityDateRange.startDate && activityDateRange.endDate) {
       const start = new Date(activityDateRange.startDate);
       const end = new Date(activityDateRange.endDate);
-
-      // Mark dates in between
       const current = new Date(start);
       current.setDate(current.getDate() + 1);
-
       while (current < end) {
         const dateStr = current.toISOString().split("T")[0];
-        markedDates[dateStr] = {
+        marked[dateStr] = {
           selected: true,
           color: `${COLORS.primary}80`,
           textColor: "#FFFFFF",
@@ -1022,15 +1027,14 @@ export const FilterModal: React.FC<FilterModalProps> = ({
         current.setDate(current.getDate() + 1);
       }
     }
-
-    return markedDates;
+    return marked;
   };
 
   return (
     <Modal
       visible={showActivityCalendar}
       transparent
-      animationType="none" // We're doing our own animation
+      animationType="none"
       onRequestClose={() => toggleActivityCalendar()}
     >
       <View
@@ -1042,17 +1046,16 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       >
         <Animated.View
           style={{
-            opacity: opacity,
+            opacity,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
           }}
         >
           <TouchableOpacity
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-            }}
+            style={{ flex: 1 }}
             activeOpacity={1}
             onPress={() => toggleActivityCalendar()}
           />
@@ -1065,7 +1068,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             borderTopRightRadius: 24,
             padding: 20,
             maxHeight: "90%",
-            transform: [{ translateY: translateY }],
+            transform: [{ translateY }],
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -5 },
             shadowOpacity: 0.15,
@@ -1073,7 +1076,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             elevation: 10,
           }}
         >
-          {/* Modal Header */}
+          {/* HEADER */}
           <View
             style={{
               flexDirection: "row",
@@ -1116,7 +1119,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 20 }}
           >
-            {/* Search Input */}
+            {/* SEARCH INPUT */}
             <View
               style={{
                 backgroundColor: dark
@@ -1149,18 +1152,20 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   fontSize: 16,
                 }}
               />
-              {searchKeyword ? (
+              {searchKeyword && (
                 <TouchableOpacity onPress={() => setSearchKeyword("")}>
-                  <FontAwesomeIcon
-                    icon={faTimesCircle}
-                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-                    size={16}
-                  />
+                  {
+                    <FontAwesomeIcon
+                      icon={faTimesCircle}
+                      color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                      size={16}
+                    />
+                  }
                 </TouchableOpacity>
-              ) : null}
+              )}
             </View>
 
-            {/* Calendar Date Selection */}
+            {/* CALENDAR SECTION */}
             <View style={{ marginBottom: 24 }}>
               <View
                 style={{
@@ -1186,7 +1191,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 </Text>
               </View>
 
-              {/* Calendar Status */}
               <View
                 style={{
                   backgroundColor: dark
@@ -1221,17 +1225,12 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                       Date de début:{" "}
                       {new Date(activityDateRange.startDate).toLocaleDateString(
                         "fr-FR",
-                        {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        }
+                        { day: "numeric", month: "long", year: "numeric" }
                       )}
                     </Text>
                   )}
               </View>
 
-              {/* Calendar Component */}
               <Calendar
                 style={{
                   borderRadius: 16,
@@ -1265,64 +1264,85 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 markingType="period"
                 markedDates={getMarkedDates()}
                 onDayPress={handleActivityDayPress}
-                enableSwipeMonths={true}
+                enableSwipeMonths
               />
             </View>
 
-            {/* Assistant Types */}
-            <AssistantTypeFilters
-              uniqueAssistantTypes={uniqueAssistantTypes}
-              selectedAssistantTypes={advancedFilters.selectedAssistants}
-              setSelectedAssistantTypes={(assistants) =>
-                setAdvancedFilters({ selectedAssistants: assistants })
-              }
-              dark={dark}
-            />
-
-            {/* Subject Filters (Only if J'Apprends is selected) */}
-            {advancedFilters.selectedAssistants.includes("J'Apprends") && (
-              <SubjectFilters
-                availableSubjects={availableSubjects}
-                selectedSubjects={advancedFilters.selectedSubjects}
-                setSelectedSubjects={(subjects) =>
-                  setAdvancedFilters({ selectedSubjects: subjects })
+            {/* ADVANCED FILTERS */}
+            {uniqueAssistantTypes.length > 0 && (
+              <AssistantTypeFilters
+                uniqueAssistantTypes={uniqueAssistantTypes}
+                selectedAssistantTypes={
+                  advancedFilters.selectedAssistants || []
                 }
+                setSelectedAssistantTypes={(assistants) => {
+                  if (typeof assistants === "function") {
+                    const newAssistants = assistants(
+                      advancedFilters.selectedAssistants || []
+                    );
+                    setAdvancedFilters({
+                      ...advancedFilters,
+                      selectedAssistants: newAssistants,
+                    });
+                  } else {
+                    setAdvancedFilters({
+                      ...advancedFilters,
+                      selectedAssistants: assistants,
+                    });
+                  }
+                }}
                 dark={dark}
               />
             )}
 
-            {/* Chapter Filters (Only if a subject is selected) */}
-            {advancedFilters.selectedSubjects.length > 0 && (
-              <ChapterFilters
-                availableChapters={availableChapters}
-                selectedChapters={advancedFilters.selectedChapters}
-                setSelectedChapters={(chapters) =>
-                  setAdvancedFilters({ selectedChapters: chapters })
-                }
-                dark={dark}
-              />
-            )}
+            {advancedFilters.selectedAssistants?.includes("J'Apprends") &&
+              availableSubjects.length > 0 && (
+                <SubjectFilters
+                  availableSubjects={availableSubjects}
+                  selectedSubjects={advancedFilters.selectedSubjects || []}
+                  setSelectedSubjects={(subjects) =>
+                    setAdvancedFilters({
+                      ...advancedFilters,
+                      selectedSubjects: subjects,
+                    })
+                  }
+                  dark={dark}
+                />
+              )}
 
-            {/* Exercise Filters (Only if a chapter is selected) */}
-            {advancedFilters.selectedChapters.length > 0 && (
-              <ExerciseFilters
-                availableExercises={availableExercises}
-                selectedExercises={advancedFilters.selectedExercises}
-                setSelectedExercises={(exercises) =>
-                  setAdvancedFilters({ selectedExercises: exercises })
-                }
-                dark={dark}
-              />
-            )}
+            {advancedFilters.selectedSubjects?.length > 0 &&
+              availableChapters.length > 0 && (
+                <ChapterFilters
+                  availableChapters={availableChapters}
+                  selectedChapters={advancedFilters.selectedChapters || []}
+                  setSelectedChapters={(chapters) =>
+                    setAdvancedFilters({
+                      ...advancedFilters,
+                      selectedChapters: chapters,
+                    })
+                  }
+                  dark={dark}
+                />
+              )}
+
+            {advancedFilters.selectedChapters?.length > 0 &&
+              availableExercises.length > 0 && (
+                <ExerciseFilters
+                  availableExercises={availableExercises}
+                  selectedExercises={advancedFilters.selectedExercises || []}
+                  setSelectedExercises={(exercises) =>
+                    setAdvancedFilters({
+                      ...advancedFilters,
+                      selectedExercises: exercises,
+                    })
+                  }
+                  dark={dark}
+                />
+              )}
           </ScrollView>
 
-          {/* Action Buttons */}
-          <View
-            style={{
-              flexDirection: "row",
-              marginTop: 16,
-            }}
-          >
+          {/* ACTION BUTTONS */}
+          <View style={{ flexDirection: "row", marginTop: 16 }}>
             <TouchableOpacity
               style={{
                 flex: 1,
@@ -1346,7 +1366,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 Réinitialiser
               </Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               style={{
                 flex: 1,
@@ -1364,11 +1383,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               onPress={() => toggleActivityCalendar()}
             >
               <Text
-                style={{
-                  color: COLORS.white,
-                  fontWeight: "600",
-                  fontSize: 16,
-                }}
+                style={{ color: COLORS.white, fontWeight: "600", fontSize: 16 }}
               >
                 Appliquer
               </Text>
@@ -1379,3 +1394,5 @@ export const FilterModal: React.FC<FilterModalProps> = ({
     </Modal>
   );
 };
+
+// EOF – filtre.tsx

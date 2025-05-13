@@ -1,10 +1,11 @@
-// app/Enfants/Historique/filtre.ts
+// app/Enfants/Historique/filtre.ts - improved version
 import { useState, useEffect } from "react";
 
 import type { Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
 import { enhanceActivity } from "../../../data/Enfants/CHILDREN_DATA";
 
+// Define stronger types for our filter state
 interface ActivityFiltersState {
   searchKeyword: string;
   activityDateRange: {
@@ -22,6 +23,7 @@ interface ActivityFiltersState {
 }
 
 export const useActivityFilters = (activities: Activity[]) => {
+  // Initialize filter state with proper default values for all properties
   const [filters, setFilters] = useState<ActivityFiltersState>({
     searchKeyword: "",
     activityDateRange: {
@@ -31,40 +33,47 @@ export const useActivityFilters = (activities: Activity[]) => {
     showActivityCalendar: false,
     activityCalendarMode: "start",
     advancedFilters: {
-      selectedAssistants: [],
+      selectedAssistants: [], // Initialize as empty array, not undefined
       selectedSubjects: [],
       selectedChapters: [],
       selectedExercises: [],
     },
   });
 
-  const [filteredActivities, setFilteredActivities] =
-    useState<Activity[]>(activities);
+  const [filteredActivities, setFilteredActivities] = useState<Activity[]>(
+    activities || []
+  );
 
-  // Nouveaux états pour les options disponibles en cascade
+  // Options state with default values
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
   const [availableChapters, setAvailableChapters] = useState<string[]>([]);
   const [availableExercises, setAvailableExercises] = useState<string[]>([]);
 
-  // Mettre à jour les assistants disponibles à partir des activités
+  // Get available assistants from activities
   const getAvailableAssistants = () => {
     if (!activities || activities.length === 0) return [];
 
     const enhancedActivities = activities.map((activity) =>
       enhanceActivity(activity)
     );
+
     const assistants = enhancedActivities
       .map((activity) => activity.assistant)
-      .filter((assistant): assistant is string => !!assistant)
+      .filter((assistant): assistant is string => Boolean(assistant))
       .filter((value, index, self) => self.indexOf(value) === index);
 
     return assistants;
   };
 
-  // Mettre à jour les matières disponibles quand l'assistant change
+  // Update available subjects when selected assistants change
   useEffect(() => {
+    // Ensure selectedAssistants exists before trying to use it
+    if (!filters.advancedFilters.selectedAssistants) {
+      return;
+    }
+
     if (filters.advancedFilters.selectedAssistants.includes("J'Apprends")) {
-      // Filtrer les activités par l'assistant sélectionné
+      // Filter activities by the selected assistant
       const enhancedActivities = activities.map((activity) =>
         enhanceActivity(activity)
       );
@@ -72,17 +81,18 @@ export const useActivityFilters = (activities: Activity[]) => {
         (activity) => activity.assistant === "J'Apprends"
       );
 
-      // Extraire les matières uniques
+      // Extract unique subjects
       const subjects = assistantActivities
         .map((activity) => activity.matiere)
         .filter(
-          (value, index, self) => value && self.indexOf(value) === index
+          (value, index, self) =>
+            value && typeof value === "string" && self.indexOf(value) === index
         ) as string[];
 
       setAvailableSubjects(subjects);
     } else {
       setAvailableSubjects([]);
-      // Réinitialiser les filtres en cascade si l'assistant n'est pas "J'Apprends"
+      // Reset cascade filters when J'Apprends is not selected
       setFilters((prev) => ({
         ...prev,
         advancedFilters: {
@@ -95,31 +105,38 @@ export const useActivityFilters = (activities: Activity[]) => {
     }
   }, [filters.advancedFilters.selectedAssistants, activities]);
 
-  // Mettre à jour les chapitres disponibles quand la matière change
+  // Update available chapters when selected subjects change
   useEffect(() => {
-    if (filters.advancedFilters.selectedSubjects.length > 0) {
-      const enhancedActivities = activities.map((activity) =>
-        enhanceActivity(activity)
-      );
-      const subjectActivities = enhancedActivities.filter(
-        (activity) =>
-          activity.assistant === "J'Apprends" &&
-          filters.advancedFilters.selectedSubjects.includes(
-            activity.matiere || ""
-          )
-      );
-
-      // Extraire les chapitres uniques
-      const chapters = subjectActivities
-        .map((activity) => activity.chapitre)
-        .filter(
-          (value, index, self) => value && self.indexOf(value) === index
-        ) as string[];
-
-      setAvailableChapters(chapters);
-    } else {
+    if (
+      !filters.advancedFilters.selectedSubjects ||
+      filters.advancedFilters.selectedSubjects.length === 0
+    ) {
       setAvailableChapters([]);
-      // Réinitialiser les filtres de chapitres et exercices si aucune matière n'est sélectionnée
+      return;
+    }
+
+    const enhancedActivities = activities.map((activity) =>
+      enhanceActivity(activity)
+    );
+    const subjectActivities = enhancedActivities.filter(
+      (activity) =>
+        activity.assistant === "J'Apprends" &&
+        activity.matiere &&
+        filters.advancedFilters.selectedSubjects.includes(activity.matiere)
+    );
+
+    // Extract unique chapters
+    const chapters = subjectActivities
+      .map((activity) => activity.chapitre)
+      .filter(
+        (value, index, self) =>
+          value && typeof value === "string" && self.indexOf(value) === index
+      ) as string[];
+
+    setAvailableChapters(chapters);
+
+    // Reset exercise selection when subjects change
+    if (filters.advancedFilters.selectedChapters.length > 0) {
       setFilters((prev) => ({
         ...prev,
         advancedFilters: {
@@ -131,34 +148,40 @@ export const useActivityFilters = (activities: Activity[]) => {
     }
   }, [filters.advancedFilters.selectedSubjects, activities]);
 
-  // Mettre à jour les exercices disponibles quand le chapitre change
+  // Update available exercises when selected chapters change
   useEffect(() => {
-    if (filters.advancedFilters.selectedChapters.length > 0) {
-      const enhancedActivities = activities.map((activity) =>
-        enhanceActivity(activity)
-      );
-      const chapterActivities = enhancedActivities.filter(
-        (activity) =>
-          activity.assistant === "J'Apprends" &&
-          filters.advancedFilters.selectedSubjects.includes(
-            activity.matiere || ""
-          ) &&
-          filters.advancedFilters.selectedChapters.includes(
-            activity.chapitre || ""
-          )
-      );
-
-      // Extraire les exercices uniques
-      const exercises = chapterActivities
-        .map((activity) => activity.typeExercice)
-        .filter(
-          (value, index, self) => value && self.indexOf(value) === index
-        ) as string[];
-
-      setAvailableExercises(exercises);
-    } else {
+    if (
+      !filters.advancedFilters.selectedChapters ||
+      filters.advancedFilters.selectedChapters.length === 0
+    ) {
       setAvailableExercises([]);
-      // Réinitialiser le filtre d'exercices si aucun chapitre n'est sélectionné
+      return;
+    }
+
+    const enhancedActivities = activities.map((activity) =>
+      enhanceActivity(activity)
+    );
+    const chapterActivities = enhancedActivities.filter(
+      (activity) =>
+        activity.assistant === "J'Apprends" &&
+        activity.matiere &&
+        filters.advancedFilters.selectedSubjects.includes(activity.matiere) &&
+        activity.chapitre &&
+        filters.advancedFilters.selectedChapters.includes(activity.chapitre)
+    );
+
+    // Extract unique exercises
+    const exercises = chapterActivities
+      .map((activity) => activity.typeExercice)
+      .filter(
+        (value, index, self) =>
+          value && typeof value === "string" && self.indexOf(value) === index
+      ) as string[];
+
+    setAvailableExercises(exercises);
+
+    // Reset exercise selection when chapters change
+    if (filters.advancedFilters.selectedExercises.length > 0) {
       setFilters((prev) => ({
         ...prev,
         advancedFilters: {
@@ -182,7 +205,7 @@ export const useActivityFilters = (activities: Activity[]) => {
 
     let result = [...activities];
 
-    // Enhance all activities to get additional data like subject and assistant
+    // Enhance all activities to get additional data
     const enhancedActivities = activities.map((activity) =>
       enhanceActivity(activity)
     );
@@ -192,7 +215,8 @@ export const useActivityFilters = (activities: Activity[]) => {
       const keyword = filters.searchKeyword.toLowerCase();
       result = enhancedActivities.filter(
         (activity) =>
-          activity.activite?.toLowerCase().includes(keyword) ||
+          (activity.activite &&
+            activity.activite.toLowerCase().includes(keyword)) ||
           (activity.matiere &&
             activity.matiere.toLowerCase().includes(keyword)) ||
           (activity.assistant &&
@@ -204,50 +228,37 @@ export const useActivityFilters = (activities: Activity[]) => {
 
     // Apply date range filter
     if (
-      filters.activityDateRange.startDate &&
+      filters.activityDateRange.startDate ||
       filters.activityDateRange.endDate
     ) {
       result = result.filter((activity) => {
         if (!activity.date) return false;
 
         const activityDate = new Date(activity.date);
-        const startDate = new Date(
-          filters.activityDateRange.startDate as string
-        );
-        const endDate = new Date(filters.activityDateRange.endDate as string);
 
-        // End date should include the whole day
-        endDate.setHours(23, 59, 59, 999);
+        // Check start date if set
+        if (filters.activityDateRange.startDate) {
+          const startDate = new Date(filters.activityDateRange.startDate);
+          if (activityDate < startDate) return false;
+        }
 
-        return activityDate >= startDate && activityDate <= endDate;
-      });
-    } else if (filters.activityDateRange.startDate) {
-      result = result.filter((activity) => {
-        if (!activity.date) return false;
+        // Check end date if set
+        if (filters.activityDateRange.endDate) {
+          const endDate = new Date(filters.activityDateRange.endDate);
+          // End date should include the whole day
+          endDate.setHours(23, 59, 59, 999);
+          if (activityDate > endDate) return false;
+        }
 
-        const activityDate = new Date(activity.date);
-        const startDate = new Date(
-          filters.activityDateRange.startDate as string
-        );
-
-        return activityDate >= startDate;
-      });
-    } else if (filters.activityDateRange.endDate) {
-      result = result.filter((activity) => {
-        if (!activity.date) return false;
-
-        const activityDate = new Date(activity.date);
-        const endDate = new Date(filters.activityDateRange.endDate as string);
-
-        // End date should include the whole day
-        endDate.setHours(23, 59, 59, 999);
-
-        return activityDate <= endDate;
+        return true;
       });
     }
 
     // Apply assistant filter
-    if (filters.advancedFilters.selectedAssistants.length > 0) {
+    if (
+      filters.advancedFilters.selectedAssistants &&
+      filters.advancedFilters.selectedAssistants.length > 0
+    ) {
       result = result.filter(
         (activity) =>
           activity.assistant &&
@@ -258,7 +269,10 @@ export const useActivityFilters = (activities: Activity[]) => {
     }
 
     // Apply subject filter
-    if (filters.advancedFilters.selectedSubjects.length > 0) {
+    if (
+      filters.advancedFilters.selectedSubjects &&
+      filters.advancedFilters.selectedSubjects.length > 0
+    ) {
       result = result.filter(
         (activity) =>
           activity.matiere &&
@@ -267,7 +281,10 @@ export const useActivityFilters = (activities: Activity[]) => {
     }
 
     // Apply chapter filter
-    if (filters.advancedFilters.selectedChapters.length > 0) {
+    if (
+      filters.advancedFilters.selectedChapters &&
+      filters.advancedFilters.selectedChapters.length > 0
+    ) {
       result = result.filter(
         (activity) =>
           activity.chapitre &&
@@ -276,7 +293,10 @@ export const useActivityFilters = (activities: Activity[]) => {
     }
 
     // Apply exercise filter
-    if (filters.advancedFilters.selectedExercises.length > 0) {
+    if (
+      filters.advancedFilters.selectedExercises &&
+      filters.advancedFilters.selectedExercises.length > 0
+    ) {
       result = result.filter(
         (activity) =>
           activity.typeExercice &&
@@ -297,6 +317,7 @@ export const useActivityFilters = (activities: Activity[]) => {
     }));
   };
 
+  // Set date range
   const setActivityDateRange = (range: {
     startDate: string | null;
     endDate: string | null;
@@ -307,7 +328,7 @@ export const useActivityFilters = (activities: Activity[]) => {
     }));
   };
 
-  // Toggle calendar visibility
+  // Toggle calendar visibility with mode
   const toggleActivityCalendar = (mode: "start" | "end" = "start") => {
     setFilters((prev) => ({
       ...prev,
@@ -317,7 +338,7 @@ export const useActivityFilters = (activities: Activity[]) => {
   };
 
   // Handle date selection
-  const handleActivityDayPress = (day: any) => {
+  const handleActivityDayPress = (day: { dateString: string }) => {
     const selectedDate = day.dateString;
 
     setFilters((prev) => {
@@ -353,7 +374,7 @@ export const useActivityFilters = (activities: Activity[]) => {
     });
   };
 
-  // Set advanced filters
+  // Set advanced filters - with safe type checking
   const setAdvancedFilters = (newFilters: {
     selectedAssistants?: string[];
     selectedSubjects?: string[];
@@ -364,7 +385,18 @@ export const useActivityFilters = (activities: Activity[]) => {
       ...prev,
       advancedFilters: {
         ...prev.advancedFilters,
-        ...newFilters,
+        ...(newFilters.selectedAssistants !== undefined
+          ? { selectedAssistants: newFilters.selectedAssistants }
+          : {}),
+        ...(newFilters.selectedSubjects !== undefined
+          ? { selectedSubjects: newFilters.selectedSubjects }
+          : {}),
+        ...(newFilters.selectedChapters !== undefined
+          ? { selectedChapters: newFilters.selectedChapters }
+          : {}),
+        ...(newFilters.selectedExercises !== undefined
+          ? { selectedExercises: newFilters.selectedExercises }
+          : {}),
       },
     }));
   };
@@ -394,16 +426,32 @@ export const useActivityFilters = (activities: Activity[]) => {
       filters.searchKeyword !== "" ||
       filters.activityDateRange.startDate !== null ||
       filters.activityDateRange.endDate !== null ||
-      filters.advancedFilters.selectedAssistants.length > 0 ||
-      filters.advancedFilters.selectedSubjects.length > 0 ||
-      filters.advancedFilters.selectedChapters.length > 0 ||
-      filters.advancedFilters.selectedExercises.length > 0
+      (filters.advancedFilters.selectedAssistants &&
+        filters.advancedFilters.selectedAssistants.length > 0) ||
+      (filters.advancedFilters.selectedSubjects &&
+        filters.advancedFilters.selectedSubjects.length > 0) ||
+      (filters.advancedFilters.selectedChapters &&
+        filters.advancedFilters.selectedChapters.length > 0) ||
+      (filters.advancedFilters.selectedExercises &&
+        filters.advancedFilters.selectedExercises.length > 0)
     );
   };
 
   // Helper to get unique assistant types
   const getUniqueAssistantTypes = () => {
     return getAvailableAssistants();
+  };
+
+  // Debug function to log filter state
+  const logFilterState = () => {
+    console.log("Current filter state:", {
+      searchKeyword: filters.searchKeyword,
+      dateRange: filters.activityDateRange,
+      advancedFilters: filters.advancedFilters,
+      availableSubjects,
+      availableChapters,
+      availableExercises,
+    });
   };
 
   return {
@@ -413,10 +461,11 @@ export const useActivityFilters = (activities: Activity[]) => {
     activityCalendarMode: filters.activityCalendarMode,
     advancedFilters: filters.advancedFilters,
     filteredActivities,
-    // Retourner les options disponibles pour l'interface utilisateur
+    // Return available options for UI
     availableSubjects,
     availableChapters,
     availableExercises,
+    // Functions
     setSearchKeyword,
     toggleActivityCalendar,
     handleActivityDayPress,
@@ -425,5 +474,6 @@ export const useActivityFilters = (activities: Activity[]) => {
     getUniqueAssistantTypes,
     hasActiveFilters,
     setActivityDateRange,
+    logFilterState, // Add debug function
   };
 };
