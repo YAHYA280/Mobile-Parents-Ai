@@ -7,6 +7,7 @@ import * as SplashScreen from "expo-splash-screen";
 import "react-native-reanimated";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import "../constants/fontawesome";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+
 import {
   View,
   Text,
@@ -11,7 +12,6 @@ import {
   TouchableOpacity,
   Animated,
   Share,
-  Platform,
   StatusBar,
 } from "react-native";
 
