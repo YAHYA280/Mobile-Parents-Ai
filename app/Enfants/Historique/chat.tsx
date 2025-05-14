@@ -63,7 +63,6 @@ const ASSISTANT_THEME: Record<
 
 const ChatScreen = () => {
   const router = useRouter();
-  const { dark, colors } = useTheme();
   const params = useLocalSearchParams();
   const scrollViewRef = useRef<ScrollView>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -151,22 +150,20 @@ const ChatScreen = () => {
   // Loading display
   if (isLoading) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
-      >
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            backgroundColor: "#FFFFFF",
           }}
         >
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text
             style={{
               marginTop: 20,
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
               fontSize: 16,
               fontFamily: "medium",
             }}
@@ -181,27 +178,25 @@ const ChatScreen = () => {
   // Data not found
   if (!activity || !child) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
-      >
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            backgroundColor: "#FFFFFF",
             padding: 24,
           }}
         >
           <FontAwesomeIcon
             icon="exclamation-circle"
             size={64}
-            color={dark ? COLORS.white : COLORS.black}
+            color={COLORS.black}
           />
           <Text
             style={{
               marginTop: 20,
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
               fontSize: 18,
               fontWeight: "bold",
               textAlign: "center",
@@ -212,7 +207,7 @@ const ChatScreen = () => {
           <Text
             style={{
               marginTop: 10,
-              color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+              color: COLORS.gray3,
               textAlign: "center",
               marginBottom: 30,
             }}
@@ -275,9 +270,7 @@ const ChatScreen = () => {
   };
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -287,7 +280,7 @@ const ChatScreen = () => {
           style={{
             flex: 1,
             opacity: fadeAnim,
-            backgroundColor: dark ? COLORS.dark1 : "#F8F8F8",
+            backgroundColor: "#F8F8F8",
           }}
         >
           {/* Header */}
@@ -297,10 +290,8 @@ const ChatScreen = () => {
               alignItems: "center",
               padding: 16,
               borderBottomWidth: 1,
-              borderBottomColor: dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.05)",
-              backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+              borderBottomColor: "rgba(0,0,0,0.05)",
+              backgroundColor: "#FFFFFF",
               elevation: 2,
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 1 },
@@ -314,19 +305,13 @@ const ChatScreen = () => {
                 width: 40,
                 height: 40,
                 borderRadius: 20,
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(0,0,0,0.05)",
+                backgroundColor: "rgba(0,0,0,0.05)",
                 justifyContent: "center",
                 alignItems: "center",
                 marginRight: 12,
               }}
             >
-              <Ionicons
-                name="arrow-back"
-                size={22}
-                color={dark ? COLORS.white : COLORS.black}
-              />
+              <Ionicons name="arrow-back" size={22} color={COLORS.black} />
             </TouchableOpacity>
 
             <LinearGradient
@@ -359,7 +344,7 @@ const ChatScreen = () => {
                 style={{
                   fontSize: 18,
                   fontWeight: "bold",
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 }}
               >
                 Assistant {assistantName}
@@ -367,7 +352,7 @@ const ChatScreen = () => {
               <Text
                 style={{
                   fontSize: 13,
-                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  color: COLORS.gray3,
                 }}
               >
                 {formattedDate}
@@ -380,13 +365,9 @@ const ChatScreen = () => {
             style={{
               paddingVertical: 14,
               paddingHorizontal: 16,
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(0,0,0,0.02)",
+              backgroundColor: "rgba(0,0,0,0.02)",
               borderBottomWidth: 1,
-              borderBottomColor: dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.05)",
+              borderBottomColor: "rgba(0,0,0,0.05)",
             }}
           >
             <View
@@ -400,7 +381,7 @@ const ChatScreen = () => {
                 style={{
                   fontSize: 16,
                   fontWeight: "500",
-                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  color: COLORS.gray3,
                   flex: 1,
                 }}
               >
@@ -410,9 +391,7 @@ const ChatScreen = () => {
                 onPress={() => setShowStatement(!showStatement)}
                 style={{
                   padding: 8,
-                  backgroundColor: dark
-                    ? "rgba(255,255,255,0.1)"
-                    : "rgba(0,0,0,0.05)",
+                  backgroundColor: "rgba(0,0,0,0.05)",
                   borderRadius: 20,
                   width: 36,
                   height: 36,
@@ -423,14 +402,14 @@ const ChatScreen = () => {
                 <FontAwesomeIcon
                   icon={showStatement ? "chevron-up" : "chevron-down"}
                   size={16}
-                  color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                  color={COLORS.gray3}
                 />
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Corrected Statement Section */}
-          {showStatement && <Statement activity={activity} dark={dark} />}
+          {showStatement && <Statement activity={activity} />}
 
           {/* Chat Messages */}
           <ScrollView
@@ -481,12 +460,8 @@ const ChatScreen = () => {
                   <View
                     style={{
                       backgroundColor: isAssistant
-                        ? dark
-                          ? "rgba(0, 149, 255, 0.2)"
-                          : "rgba(0, 149, 255, 0.08)"
-                        : dark
-                          ? "rgba(66, 66, 66, 0.8)"
-                          : "#F0F0F0",
+                        ? "rgba(0, 149, 255, 0.08)"
+                        : "#F0F0F0",
                       padding: 16,
                       maxWidth: "85%",
                       minWidth: 80,
@@ -500,13 +475,7 @@ const ChatScreen = () => {
                   >
                     <Text
                       style={{
-                        color: isAssistant
-                          ? dark
-                            ? COLORS.white
-                            : "#0066CC"
-                          : dark
-                            ? COLORS.white
-                            : COLORS.black,
+                        color: isAssistant ? "#0066CC" : COLORS.black,
                         fontSize: 15,
                         lineHeight: 22,
                         fontWeight: isAssistant ? "normal" : "500",
@@ -517,9 +486,7 @@ const ChatScreen = () => {
                     <Text
                       style={{
                         fontSize: 11,
-                        color: dark
-                          ? "rgba(255, 255, 255, 0.5)"
-                          : "rgba(0, 0, 0, 0.4)",
+                        color: "rgba(0, 0, 0, 0.4)",
                         alignSelf: "flex-end",
                         marginTop: 6,
                       }}
@@ -537,20 +504,16 @@ const ChatScreen = () => {
             style={{
               flexDirection: "row",
               padding: 12,
-              backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+              backgroundColor: COLORS.white,
               borderTopWidth: 1,
-              borderTopColor: dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.05)",
+              borderTopColor: "rgba(0,0,0,0.05)",
               alignItems: "center",
             }}
           >
             <View
               style={{
                 flex: 1,
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.03)",
+                backgroundColor: "rgba(0,0,0,0.03)",
                 borderRadius: 25,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
@@ -560,30 +523,22 @@ const ChatScreen = () => {
             >
               <TextInput
                 placeholder="Ce chat est en lecture seule..."
-                placeholderTextColor={
-                  dark ? COLORS.secondaryWhite : COLORS.gray3
-                }
+                placeholderTextColor={COLORS.gray3}
                 style={{
                   flex: 1,
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                   fontSize: 15,
                 }}
                 editable={false}
               />
-              <Ionicons
-                name="lock-closed"
-                size={18}
-                color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-              />
+              <Ionicons name="lock-closed" size={18} color={COLORS.gray3} />
             </View>
           </View>
 
           {/* Info Banner */}
           <View
             style={{
-              backgroundColor: dark
-                ? "rgba(0, 149, 255, 0.1)"
-                : "rgba(0, 149, 255, 0.05)",
+              backgroundColor: "rgba(0, 149, 255, 0.05)",
               padding: 14,
               alignItems: "center",
               flexDirection: "row",

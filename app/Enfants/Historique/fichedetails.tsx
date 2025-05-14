@@ -61,7 +61,6 @@ const PEDAGOGICAL_RESOURCES: PedagogicalResource[] = [
 
 const FicheDetails = () => {
   const router = useRouter();
-  const { dark, colors } = useTheme();
   const params = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -143,33 +142,25 @@ const FicheDetails = () => {
 
   if (isLoading) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
-      >
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
         <View
           style={{
             padding: 16,
             flexDirection: "row",
             alignItems: "center",
-            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            backgroundColor: "#FFFFFF",
             borderBottomWidth: 1,
-            borderBottomColor: dark
-              ? "rgba(255,255,255,0.1)"
-              : "rgba(0,0,0,0.05)",
+            borderBottomColor: "rgba(0,0,0,0.05)",
           }}
         >
           <TouchableOpacity onPress={handleBack} style={{ marginRight: 16 }}>
-            <FontAwesomeIcon
-              icon="arrow-left"
-              size={22}
-              color={dark ? COLORS.white : COLORS.black}
-            />
+            <FontAwesomeIcon icon="arrow-left" size={22} color={COLORS.black} />
           </TouchableOpacity>
           <Text
             style={{
               fontSize: 18,
               fontWeight: "bold",
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
             }}
           >
             Fiche Pédagogique
@@ -179,9 +170,7 @@ const FicheDetails = () => {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text
-            style={{ marginTop: 16, color: dark ? COLORS.white : COLORS.black }}
-          >
+          <Text style={{ marginTop: 16, color: COLORS.black }}>
             Chargement de la fiche...
           </Text>
         </View>
@@ -190,9 +179,7 @@ const FicheDetails = () => {
   }
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
       {/* Header */}
       <View
         style={{
@@ -200,10 +187,8 @@ const FicheDetails = () => {
           alignItems: "center",
           padding: 16,
           borderBottomWidth: 1,
-          borderBottomColor: dark
-            ? "rgba(255,255,255,0.1)"
-            : "rgba(0,0,0,0.05)",
-          backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+          borderBottomColor: "rgba(0,0,0,0.05)",
+          backgroundColor: "#FFFFFF",
           elevation: 2,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 1 },
@@ -217,26 +202,20 @@ const FicheDetails = () => {
             width: 40,
             height: 40,
             borderRadius: 20,
-            backgroundColor: dark
-              ? "rgba(255,255,255,0.08)"
-              : "rgba(0,0,0,0.05)",
+            backgroundColor: "rgba(0,0,0,0.05)",
             justifyContent: "center",
             alignItems: "center",
             marginRight: 12,
           }}
         >
-          <FontAwesomeIcon
-            icon="arrow-left"
-            size={18}
-            color={dark ? COLORS.white : COLORS.black}
-          />
+          <FontAwesomeIcon icon="arrow-left" size={18} color={COLORS.black} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text
             style={{
               fontSize: 18,
               fontWeight: "bold",
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
             }}
           >
             Fiche Pédagogique
@@ -244,7 +223,7 @@ const FicheDetails = () => {
           <Text
             style={{
               fontSize: 13,
-              color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+              color: COLORS.gray3,
             }}
           >
             {resource.subject}
@@ -255,20 +234,14 @@ const FicheDetails = () => {
             width: 40,
             height: 40,
             borderRadius: 20,
-            backgroundColor: dark
-              ? "rgba(255,255,255,0.08)"
-              : "rgba(0,0,0,0.05)",
+            backgroundColor: "rgba(0,0,0,0.05)",
             justifyContent: "center",
             alignItems: "center",
             marginLeft: 8,
           }}
           onPress={handleShare}
         >
-          <FontAwesomeIcon
-            icon="share-alt"
-            size={18}
-            color={dark ? COLORS.white : COLORS.black}
-          />
+          <FontAwesomeIcon icon="share-alt" size={18} color={COLORS.black} />
         </TouchableOpacity>
       </View>
 
@@ -286,7 +259,7 @@ const FicheDetails = () => {
           {/* Resource Title Card */}
           <View
             style={{
-              backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+              backgroundColor: COLORS.white,
               borderRadius: 16,
               padding: 20,
               marginBottom: 16,
@@ -301,7 +274,7 @@ const FicheDetails = () => {
               style={{
                 fontSize: 22,
                 fontWeight: "bold",
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
                 marginBottom: 16,
               }}
             >
@@ -318,9 +291,7 @@ const FicheDetails = () => {
             >
               <View
                 style={{
-                  backgroundColor: dark
-                    ? "rgba(255,255,255,0.08)"
-                    : "rgba(0,0,0,0.05)",
+                  backgroundColor: "rgba(0,0,0,0.05)",
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 16,
@@ -333,12 +304,12 @@ const FicheDetails = () => {
                 <FontAwesomeIcon
                   icon="book"
                   size={14}
-                  color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                  color={COLORS.gray3}
                   style={{ marginRight: 6 }}
                 />
                 <Text
                   style={{
-                    color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                    color: COLORS.gray3,
                     fontWeight: "500",
                     fontSize: 14,
                   }}
@@ -381,9 +352,7 @@ const FicheDetails = () => {
 
               <View
                 style={{
-                  backgroundColor: dark
-                    ? "rgba(255,255,255,0.08)"
-                    : "rgba(0,0,0,0.05)",
+                  backgroundColor: "rgba(0,0,0,0.05)",
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 16,
@@ -395,12 +364,12 @@ const FicheDetails = () => {
                 <FontAwesomeIcon
                   icon="clock"
                   size={14}
-                  color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                  color={COLORS.gray3}
                   style={{ marginRight: 6 }}
                 />
                 <Text
                   style={{
-                    color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                    color: COLORS.gray3,
                     fontWeight: "500",
                     fontSize: 14,
                   }}
@@ -414,7 +383,7 @@ const FicheDetails = () => {
               style={{
                 fontSize: 15,
                 lineHeight: 22,
-                color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                color: COLORS.gray3,
               }}
             >
               {resource.description}
@@ -424,7 +393,7 @@ const FicheDetails = () => {
           {/* Content Card */}
           <View
             style={{
-              backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+              backgroundColor: COLORS.white,
               borderRadius: 16,
               padding: 20,
               marginBottom: 16,
@@ -452,7 +421,7 @@ const FicheDetails = () => {
                 style={{
                   fontSize: 18,
                   fontWeight: "600",
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 }}
               >
                 Contenu
@@ -493,7 +462,7 @@ const FicheDetails = () => {
                 <View style={{ flex: 1 }}>
                   <Text
                     style={{
-                      color: dark ? COLORS.white : COLORS.black,
+                      color: COLORS.black,
                       fontSize: 16,
                       fontWeight: "500",
                       lineHeight: 24,
@@ -509,7 +478,7 @@ const FicheDetails = () => {
           {/* Tags Card */}
           <View
             style={{
-              backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+              backgroundColor: COLORS.white,
               borderRadius: 16,
               padding: 20,
               marginBottom: 16,
@@ -537,7 +506,7 @@ const FicheDetails = () => {
                 style={{
                   fontSize: 18,
                   fontWeight: "600",
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 }}
               >
                 Mots-clés
@@ -549,9 +518,7 @@ const FicheDetails = () => {
                 <View
                   key={index}
                   style={{
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(0,0,0,0.05)",
+                    backgroundColor: "rgba(0,0,0,0.05)",
                     paddingHorizontal: 14,
                     paddingVertical: 8,
                     borderRadius: 20,
@@ -560,7 +527,7 @@ const FicheDetails = () => {
                 >
                   <Text
                     style={{
-                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      color: COLORS.gray3,
                       fontSize: 14,
                       fontWeight: "500",
                     }}

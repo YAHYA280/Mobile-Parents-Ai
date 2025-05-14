@@ -17,10 +17,9 @@ import { COLORS } from "../../../constants/theme";
 
 interface StatementProps {
   activity: Activity;
-  dark: boolean;
 }
 
-const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
+const Statement: React.FC<StatementProps> = ({ activity }) => {
   const [expanded, setExpanded] = useState(false);
   const heightAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -77,9 +76,9 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
       style={{
         opacity: fadeAnim,
         padding: 16,
-        backgroundColor: dark ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.03)",
+        backgroundColor: "rgba(0,0,0,0.03)",
         borderBottomWidth: 1,
-        borderBottomColor: dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+        borderBottomColor: "rgba(0,0,0,0.05)",
       }}
     >
       {/* Titre de l'énoncé */}
@@ -109,7 +108,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
             style={{
               fontSize: 16,
               fontWeight: "bold",
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
             }}
           >
             Énoncé de l&apos;exercice
@@ -120,7 +119,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
           <FontAwesomeIcon
             icon={expanded ? "chevron-up" : "chevron-down"}
             size={16}
-            color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+            color={COLORS.gray3}
           />
         </TouchableOpacity>
       </View>
@@ -138,9 +137,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
       >
         <View
           style={{
-            backgroundColor: dark
-              ? "rgba(255,255,255,0.05)"
-              : "rgba(0,0,0,0.02)",
+            backgroundColor: "rgba(0,0,0,0.02)",
             padding: 16,
             borderRadius: 12,
             marginBottom: 16,
@@ -150,7 +147,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
             style={{
               fontSize: 17,
               fontWeight: "600",
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
               marginBottom: 12,
             }}
           >
@@ -161,7 +158,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
             style={{
               fontSize: 15,
               lineHeight: 22,
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
               marginBottom: 16,
             }}
           >
@@ -173,7 +170,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
               style={{
                 fontSize: 15,
                 fontWeight: "600",
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
                 marginBottom: 10,
               }}
             >
@@ -216,7 +213,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
                     flex: 1,
                     fontSize: 14,
                     lineHeight: 21,
-                    color: dark ? COLORS.white : COLORS.black,
+                    color: COLORS.black,
                   }}
                 >
                   {step}
@@ -227,9 +224,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
 
           <View
             style={{
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.1)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: "rgba(0,0,0,0.05)",
               padding: 12,
               borderRadius: 8,
               flexDirection: "row",
@@ -245,7 +240,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
               style={{
                 fontSize: 14,
                 fontStyle: "italic",
-                color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                color: COLORS.gray3,
                 flex: 1,
               }}
             >
@@ -257,9 +252,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
         {/* Informations supplémentaires */}
         <View
           style={{
-            backgroundColor: dark
-              ? "rgba(255,255,255,0.05)"
-              : "rgba(0,0,0,0.02)",
+            backgroundColor: "rgba(0,0,0,0.02)",
             padding: 16,
             borderRadius: 12,
           }}
@@ -281,7 +274,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
               style={{
                 fontSize: 15,
                 fontWeight: "600",
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               }}
             >
               Détails de l&apos;activité
@@ -303,7 +296,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
             >
               <Text
                 style={{
-                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  color: COLORS.gray3,
                   fontSize: 14,
                 }}
               >
@@ -313,7 +306,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
             <Text
               style={{
                 flex: 1,
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
                 fontSize: 14,
                 fontWeight: "500",
               }}
@@ -341,7 +334,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
             >
               <Text
                 style={{
-                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  color: COLORS.gray3,
                   fontSize: 14,
                 }}
               >
@@ -350,9 +343,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
             </View>
             <View
               style={{
-                backgroundColor: dark
-                  ? "rgba(76, 175, 80, 0.2)"
-                  : "rgba(76, 175, 80, 0.1)",
+                backgroundColor: "rgba(76, 175, 80, 0.1)",
                 paddingHorizontal: 10,
                 paddingVertical: 3,
                 borderRadius: 12,
@@ -384,7 +375,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
             >
               <Text
                 style={{
-                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  color: COLORS.gray3,
                   fontSize: 14,
                 }}
               >
@@ -394,7 +385,7 @@ const Statement: React.FC<StatementProps> = ({ activity, dark }) => {
             <Text
               style={{
                 flex: 1,
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
                 fontSize: 14,
                 fontWeight: "500",
               }}

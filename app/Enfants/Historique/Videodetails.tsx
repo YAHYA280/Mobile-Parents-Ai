@@ -79,7 +79,6 @@ const VIDEO_RESOURCES: VideoResource[] = [
 
 const VideoDetails = () => {
   const router = useRouter();
-  const { dark, colors } = useTheme();
   const params = useLocalSearchParams();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -228,13 +227,10 @@ const VideoDetails = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: dark ? COLORS.dark1 : "#F8F8F8",
+        backgroundColor: "#F8F8F8",
       }}
     >
-      <StatusBar
-        barStyle={dark ? "light-content" : "dark-content"}
-        backgroundColor={dark ? COLORS.dark1 : "#FFFFFF"}
-      />
+      <StatusBar barStyle={"dark-content"} backgroundColor={"#FFFFFF"} />
 
       {/* Header - Hidden in fullscreen mode */}
       {!isFullScreen && (
@@ -243,11 +239,9 @@ const VideoDetails = () => {
             flexDirection: "row",
             alignItems: "center",
             padding: 16,
-            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            backgroundColor: "#FFFFFF",
             borderBottomWidth: 1,
-            borderBottomColor: dark
-              ? "rgba(255,255,255,0.1)"
-              : "rgba(0,0,0,0.05)",
+            borderBottomColor: "rgba(0,0,0,0.05)",
             elevation: 2,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 1 },
@@ -261,26 +255,20 @@ const VideoDetails = () => {
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.08)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: "rgba(0,0,0,0.05)",
               justifyContent: "center",
               alignItems: "center",
               marginRight: 12,
             }}
           >
-            <FontAwesomeIcon
-              icon="arrow-left"
-              size={18}
-              color={dark ? COLORS.white : COLORS.black}
-            />
+            <FontAwesomeIcon icon="arrow-left" size={18} color={COLORS.black} />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text
               style={{
                 fontSize: 18,
                 fontWeight: "bold",
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               }}
             >
               Vidéo Explicative
@@ -288,7 +276,7 @@ const VideoDetails = () => {
             <Text
               style={{
                 fontSize: 13,
-                color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                color: COLORS.gray3,
               }}
             >
               {resource.subject}
@@ -300,20 +288,14 @@ const VideoDetails = () => {
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.08)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: "rgba(0,0,0,0.05)",
               justifyContent: "center",
               alignItems: "center",
               marginLeft: 8,
             }}
             onPress={handleShare}
           >
-            <FontAwesomeIcon
-              icon="share-alt"
-              size={18}
-              color={dark ? COLORS.white : COLORS.black}
-            />
+            <FontAwesomeIcon icon="share-alt" size={18} color={COLORS.black} />
           </TouchableOpacity>
         </View>
       )}
@@ -486,7 +468,7 @@ const VideoDetails = () => {
             {/* Video Title and Details Card */}
             <View
               style={{
-                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                backgroundColor: COLORS.white,
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 16,
@@ -501,7 +483,7 @@ const VideoDetails = () => {
                 style={{
                   fontSize: 22,
                   fontWeight: "bold",
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                   marginBottom: 16,
                 }}
               >
@@ -518,9 +500,7 @@ const VideoDetails = () => {
               >
                 <View
                   style={{
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(0,0,0,0.05)",
+                    backgroundColor: "rgba(0,0,0,0.05)",
                     paddingHorizontal: 12,
                     paddingVertical: 6,
                     borderRadius: 16,
@@ -533,12 +513,12 @@ const VideoDetails = () => {
                   <FontAwesomeIcon
                     icon="book"
                     size={14}
-                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                    color={COLORS.gray3}
                     style={{ marginRight: 6 }}
                   />
                   <Text
                     style={{
-                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      color: COLORS.gray3,
                       fontWeight: "500",
                       fontSize: 14,
                     }}
@@ -581,9 +561,7 @@ const VideoDetails = () => {
 
                 <View
                   style={{
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(0,0,0,0.05)",
+                    backgroundColor: "rgba(0,0,0,0.05)",
                     paddingHorizontal: 12,
                     paddingVertical: 6,
                     borderRadius: 16,
@@ -595,12 +573,12 @@ const VideoDetails = () => {
                   <FontAwesomeIcon
                     icon="clock"
                     size={14}
-                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                    color={COLORS.gray3}
                     style={{ marginRight: 6 }}
                   />
                   <Text
                     style={{
-                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      color: COLORS.gray3,
                       fontWeight: "500",
                       fontSize: 14,
                     }}
@@ -614,7 +592,7 @@ const VideoDetails = () => {
                 style={{
                   fontSize: 15,
                   lineHeight: 22,
-                  color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                  color: COLORS.gray3,
                 }}
               >
                 {resource.description}
@@ -624,7 +602,7 @@ const VideoDetails = () => {
             {/* Tags Card */}
             <View
               style={{
-                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                backgroundColor: COLORS.white,
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 16,
@@ -652,7 +630,7 @@ const VideoDetails = () => {
                   style={{
                     fontSize: 18,
                     fontWeight: "600",
-                    color: dark ? COLORS.white : COLORS.black,
+                    color: COLORS.black,
                   }}
                 >
                   Mots-clés
@@ -664,9 +642,7 @@ const VideoDetails = () => {
                   <View
                     key={index}
                     style={{
-                      backgroundColor: dark
-                        ? "rgba(255,255,255,0.08)"
-                        : "rgba(0,0,0,0.05)",
+                      backgroundColor: "rgba(0,0,0,0.05)",
                       paddingHorizontal: 14,
                       paddingVertical: 8,
                       borderRadius: 20,
@@ -675,7 +651,7 @@ const VideoDetails = () => {
                   >
                     <Text
                       style={{
-                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                        color: COLORS.gray3,
                         fontSize: 14,
                         fontWeight: "500",
                       }}
@@ -692,7 +668,7 @@ const VideoDetails = () => {
               resource.relatedResources.length > 0 && (
                 <View
                   style={{
-                    backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                    backgroundColor: COLORS.white,
                     borderRadius: 16,
                     padding: 20,
                     shadowColor: "#000",
@@ -719,7 +695,7 @@ const VideoDetails = () => {
                       style={{
                         fontSize: 18,
                         fontWeight: "600",
-                        color: dark ? COLORS.white : COLORS.black,
+                        color: COLORS.black,
                       }}
                     >
                       Ressources associées
@@ -732,9 +708,7 @@ const VideoDetails = () => {
                       style={{
                         flexDirection: "row",
                         alignItems: "center",
-                        backgroundColor: dark
-                          ? "rgba(255,255,255,0.06)"
-                          : "rgba(0,0,0,0.02)",
+                        backgroundColor: "rgba(0,0,0,0.02)",
                         borderRadius: 12,
                         padding: 14,
                         marginBottom:
@@ -789,7 +763,7 @@ const VideoDetails = () => {
                           style={{
                             fontWeight: "500",
                             fontSize: 15,
-                            color: dark ? COLORS.white : COLORS.black,
+                            color: COLORS.black,
                             marginBottom: 3,
                           }}
                         >
@@ -801,9 +775,7 @@ const VideoDetails = () => {
                           <Text
                             style={{
                               fontSize: 13,
-                              color: dark
-                                ? COLORS.secondaryWhite
-                                : COLORS.gray3,
+                              color: COLORS.gray3,
                               textTransform: "capitalize",
                             }}
                           >
@@ -816,18 +788,14 @@ const VideoDetails = () => {
                                   width: 3,
                                   height: 3,
                                   borderRadius: 1.5,
-                                  backgroundColor: dark
-                                    ? COLORS.secondaryWhite
-                                    : COLORS.gray3,
+                                  backgroundColor: COLORS.gray3,
                                   marginHorizontal: 6,
                                 }}
                               />
                               <Text
                                 style={{
                                   fontSize: 13,
-                                  color: dark
-                                    ? COLORS.secondaryWhite
-                                    : COLORS.gray3,
+                                  color: COLORS.gray3,
                                 }}
                               >
                                 {relatedResource.duration}
@@ -840,7 +808,7 @@ const VideoDetails = () => {
                       <FontAwesomeIcon
                         icon="chevron-right"
                         size={16}
-                        color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                        color={COLORS.gray3}
                       />
                     </TouchableOpacity>
                   ))}

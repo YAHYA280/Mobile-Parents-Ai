@@ -40,7 +40,6 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
   childData,
 }) => {
   const router = useRouter();
-  const { dark } = useTheme();
   const flatListRef = useRef<FlatList<Activity>>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -660,9 +659,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
                 width: 36,
                 height: 36,
                 borderRadius: 18,
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.05)",
+                backgroundColor: "rgba(0,0,0,0.05)",
                 justifyContent: "center",
                 alignItems: "center",
               }}
@@ -1056,6 +1053,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
     <SafeAreaView
       style={{
         flex: 1,
+
         backgroundColor: "#F8F8F8",
       }}
     >

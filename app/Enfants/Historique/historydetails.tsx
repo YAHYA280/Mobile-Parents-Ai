@@ -60,7 +60,6 @@ const ASSISTANT_THEME: Record<
 
 const HistoryDetails = () => {
   const router = useRouter();
-  const { dark, colors } = useTheme();
   const params = useLocalSearchParams();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -283,19 +282,15 @@ const HistoryDetails = () => {
   // Affichage du chargement
   if (isLoading) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
-      >
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             padding: 16,
-            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            backgroundColor: "#FFFFFF",
             borderBottomWidth: 1,
-            borderBottomColor: dark
-              ? "rgba(255,255,255,0.1)"
-              : "rgba(0,0,0,0.05)",
+            borderBottomColor: "rgba(0,0,0,0.05)",
           }}
         >
           <TouchableOpacity
@@ -304,25 +299,19 @@ const HistoryDetails = () => {
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.08)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: "rgba(0,0,0,0.05)",
               justifyContent: "center",
               alignItems: "center",
               marginRight: 12,
             }}
           >
-            <FontAwesomeIcon
-              icon="arrow-left"
-              size={18}
-              color={dark ? COLORS.white : COLORS.black}
-            />
+            <FontAwesomeIcon icon="arrow-left" size={18} color={COLORS.black} />
           </TouchableOpacity>
           <Text
             style={{
               fontSize: 18,
               fontWeight: "bold",
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
             }}
           >
             Détails de l&apos;activité
@@ -335,7 +324,7 @@ const HistoryDetails = () => {
           <Text
             style={{
               marginTop: 20,
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
               fontSize: 16,
             }}
           >
@@ -349,19 +338,15 @@ const HistoryDetails = () => {
   // Données introuvables
   if (!activity || !child) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
-      >
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             padding: 16,
-            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            backgroundColor: "#FFFFFF",
             borderBottomWidth: 1,
-            borderBottomColor: dark
-              ? "rgba(255,255,255,0.1)"
-              : "rgba(0,0,0,0.05)",
+            borderBottomColor: "rgba(0,0,0,0.05)",
           }}
         >
           <TouchableOpacity
@@ -370,25 +355,19 @@ const HistoryDetails = () => {
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.08)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: "rgba(0,0,0,0.05)",
               justifyContent: "center",
               alignItems: "center",
               marginRight: 12,
             }}
           >
-            <FontAwesomeIcon
-              icon="arrow-left"
-              size={18}
-              color={dark ? COLORS.white : COLORS.black}
-            />
+            <FontAwesomeIcon icon="arrow-left" size={18} color={COLORS.black} />
           </TouchableOpacity>
           <Text
             style={{
               fontSize: 18,
               fontWeight: "bold",
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
             }}
           >
             Détails de l&apos;activité
@@ -405,12 +384,12 @@ const HistoryDetails = () => {
           <FontAwesomeIcon
             icon="exclamation-circle"
             size={64}
-            color={dark ? COLORS.white : COLORS.black}
+            color={COLORS.black}
           />
           <Text
             style={{
               marginTop: 20,
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
               fontSize: 18,
               fontWeight: "bold",
               textAlign: "center",
@@ -421,7 +400,7 @@ const HistoryDetails = () => {
           <Text
             style={{
               marginTop: 10,
-              color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+              color: COLORS.gray3,
               textAlign: "center",
               marginBottom: 30,
             }}
@@ -489,7 +468,7 @@ const HistoryDetails = () => {
         <View
           style={{
             width: "90%",
-            backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+            backgroundColor: COLORS.white,
             borderRadius: 16,
             padding: 20,
             shadowColor: "#000",
@@ -511,7 +490,7 @@ const HistoryDetails = () => {
               style={{
                 fontSize: 18,
                 fontWeight: "bold",
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               }}
             >
               Éditer le commentaire
@@ -522,18 +501,12 @@ const HistoryDetails = () => {
                 width: 36,
                 height: 36,
                 borderRadius: 18,
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(0,0,0,0.05)",
+                backgroundColor: "rgba(0,0,0,0.05)",
                 justifyContent: "center",
                 alignItems: "center",
               }}
             >
-              <FontAwesomeIcon
-                icon="times"
-                size={16}
-                color={dark ? COLORS.white : COLORS.black}
-              />
+              <FontAwesomeIcon icon="times" size={16} color={COLORS.black} />
             </TouchableOpacity>
           </View>
 
@@ -542,21 +515,17 @@ const HistoryDetails = () => {
             onChangeText={setEditingFeedback}
             multiline
             style={{
-              backgroundColor: dark
-                ? "rgba(255, 255, 255, 0.05)"
-                : "rgba(0, 0, 0, 0.03)",
+              backgroundColor: "rgba(0, 0, 0, 0.03)",
               borderRadius: 12,
               padding: 16,
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
               marginBottom: 20,
               minHeight: 120,
               textAlignVertical: "top",
               fontSize: 16,
             }}
             placeholder="Votre commentaire..."
-            placeholderTextColor={
-              dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"
-            }
+            placeholderTextColor={"rgba(0,0,0,0.3)"}
           />
 
           <View
@@ -614,23 +583,17 @@ const HistoryDetails = () => {
   );
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
-    >
-      <View
-        style={{ flex: 1, backgroundColor: dark ? COLORS.dark1 : "#F8F8F8" }}
-      >
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
+      <View style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
         {/* Header */}
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             padding: 16,
-            backgroundColor: dark ? COLORS.dark1 : "#FFFFFF",
+            backgroundColor: "#FFFFFF",
             borderBottomWidth: 1,
-            borderBottomColor: dark
-              ? "rgba(255,255,255,0.1)"
-              : "rgba(0,0,0,0.05)",
+            borderBottomColor: "rgba(0,0,0,0.05)",
             elevation: 2,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 1 },
@@ -644,19 +607,13 @@ const HistoryDetails = () => {
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.08)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: "rgba(0,0,0,0.05)",
               justifyContent: "center",
               alignItems: "center",
               marginRight: 12,
             }}
           >
-            <FontAwesomeIcon
-              icon="arrow-left"
-              size={18}
-              color={dark ? COLORS.white : COLORS.black}
-            />
+            <FontAwesomeIcon icon="arrow-left" size={18} color={COLORS.black} />
           </TouchableOpacity>
 
           <View style={{ flex: 1 }}>
@@ -664,7 +621,7 @@ const HistoryDetails = () => {
               style={{
                 fontSize: 18,
                 fontWeight: "bold",
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               }}
             >
               Détails de l&apos;activité
@@ -672,7 +629,7 @@ const HistoryDetails = () => {
             <Text
               style={{
                 fontSize: 13,
-                color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                color: COLORS.gray3,
               }}
             >
               {child.name} • {formattedDate.split(" ")[0]}
@@ -688,9 +645,7 @@ const HistoryDetails = () => {
               alignItems: "center",
               backgroundColor: blocageIdentified
                 ? "rgba(255, 0, 0, 0.2)"
-                : dark
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(0,0,0,0.05)",
+                : "rgba(0,0,0,0.05)",
               marginLeft: 8,
             }}
             onPress={toggleBlockageIdentification}
@@ -698,13 +653,7 @@ const HistoryDetails = () => {
             <FontAwesomeIcon
               icon="exclamation-circle"
               size={18}
-              color={
-                blocageIdentified
-                  ? "#FF3B30"
-                  : dark
-                    ? COLORS.secondaryWhite
-                    : COLORS.gray3
-              }
+              color={blocageIdentified ? "#FF3B30" : COLORS.gray3}
             />
           </TouchableOpacity>
 
@@ -715,18 +664,12 @@ const HistoryDetails = () => {
               borderRadius: 20,
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: dark
-                ? "rgba(255,255,255,0.08)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: "rgba(0,0,0,0.05)",
               marginLeft: 8,
             }}
             onPress={handleShare}
           >
-            <FontAwesomeIcon
-              icon="share-alt"
-              size={18}
-              color={dark ? COLORS.secondaryWhite : COLORS.gray3}
-            />
+            <FontAwesomeIcon icon="share-alt" size={18} color={COLORS.gray3} />
           </TouchableOpacity>
         </View>
 
@@ -744,7 +687,7 @@ const HistoryDetails = () => {
             {/* Carte principale de l'activité */}
             <View
               style={{
-                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                backgroundColor: COLORS.white,
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 16,
@@ -795,7 +738,7 @@ const HistoryDetails = () => {
 
                 <Text
                   style={{
-                    color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                    color: COLORS.gray3,
                     fontSize: 14,
                   }}
                 >
@@ -808,7 +751,7 @@ const HistoryDetails = () => {
                 style={{
                   fontSize: 22,
                   fontWeight: "bold",
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                   marginBottom: 16,
                   lineHeight: 30,
                 }}
@@ -827,9 +770,7 @@ const HistoryDetails = () => {
               >
                 <View
                   style={{
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(0,0,0,0.05)",
+                    backgroundColor: "rgba(0,0,0,0.05)",
                     flexDirection: "row",
                     alignItems: "center",
                     paddingHorizontal: 12,
@@ -840,12 +781,12 @@ const HistoryDetails = () => {
                   <FontAwesomeIcon
                     icon="clock"
                     size={14}
-                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                    color={COLORS.gray3}
                     style={{ marginRight: 6 }}
                   />
                   <Text
                     style={{
-                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      color: COLORS.gray3,
                     }}
                   >
                     {activity.duree}
@@ -883,9 +824,7 @@ const HistoryDetails = () => {
                 {activity.matiere && (
                   <View
                     style={{
-                      backgroundColor: dark
-                        ? "rgba(255,255,255,0.08)"
-                        : "rgba(0,0,0,0.05)",
+                      backgroundColor: "rgba(0,0,0,0.05)",
                       flexDirection: "row",
                       alignItems: "center",
                       paddingHorizontal: 12,
@@ -896,12 +835,12 @@ const HistoryDetails = () => {
                     <FontAwesomeIcon
                       icon="book"
                       size={14}
-                      color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                      color={COLORS.gray3}
                       style={{ marginRight: 6 }}
                     />
                     <Text
                       style={{
-                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                        color: COLORS.gray3,
                       }}
                     >
                       {activity.matiere}
@@ -912,9 +851,7 @@ const HistoryDetails = () => {
                 {activity.chapitre && (
                   <View
                     style={{
-                      backgroundColor: dark
-                        ? "rgba(255,255,255,0.08)"
-                        : "rgba(0,0,0,0.05)",
+                      backgroundColor: "rgba(0,0,0,0.05)",
                       flexDirection: "row",
                       alignItems: "center",
                       paddingHorizontal: 12,
@@ -925,12 +862,12 @@ const HistoryDetails = () => {
                     <FontAwesomeIcon
                       icon="bookmark"
                       size={14}
-                      color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                      color={COLORS.gray3}
                       style={{ marginRight: 6 }}
                     />
                     <Text
                       style={{
-                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                        color: COLORS.gray3,
                       }}
                     >
                       {activity.chapitre}
@@ -989,7 +926,7 @@ const HistoryDetails = () => {
                       style={{
                         fontSize: 16,
                         fontWeight: "600",
-                        color: dark ? COLORS.white : COLORS.black,
+                        color: COLORS.black,
                       }}
                     >
                       Commentaires
@@ -997,16 +934,14 @@ const HistoryDetails = () => {
                   </View>
                   <View
                     style={{
-                      backgroundColor: dark
-                        ? "rgba(255,255,255,0.05)"
-                        : "rgba(0,0,0,0.03)",
+                      backgroundColor: "rgba(0,0,0,0.03)",
                       borderRadius: 12,
                       padding: 16,
                     }}
                   >
                     <Text
                       style={{
-                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                        color: COLORS.gray3,
                         lineHeight: 22,
                         fontSize: 15,
                       }}
@@ -1037,7 +972,7 @@ const HistoryDetails = () => {
                         style={{
                           fontSize: 16,
                           fontWeight: "600",
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                         }}
                       >
                         Recommandations
@@ -1045,9 +980,7 @@ const HistoryDetails = () => {
                     </View>
                     <View
                       style={{
-                        backgroundColor: dark
-                          ? "rgba(255,255,255,0.05)"
-                          : "rgba(0,0,0,0.03)",
+                        backgroundColor: "rgba(0,0,0,0.03)",
                         borderRadius: 12,
                         padding: 16,
                       }}
@@ -1084,9 +1017,7 @@ const HistoryDetails = () => {
                           </View>
                           <Text
                             style={{
-                              color: dark
-                                ? COLORS.secondaryWhite
-                                : COLORS.gray3,
+                              color: COLORS.gray3,
                               lineHeight: 22,
                               flex: 1,
                               fontSize: 15,
@@ -1120,7 +1051,7 @@ const HistoryDetails = () => {
                       style={{
                         fontSize: 16,
                         fontWeight: "600",
-                        color: dark ? COLORS.white : COLORS.black,
+                        color: COLORS.black,
                       }}
                     >
                       Exercices
@@ -1128,9 +1059,7 @@ const HistoryDetails = () => {
                   </View>
                   <View
                     style={{
-                      backgroundColor: dark
-                        ? "rgba(255,255,255,0.05)"
-                        : "rgba(0,0,0,0.03)",
+                      backgroundColor: "rgba(0,0,0,0.03)",
                       borderRadius: 12,
                       padding: 16,
                     }}
@@ -1173,7 +1102,7 @@ const HistoryDetails = () => {
                             style={{
                               fontSize: 15,
                               fontWeight: "500",
-                              color: dark ? COLORS.white : COLORS.black,
+                              color: COLORS.black,
                             }}
                           >
                             Exercice {index + 1}
@@ -1203,9 +1132,7 @@ const HistoryDetails = () => {
                         {ex.commentaire && (
                           <View
                             style={{
-                              backgroundColor: dark
-                                ? "rgba(255,255,255,0.08)"
-                                : "rgba(0,0,0,0.05)",
+                              backgroundColor: "rgba(0,0,0,0.05)",
                               borderRadius: 8,
                               padding: 12,
                               marginLeft: 36,
@@ -1213,9 +1140,7 @@ const HistoryDetails = () => {
                           >
                             <Text
                               style={{
-                                color: dark
-                                  ? COLORS.secondaryWhite
-                                  : COLORS.gray3,
+                                color: COLORS.gray3,
                                 fontSize: 14,
                                 lineHeight: 20,
                               }}
@@ -1234,7 +1159,7 @@ const HistoryDetails = () => {
             {/* Conversations Card */}
             <View
               style={{
-                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                backgroundColor: COLORS.white,
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 16,
@@ -1264,7 +1189,7 @@ const HistoryDetails = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "600",
-                      color: dark ? COLORS.white : COLORS.black,
+                      color: COLORS.black,
                     }}
                   >
                     Conversation avec l&apos;assistant
@@ -1303,9 +1228,7 @@ const HistoryDetails = () => {
               {limitedConversation.length > 0 ? (
                 <View
                   style={{
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
+                    backgroundColor: "rgba(0,0,0,0.03)",
                     borderRadius: 12,
                     padding: 16,
                   }}
@@ -1324,12 +1247,8 @@ const HistoryDetails = () => {
                         <View
                           style={{
                             backgroundColor: isAssistant
-                              ? dark
-                                ? "rgba(0, 149, 255, 0.2)"
-                                : "rgba(0, 149, 255, 0.08)"
-                              : dark
-                                ? "rgba(66, 66, 66, 0.8)"
-                                : "#F0F0F0",
+                              ? "rgba(0, 149, 255, 0.08)"
+                              : "#F0F0F0",
                             padding: 12,
                             borderRadius: 16,
                             maxWidth: "85%",
@@ -1339,13 +1258,7 @@ const HistoryDetails = () => {
                         >
                           <Text
                             style={{
-                              color: isAssistant
-                                ? dark
-                                  ? COLORS.white
-                                  : "#0066CC"
-                                : dark
-                                  ? COLORS.white
-                                  : COLORS.black,
+                              color: isAssistant ? "#0066CC" : COLORS.black,
                               fontSize: 14,
                               lineHeight: 20,
                             }}
@@ -1355,9 +1268,7 @@ const HistoryDetails = () => {
                           <Text
                             style={{
                               fontSize: 11,
-                              color: dark
-                                ? "rgba(255, 255, 255, 0.5)"
-                                : "rgba(0, 0, 0, 0.4)",
+                              color: "rgba(0, 0, 0, 0.4)",
                               alignSelf: "flex-end",
                               marginTop: 4,
                             }}
@@ -1372,9 +1283,7 @@ const HistoryDetails = () => {
               ) : (
                 <View
                   style={{
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
+                    backgroundColor: "rgba(0,0,0,0.03)",
                     borderRadius: 12,
                     padding: 16,
                     alignItems: "center",
@@ -1383,7 +1292,7 @@ const HistoryDetails = () => {
                 >
                   <Text
                     style={{
-                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      color: COLORS.gray3,
                       fontStyle: "italic",
                     }}
                   >
@@ -1396,7 +1305,7 @@ const HistoryDetails = () => {
             {/* Parent Feedback Card */}
             <View
               style={{
-                backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                backgroundColor: COLORS.white,
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 16,
@@ -1424,7 +1333,7 @@ const HistoryDetails = () => {
                   style={{
                     fontSize: 16,
                     fontWeight: "600",
-                    color: dark ? COLORS.white : COLORS.black,
+                    color: COLORS.black,
                   }}
                 >
                   Commentaires des parents
@@ -1437,9 +1346,7 @@ const HistoryDetails = () => {
                     <TouchableOpacity
                       key={index}
                       style={{
-                        backgroundColor: dark
-                          ? "rgba(255,255,255,0.05)"
-                          : "rgba(0,0,0,0.03)",
+                        backgroundColor: "rgba(0,0,0,0.03)",
                         borderRadius: 12,
                         padding: 16,
                         marginBottom:
@@ -1449,7 +1356,7 @@ const HistoryDetails = () => {
                     >
                       <Text
                         style={{
-                          color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                          color: COLORS.gray3,
                           lineHeight: 22,
                           fontSize: 15,
                         }}
@@ -1467,9 +1374,7 @@ const HistoryDetails = () => {
                         <Text
                           style={{
                             fontSize: 12,
-                            color: dark
-                              ? "rgba(255, 255, 255, 0.5)"
-                              : "rgba(0, 0, 0, 0.4)",
+                            color: "rgba(0, 0, 0, 0.4)",
                           }}
                         >
                           {fb.date.toLocaleDateString("fr-FR", {
@@ -1480,9 +1385,7 @@ const HistoryDetails = () => {
                         </Text>
                         <View
                           style={{
-                            backgroundColor: dark
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.07)",
+                            backgroundColor: "rgba(0,0,0,0.07)",
                             paddingHorizontal: 8,
                             paddingVertical: 4,
                             borderRadius: 12,
@@ -1493,15 +1396,13 @@ const HistoryDetails = () => {
                           <FontAwesomeIcon
                             icon="pen"
                             size={10}
-                            color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                            color={COLORS.gray3}
                             style={{ marginRight: 4 }}
                           />
                           <Text
                             style={{
                               fontSize: 11,
-                              color: dark
-                                ? COLORS.secondaryWhite
-                                : COLORS.gray3,
+                              color: COLORS.gray3,
                             }}
                           >
                             Modifier
@@ -1514,9 +1415,7 @@ const HistoryDetails = () => {
               ) : (
                 <View
                   style={{
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
+                    backgroundColor: "rgba(0,0,0,0.03)",
                     borderRadius: 12,
                     padding: 16,
                     alignItems: "center",
@@ -1526,7 +1425,7 @@ const HistoryDetails = () => {
                 >
                   <Text
                     style={{
-                      color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                      color: COLORS.gray3,
                       fontStyle: "italic",
                     }}
                   >
@@ -1538,23 +1437,19 @@ const HistoryDetails = () => {
               {/* Add Feedback Input */}
               <View
                 style={{
-                  backgroundColor: dark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.03)",
+                  backgroundColor: "rgba(0,0,0,0.03)",
                   borderRadius: 12,
                   padding: 16,
                 }}
               >
                 <TextInput
                   placeholder="Ajouter un commentaire..."
-                  placeholderTextColor={
-                    dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"
-                  }
+                  placeholderTextColor={"rgba(0,0,0,0.3)"}
                   value={feedback}
                   onChangeText={setFeedback}
                   multiline
                   style={{
-                    color: dark ? COLORS.white : COLORS.black,
+                    color: COLORS.black,
                     fontSize: 15,
                     minHeight: 80,
                     textAlignVertical: "top",
@@ -1600,7 +1495,7 @@ const HistoryDetails = () => {
             {assistantName === "J'Apprends" && (
               <View
                 style={{
-                  backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+                  backgroundColor: COLORS.white,
                   borderRadius: 16,
                   padding: 20,
                   shadowColor: "#000",
@@ -1627,7 +1522,7 @@ const HistoryDetails = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "600",
-                      color: dark ? COLORS.white : COLORS.black,
+                      color: COLORS.black,
                     }}
                   >
                     Ressources pédagogiques
@@ -1639,9 +1534,7 @@ const HistoryDetails = () => {
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
+                    backgroundColor: "rgba(0,0,0,0.03)",
                     borderRadius: 12,
                     padding: 16,
                     marginBottom: 12,
@@ -1672,7 +1565,7 @@ const HistoryDetails = () => {
                       style={{
                         fontSize: 16,
                         fontWeight: "500",
-                        color: dark ? COLORS.white : COLORS.black,
+                        color: COLORS.black,
                         marginBottom: 4,
                       }}
                     >
@@ -1680,7 +1573,7 @@ const HistoryDetails = () => {
                     </Text>
                     <Text
                       style={{
-                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                        color: COLORS.gray3,
                         fontSize: 14,
                       }}
                     >
@@ -1691,7 +1584,7 @@ const HistoryDetails = () => {
                   <FontAwesomeIcon
                     icon="chevron-right"
                     size={16}
-                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                    color={COLORS.gray3}
                   />
                 </TouchableOpacity>
 
@@ -1700,9 +1593,7 @@ const HistoryDetails = () => {
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    backgroundColor: dark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
+                    backgroundColor: "rgba(0,0,0,0.03)",
                     borderRadius: 12,
                     padding: 16,
                   }}
@@ -1732,7 +1623,7 @@ const HistoryDetails = () => {
                       style={{
                         fontSize: 16,
                         fontWeight: "500",
-                        color: dark ? COLORS.white : COLORS.black,
+                        color: COLORS.black,
                         marginBottom: 4,
                       }}
                     >
@@ -1740,7 +1631,7 @@ const HistoryDetails = () => {
                     </Text>
                     <Text
                       style={{
-                        color: dark ? COLORS.secondaryWhite : COLORS.gray3,
+                        color: COLORS.gray3,
                         fontSize: 14,
                       }}
                     >
@@ -1751,7 +1642,7 @@ const HistoryDetails = () => {
                   <FontAwesomeIcon
                     icon="chevron-right"
                     size={16}
-                    color={dark ? COLORS.secondaryWhite : COLORS.gray3}
+                    color={COLORS.gray3}
                   />
                 </TouchableOpacity>
               </View>
