@@ -157,7 +157,7 @@ const Index = () => {
       height: interpolate(
         scrollY.value,
         [-20, 0, 100],
-        [120, 100, 70],
+        [70, 70, 70],
         Extrapolate.CLAMP
       ),
       opacity: interpolate(

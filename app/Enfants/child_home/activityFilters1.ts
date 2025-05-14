@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 import type { Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
@@ -11,74 +11,83 @@ export const useActivityFilters = (initialActivities: Activity[] = []) => {
   // États pour les filtres
   const [activityDateRange, setActivityDateRange] = useState<DateRange>({
     startDate: null,
-    endDate: null
+    endDate: null,
   });
   const [searchKeyword, setSearchKeyword] = useState("");
   const [showActivityCalendar, setShowActivityCalendar] = useState(false);
-  const [activityCalendarMode, setActivityCalendarMode] = useState<'start' | 'end'>('start');
+  const [activityCalendarMode, setActivityCalendarMode] = useState<
+    "start" | "end"
+  >("start");
   const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
 
   // Fonction pour basculer l'affichage du calendrier d'activités
-  const toggleActivityCalendar = (mode: 'start' | 'end') => {
+  const toggleActivityCalendar = (mode: "start" | "end") => {
     setActivityCalendarMode(mode);
     setShowActivityCalendar(!showActivityCalendar);
   };
 
   // Fonction pour gérer la sélection d'une date dans le calendrier d'activités
   const handleActivityDayPress = (day: any) => {
-    if (activityCalendarMode === 'start') {
+    if (activityCalendarMode === "start") {
       setActivityDateRange({
         startDate: day.dateString,
-        endDate: activityDateRange.endDate && new Date(day.dateString) > new Date(activityDateRange.endDate)
-          ? day.dateString
-          : activityDateRange.endDate
+        endDate:
+          activityDateRange.endDate &&
+          new Date(day.dateString) > new Date(activityDateRange.endDate)
+            ? day.dateString
+            : activityDateRange.endDate,
       });
     } else {
       setActivityDateRange({
-        startDate: activityDateRange.startDate && new Date(day.dateString) < new Date(activityDateRange.startDate)
-          ? day.dateString
-          : activityDateRange.startDate,
-        endDate: day.dateString
+        startDate:
+          activityDateRange.startDate &&
+          new Date(day.dateString) < new Date(activityDateRange.startDate)
+            ? day.dateString
+            : activityDateRange.startDate,
+        endDate: day.dateString,
       });
     }
     setShowActivityCalendar(false);
   };
 
   // Memoize the filterActivities function
-  const filterActivities = useCallback((activities: Activity[]) => {
-    if (!activities || activities.length === 0) return [];
+  const filterActivities = useCallback(
+    (activities: Activity[]) => {
+      if (!activities || activities.length === 0) return [];
 
-    let filtered = [...activities];
+      let filtered = [...activities];
 
-    // Filtre par mot-clé
-    if (searchKeyword.trim() !== "") {
-      const keyword = searchKeyword.toLowerCase();
-      filtered = filtered.filter(activity =>
-        activity.activite.toLowerCase().includes(keyword)
-      );
-    }
+      // Filtre par mot-clé
+      if (searchKeyword.trim() !== "") {
+        const keyword = searchKeyword.toLowerCase();
+        filtered = filtered.filter((activity) =>
+          activity.activite.toLowerCase().includes(keyword)
+        );
+      }
 
-    // Filtre par plage de dates
-    if (activityDateRange.startDate) {
-      filtered = filtered.filter(activity => {
-        const activityDate = new Date(activity.date);
-        const startDate = new Date(activityDateRange.startDate!);
-        return activityDate >= startDate;
-      });
-    }
+      // Filtre par plage de dates
+      if (activityDateRange.startDate) {
+        filtered = filtered.filter((activity) => {
+          const activityDate = new Date(activity.date);
+          const startDate = new Date(activityDateRange.startDate!);
+          return activityDate >= startDate;
+        });
+      }
 
-    if (activityDateRange.endDate) {
-      filtered = filtered.filter(activity => {
-        const activityDate = new Date(activity.date);
-        const endDate = new Date(activityDateRange.endDate!);
-        // Ajoutez 1 jour pour inclure la date de fin
-        endDate.setDate(endDate.getDate() + 1);
-        return activityDate < endDate;
-      });
-    }
+      if (activityDateRange.endDate) {
+        filtered = filtered.filter((activity) => {
+          const activityDate = new Date(activity.date);
+          const endDate = new Date(activityDateRange.endDate!);
+          // Ajoutez 1 jour pour inclure la date de fin
+          endDate.setDate(endDate.getDate() + 1);
+          return activityDate < endDate;
+        });
+      }
 
-    return filtered;
-  }, [searchKeyword, activityDateRange]);
+      return filtered;
+    },
+    [searchKeyword, activityDateRange]
+  );
 
   // Fonction pour réinitialiser les filtres d'activités
   const resetActivityFilters = () => {
@@ -108,6 +117,6 @@ export const useActivityFilters = (initialActivities: Activity[] = []) => {
     // Fonctions
     toggleActivityCalendar,
     handleActivityDayPress,
-    resetActivityFilters
+    resetActivityFilters,
   };
 };

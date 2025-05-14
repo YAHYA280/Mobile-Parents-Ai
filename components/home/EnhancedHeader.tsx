@@ -1,21 +1,8 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { COLORS, icons } from "@/constants";
-import NotificationIcon from "../notifications/NotificationIcon";
-import { BlurView } from "expo-blur";
-import { Ionicons } from "@expo/vector-icons";
-import Animated, {
-  useAnimatedStyle,
-  interpolate,
-  Extrapolate,
-} from "react-native-reanimated";
+import { COLORS } from "@/constants";
+import NotificationBell from "../../components/notifications/NotificationBell";
 
 interface EnhancedHeaderProps {
   userName: string;
@@ -27,19 +14,24 @@ interface EnhancedHeaderProps {
 const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({
   userName,
   userImage,
-  onNotificationPress,
   onProfilePress,
 }) => {
   return (
     <View style={styles.container}>
       <View style={styles.userInfoContainer}>
-        <TouchableOpacity
-          onPress={onProfilePress}
-          style={styles.avatarContainer}
-        >
-          <Image source={userImage} style={styles.avatar} contentFit="cover" />
+        <View style={styles.avatarWrapper}>
+          <TouchableOpacity
+            onPress={onProfilePress}
+            style={styles.avatarContainer}
+          >
+            <Image
+              source={userImage}
+              style={styles.avatar}
+              contentFit="cover"
+            />
+          </TouchableOpacity>
           <View style={styles.statusIndicator} />
-        </TouchableOpacity>
+        </View>
         <View style={styles.textContainer}>
           <Text style={styles.welcomeText}>Bonjour,</Text>
           <Text style={styles.userName}>{userName}</Text>
@@ -47,13 +39,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({
       </View>
 
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
-          <Ionicons name="settings-outline" size={20} color={COLORS.primary} />
-        </TouchableOpacity>
-        <NotificationIcon
-          onPress={onNotificationPress}
-          hasNotification={true}
-        />
+        <NotificationBell />
       </View>
     </View>
   );
@@ -72,6 +58,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  avatarWrapper: {
+    position: "relative",
+    width: 48,
+    height: 48,
+  },
   avatarContainer: {
     height: 48,
     width: 48,
@@ -79,7 +70,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 2,
     borderColor: COLORS.primary,
-    position: "relative",
   },
   avatar: {
     width: "100%",
@@ -93,8 +83,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#4CAF50",
     borderWidth: 2,
     borderColor: "#FFFFFF",
-    bottom: 0,
+    bottom: -1,
     right: 0,
+    zIndex: 1,
   },
   textContainer: {
     marginLeft: 12,
