@@ -1,4 +1,4 @@
-// app/Enfants/Performance/components/ProgressTrendsCard.tsx
+// Fixed ProgressTrendsCard.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Dimensions, Animated } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -79,6 +79,9 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
           .split("/")
           .map((num) => parseInt(num, 10));
 
+        // FIX: Add null check for score and possible
+        if (isNaN(score) || isNaN(possible) || possible === 0) return;
+
         const percentage = (score / possible) * 100;
         const date = new Date(activity.date);
         const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
@@ -95,7 +98,7 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
       return Object.values(monthlyScores)
         .map((item) => ({
           date: item.date,
-          score: item.total / item.count,
+          score: item.count > 0 ? item.total / item.count : 0,
         }))
         .sort((a, b) => a.date.getTime() - b.date.getTime());
     };
@@ -229,19 +232,13 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
       const y =
         chartHeight - paddingVertical - (point.score / 100) * innerHeight;
 
-      // Apply scaling animation to points
-      const scale = pointAnimation
-        ? pointAnimation.interpolate({
-            inputRange: [0, 0.8, 1],
-            outputRange: [0, 1.2, 1],
-          })
-        : 1;
-
-      // Use an animated transform instead of a scale prop
-      const animatedStyle = {
-        transform: [{ scale }],
-        opacity: pointAnimation,
-      };
+      // FIX: Use simpler animation approach
+      const animatedOpacity = pointAnimation;
+      const animatedScale = pointAnimation.interpolate({
+        inputRange: [0, 0.8, 1],
+        outputRange: [0, 1.2, 1],
+        extrapolate: "clamp",
+      });
 
       return (
         <AnimatedCircle
@@ -252,9 +249,9 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
           fill="#FFFFFF"
           stroke={COLORS.primary}
           strokeWidth={2}
-          opacity={pointAnimation}
-          // Use the transform property of SVG
-          transform={`translate(${x} ${y}) scale(${scale}) translate(-${x} -${y})`}
+          opacity={animatedOpacity}
+          // Use scale transform
+          transform={`scale(${animatedScale})`}
         />
       );
     });
@@ -326,7 +323,7 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
           {/* X axis labels */}
           {renderXAxisLabels()}
 
-          {/* Data line */}
+          {/* Data line - FIX: Use strokeDashoffset instead of dynamic path */}
           {pathRef.current && (
             <AnimatedPath
               d={pathRef.current}
@@ -337,6 +334,7 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
               strokeDashoffset={pathAnimation.interpolate({
                 inputRange: [0, 1],
                 outputRange: [innerWidth * 2, 0],
+                extrapolate: "clamp",
               })}
             />
           )}

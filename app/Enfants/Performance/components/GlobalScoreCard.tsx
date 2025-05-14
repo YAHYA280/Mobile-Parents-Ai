@@ -1,4 +1,4 @@
-// app/Enfants/Performance/components/GlobalScoreCard.tsx
+// Fixed GlobalScoreCard.tsx
 import React, { useEffect, useRef } from "react";
 import {
   View,
@@ -52,12 +52,16 @@ const GlobalScoreCard: React.FC<GlobalScoreCardProps> = ({
         .split("/")
         .map((num) => parseInt(num, 10));
 
+      if (isNaN(score) || isNaN(possible) || possible === 0) return;
+
       totalScore += score;
       totalPossible += possible;
     });
 
-    const averagePercentage =
-      totalPossible > 0 ? (totalScore / totalPossible) * 100 : 0;
+    // Safeguard against division by zero
+    if (totalPossible === 0) return 0;
+
+    const averagePercentage = (totalScore / totalPossible) * 100;
 
     return Math.round(averagePercentage * 10) / 10; // Round to 1 decimal place
   };
@@ -88,11 +92,17 @@ const GlobalScoreCard: React.FC<GlobalScoreCardProps> = ({
 
   const progressColors = getProgressColor(averageScore);
 
-  // Animate the score number
-  const animatedScore = progressAnimation.interpolate({
+  // FIX: Simplify the animation to avoid chained interpolations which can cause errors
+  const animatedScoreValue = progressAnimation.interpolate({
     inputRange: [0, 1],
     outputRange: [0, averageScore],
+    extrapolate: "clamp",
   });
+
+  // FIX: Create a formatted score string for display
+  const getFormattedScore = () => {
+    return `${averageScore.toFixed(1)}%`;
+  };
 
   return (
     <View style={styles.container}>
@@ -110,19 +120,11 @@ const GlobalScoreCard: React.FC<GlobalScoreCardProps> = ({
           strokeWidth={12}
           progressColors={progressColors}
         >
+          {/* FIX: Use simple Text component instead of Animated.Text with complex interpolations */}
           <Animated.Text
             style={[styles.scoreText, { color: progressColors[0] }]}
           >
-            {animatedScore
-              .interpolate({
-                inputRange: [0, averageScore],
-                outputRange: ["0", averageScore.toFixed(1)],
-                extrapolate: "clamp",
-              })
-              .interpolate({
-                inputRange: [0, 100],
-                outputRange: ["0%", "100%"],
-              })}
+            {getFormattedScore()}
           </Animated.Text>
         </CircularProgress>
 

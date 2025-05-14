@@ -1,5 +1,5 @@
-// app/Enfants/Performance/components/SkillBreakdownCard.tsx
-import React, { useEffect, useState } from "react";
+// Fixed SkillBreakdownCard.tsx
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet, Dimensions, Animated } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBrain, faCheck } from "@fortawesome/free-solid-svg-icons";
@@ -26,6 +26,8 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
 }) => {
   const [skills, setSkills] = useState<SkillData[]>([]);
   const [animation] = useState(new Animated.Value(0));
+  // FIX: Add ref for points to avoid recreating them on each render
+  const pointsRef = useRef<string>("");
 
   const windowWidth = Dimensions.get("window").width;
   const chartSize = windowWidth - 100; // Allow for padding
@@ -53,7 +55,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
       duration: 1000,
       useNativeDriver: false,
     }).start();
-  }, [childData]);
+  }, [childData, animation]);
 
   // Calculate points for the radar chart
   const getPolygonPoints = (
@@ -72,6 +74,21 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
 
     return points.join(" ");
   };
+
+  // FIX: Pre-calculate start and end points for animation
+  useEffect(() => {
+    if (skills.length > 0) {
+      // Create and cache the end points when skills are loaded
+      pointsRef.current = getPolygonPoints(skills, 1);
+    }
+  }, [skills]);
+
+  // FIX: Use a simple Polygon with fixed points instead of animated points
+  const animatedScale = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+    extrapolate: "clamp",
+  });
 
   // Generate grid lines for the radar background
   const generateGridLines = () => {
@@ -143,12 +160,6 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
     return result;
   };
 
-  // Animate the polygon points
-  const animatedPoints = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [getPolygonPoints(skills, 0), getPolygonPoints(skills, 1)],
-  });
-
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
@@ -167,13 +178,16 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
           {/* Background grid */}
           {generateGridLines()}
 
-          {/* Data polygon */}
-          {skills.length > 0 && (
+          {/* Data polygon - FIX: use standard polygon with transform */}
+          {skills.length > 0 && pointsRef.current && (
             <AnimatedPolygon
-              points={animatedPoints}
+              points={pointsRef.current}
               fill="rgba(156, 39, 176, 0.3)"
               stroke="#9C27B0"
               strokeWidth={2}
+              originX={centerX} // <- centre of the radar
+              originY={centerY}
+              scale={animatedScale} // <- single animated prop
             />
           )}
         </Svg>

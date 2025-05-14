@@ -1,4 +1,4 @@
-// app/Enfants/Performance/home.tsx
+// Fixed home.tsx
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -49,7 +49,7 @@ const PerformanceHome: React.FC<PerformanceHomeProps> = ({
   const params = useLocalSearchParams();
   const childId = Number(params.childId || 0);
 
-  // Animation refs
+  // FIX: Use simple animated values instead of complex interpolation
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -104,7 +104,8 @@ const PerformanceHome: React.FC<PerformanceHomeProps> = ({
 
         // Start animations after a short delay
         setTimeout(() => {
-          Animated.parallel([
+          // FIX: Run animations in sequence rather than parallel to avoid race conditions
+          Animated.sequence([
             Animated.timing(fadeAnim, {
               toValue: 1,
               duration: 400,

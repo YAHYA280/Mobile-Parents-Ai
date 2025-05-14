@@ -1,4 +1,4 @@
-// app/Enfants/Performance/components/CircularProgress.tsx
+// Fixed CircularProgress.tsx
 import React, { useEffect, useRef } from "react";
 import { View, StyleSheet, Animated, Easing, ViewStyle } from "react-native";
 import Svg, { Circle, G } from "react-native-svg";
@@ -42,16 +42,16 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   };
 
   useEffect(() => {
-    // Ensure percentage is a valid number
+    // FIX: Ensure percentage is a valid number
     const safePercentage =
-      typeof percentage === "number"
+      typeof percentage === "number" && !isNaN(percentage)
         ? Math.min(Math.max(percentage, 0), 100)
         : 0;
 
     animation(safePercentage).start();
-  }, [percentage]);
+  }, [percentage, animation]);
 
-  // Calculate the stroke dashoffset based on the animated value
+  // FIX: Calculate the stroke dashoffset based on the animated value with safe checks
   const animatedStrokeDashoffset = animatedValue.interpolate({
     inputRange: [0, 100],
     outputRange: [circleCircumference, 0],
@@ -75,7 +75,6 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
             strokeWidth={strokeWidth}
             strokeOpacity={1}
           />
-          {/* Use AnimatedCircle instead of wrapping Circle in an Animated.View */}
           <AnimatedCircle
             cx="50%"
             cy="50%"

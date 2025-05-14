@@ -1,4 +1,4 @@
-// app/Enfants/Performance/components/SubjectPerformanceCard.tsx
+// Fixed SubjectPerformanceCard.tsx
 import React, { useEffect, useRef } from "react";
 import {
   View,
@@ -51,6 +51,8 @@ const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
         .split("/")
         .map((num) => parseInt(num, 10));
 
+      if (isNaN(score) || isNaN(possible) || possible === 0) return;
+
       if (!subjectData[activity.matiere]) {
         subjectData[activity.matiere] = { total: 0, possible: 0 };
       }
@@ -65,7 +67,7 @@ const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
         name,
         total: data.total,
         possible: data.possible,
-        percentage: (data.total / data.possible) * 100,
+        percentage: data.possible > 0 ? (data.total / data.possible) * 100 : 0,
       }))
       .sort((a, b) => b.percentage - a.percentage); // Sort by percentage (highest first)
   };
@@ -74,19 +76,31 @@ const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
 
   // Initialize animations for each subject
   useEffect(() => {
-    subjectPerformance.forEach((subject) => {
-      if (!barAnimations[subject.name]) {
-        barAnimations[subject.name] = new Animated.Value(0);
-      }
+    // FIX: Create a new object to avoid reference issues
+    const animations: { [key: string]: Animated.Value } = {};
 
-      Animated.timing(barAnimations[subject.name], {
+    subjectPerformance.forEach((subject) => {
+      // Create new animation value or reuse existing one
+      animations[subject.name] =
+        barAnimations[subject.name] || new Animated.Value(0);
+    });
+
+    // Start animations for all subjects
+    const animationsToStart = subjectPerformance.map((subject) =>
+      Animated.timing(animations[subject.name], {
         toValue: 1,
         duration: 1000,
         delay: 300, // Slight delay for a nice effect
         easing: Easing.out(Easing.cubic),
         useNativeDriver: false,
-      }).start();
-    });
+      })
+    );
+
+    // Run all animations in parallel
+    Animated.parallel(animationsToStart).start();
+
+    // Update ref to keep track of animations
+    Object.assign(barAnimations, animations);
   }, [subjectPerformance]);
 
   // Utility function to get progress color
@@ -122,12 +136,18 @@ const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
           {subjectPerformance.map((subject, index) => {
             const progressColors = getProgressColor(subject.percentage);
 
-            // Get the animated width for this subject
-            const animatedWidth =
-              barAnimations[subject.name]?.interpolate({
+            // FIX: Make sure we have an animation value for this subject
+            const animationValue =
+              barAnimations[subject.name] || new Animated.Value(0);
+
+            // FIX: Create width style directly without chained interpolations
+            const widthStyle = {
+              width: animationValue.interpolate({
                 inputRange: [0, 1],
                 outputRange: ["0%", `${subject.percentage}%`],
-              }) || "0%";
+                extrapolate: "clamp",
+              }),
+            };
 
             return (
               <View
@@ -151,7 +171,7 @@ const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
                 </View>
 
                 <View style={styles.progressBarContainer}>
-                  <Animated.View style={{ width: animatedWidth }}>
+                  <Animated.View style={widthStyle}>
                     <LinearGradient
                       colors={progressColors}
                       start={{ x: 0, y: 0 }}
