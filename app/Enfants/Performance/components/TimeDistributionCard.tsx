@@ -1,6 +1,6 @@
-// app/Enfants/Performance/components/TimeDistributionCard.tsx
-import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Animated, Easing } from "react-native";
+// Fixed TimeDistributionCard.tsx
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faClock,
@@ -30,8 +30,7 @@ const TimeDistributionCard: React.FC<TimeDistributionCardProps> = ({
   activities,
 }) => {
   const [categories, setCategories] = useState<TimeCategory[]>([]);
-  const [rotation] = useState(new Animated.Value(0));
-  const [opacity] = useState(new Animated.Value(0));
+  const [pieProgress, setPieProgress] = useState(0);
 
   const size = 180;
   const radius = size / 2;
@@ -76,21 +75,24 @@ const TimeDistributionCard: React.FC<TimeDistributionCardProps> = ({
 
     setCategories(mockCategories);
 
-    // Start animations
-    Animated.parallel([
-      Animated.timing(rotation, {
-        toValue: 1,
-        duration: 1500,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [rotation, opacity]);
+    // Animate pie chart appearing (without Animated API)
+    let progress = 0;
+    const animationDuration = 1500; // milliseconds
+    const interval = 16; // ~60fps
+    const steps = animationDuration / interval;
+    const increment = 1 / steps;
+
+    const animation = setInterval(() => {
+      progress += increment;
+      if (progress >= 1) {
+        progress = 1;
+        clearInterval(animation);
+      }
+      setPieProgress(progress);
+    }, interval);
+
+    return () => clearInterval(animation);
+  }, []);
 
   // Format minutes as hours and minutes
   const formatTime = (minutes: number): string => {
@@ -151,42 +153,22 @@ const TimeDistributionCard: React.FC<TimeDistributionCardProps> = ({
     let startAngle = 0;
 
     return categories.map((category, index) => {
-      const endAngle = startAngle + (category.percentage / 100) * 360;
+      const angleToRender = (category.percentage / 100) * 360 * pieProgress;
+      const endAngle = startAngle + angleToRender;
       const path = createPieSlice(startAngle, endAngle, radius, innerRadius);
 
       // This slice's starting angle becomes the next slice's starting angle
       const thisStartAngle = startAngle;
       startAngle = endAngle;
 
-      // Calculate position for the label
-      const midAngle = thisStartAngle + (category.percentage / 200) * 360;
-      const midRadians = (midAngle - 90) * (Math.PI / 180);
-      const labelRadius = radius * 0.8; // Position between inner and outer radius
-
-      const labelX = centerX + labelRadius * Math.cos(midRadians);
-      const labelY = centerY + labelRadius * Math.sin(midRadians);
-
-      // Animated rotation for each slice
-      const sliceRotation = rotation.interpolate({
-        inputRange: [0, 1],
-        outputRange: ["0deg", "360deg"],
-      });
-
       return (
-        <Animated.View
+        <Path
           key={index}
-          style={{
-            opacity,
-            transform: [{ rotate: sliceRotation }],
-          }}
-        >
-          <Path
-            d={path}
-            fill={category.color}
-            stroke="#FFFFFF"
-            strokeWidth={1}
-          />
-        </Animated.View>
+          d={path}
+          fill={category.color}
+          stroke="#FFFFFF"
+          strokeWidth={1}
+        />
       );
     });
   };

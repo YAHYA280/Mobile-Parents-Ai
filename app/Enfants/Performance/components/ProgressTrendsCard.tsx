@@ -1,6 +1,6 @@
 // Fixed ProgressTrendsCard.tsx
-import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Dimensions, Animated } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChartLine, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import Svg, { Path, Line, Text as SvgText, G, Circle } from "react-native-svg";
@@ -17,16 +17,12 @@ interface DataPoint {
   score: number;
 }
 
-// Create animated SVG components
-const AnimatedPath = Animated.createAnimatedComponent(Path);
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-
 const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
   activities,
 }) => {
   const [data, setData] = useState<DataPoint[]>([]);
-  const [pathAnimation] = useState(new Animated.Value(0));
-  const [pointAnimation] = useState(new Animated.Value(0));
+  const [pathProgress, setPathProgress] = useState(0);
+  const [pointsOpacity, setPointsOpacity] = useState(0);
 
   const windowWidth = Dimensions.get("window").width;
   const chartWidth = windowWidth - 80;
@@ -36,8 +32,6 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
 
   const innerWidth = chartWidth - paddingHorizontal * 2;
   const innerHeight = chartHeight - paddingVertical * 2;
-
-  const pathRef = useRef<string>("");
 
   // Process activities data for the chart
   useEffect(() => {
@@ -79,7 +73,6 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
           .split("/")
           .map((num) => parseInt(num, 10));
 
-        // FIX: Add null check for score and possible
         if (isNaN(score) || isNaN(possible) || possible === 0) return;
 
         const percentage = (score / possible) * 100;
@@ -106,53 +99,114 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
     const newData = processData();
     setData(newData);
 
-    // Create the animated path
-    if (newData.length > 0) {
-      const createPath = () => {
-        if (newData.length < 2) return "";
+    // Animate the chart
+    let progress = 0;
+    const animationDuration = 1500; // milliseconds
+    const interval = 16; // ~60fps
+    const steps = animationDuration / interval;
+    const increment = 1 / steps;
 
-        const maxDate = Math.max(...newData.map((d) => d.date.getTime()));
-        const minDate = Math.min(...newData.map((d) => d.date.getTime()));
-        const dateRange = maxDate - minDate;
+    // Reset animation values
+    setPathProgress(0);
+    setPointsOpacity(0);
 
-        const getX = (date: Date) => {
-          if (dateRange === 0) return paddingHorizontal; // Handle edge case
-          return (
-            paddingHorizontal +
-            ((date.getTime() - minDate) / dateRange) * innerWidth
-          );
-        };
+    // Animate the path
+    const animation = setInterval(() => {
+      progress += increment;
+      if (progress >= 1) {
+        progress = 1;
+        clearInterval(animation);
+      }
+      setPathProgress(progress);
 
-        const getY = (score: number) => {
-          return chartHeight - paddingVertical - (score / 100) * innerHeight;
-        };
+      // Delay the points appearance slightly
+      if (progress > 0.5) {
+        const pointsProgress = (progress - 0.5) * 2; // Scale 0.5-1 to 0-1
+        setPointsOpacity(pointsProgress);
+      }
+    }, interval);
 
-        let path = `M ${getX(newData[0].date)} ${getY(newData[0].score)}`;
+    return () => clearInterval(animation);
+  }, [activities]);
 
-        for (let i = 1; i < newData.length; i++) {
-          path += ` L ${getX(newData[i].date)} ${getY(newData[i].score)}`;
+  // Create the path string for the line chart
+  const createLinePath = (): string => {
+    if (data.length < 2) return "";
+
+    const maxDate = Math.max(...data.map((d) => d.date.getTime()));
+    const minDate = Math.min(...data.map((d) => d.date.getTime()));
+    const dateRange = maxDate - minDate;
+
+    const getX = (date: Date) => {
+      if (dateRange === 0) return paddingHorizontal; // Handle edge case
+      return (
+        paddingHorizontal +
+        ((date.getTime() - minDate) / dateRange) * innerWidth
+      );
+    };
+
+    const getY = (score: number) => {
+      return chartHeight - paddingVertical - (score / 100) * innerHeight;
+    };
+
+    // Calculate the full path first
+    let fullPath = "";
+    data.forEach((point, index) => {
+      const x = getX(point.date);
+      const y = getY(point.score);
+
+      if (index === 0) {
+        fullPath = `M ${x} ${y}`;
+      } else {
+        fullPath += ` L ${x} ${y}`;
+      }
+    });
+
+    // If animation in progress, calculate partial path
+    if (pathProgress < 1 && data.length >= 2) {
+      const totalLength = data.length - 1; // Total number of line segments
+      const progressSegments = totalLength * pathProgress;
+      const completeSegments = Math.floor(progressSegments);
+      const partialSegment = progressSegments - completeSegments;
+
+      let partialPath = "";
+
+      // Add all complete segments
+      data.forEach((point, index) => {
+        if (index <= completeSegments) {
+          const x = getX(point.date);
+          const y = getY(point.score);
+
+          if (index === 0) {
+            partialPath = `M ${x} ${y}`;
+          } else {
+            partialPath += ` L ${x} ${y}`;
+          }
         }
+      });
 
-        return path;
-      };
+      // Add partial segment if needed
+      if (completeSegments < totalLength) {
+        const startPoint = data[completeSegments];
+        const endPoint = data[completeSegments + 1];
 
-      pathRef.current = createPath();
+        const startX = getX(startPoint.date);
+        const startY = getY(startPoint.score);
+        const endX = getX(endPoint.date);
+        const endY = getY(endPoint.score);
 
-      // Animate the path
-      Animated.parallel([
-        Animated.timing(pathAnimation, {
-          toValue: 1,
-          duration: 1500,
-          useNativeDriver: false,
-        }),
-        Animated.timing(pointAnimation, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: false,
-        }),
-      ]).start();
+        // Interpolate between start and end
+        const partialX = startX + (endX - startX) * partialSegment;
+        const partialY = startY + (endY - startY) * partialSegment;
+
+        partialPath += ` L ${partialX} ${partialY}`;
+      }
+
+      return partialPath;
     }
-  }, [activities, pathAnimation, pointAnimation]);
+
+    return fullPath;
+  };
 
   // Generate the x-axis labels
   const renderXAxisLabels = () => {
@@ -232,16 +286,8 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
       const y =
         chartHeight - paddingVertical - (point.score / 100) * innerHeight;
 
-      // FIX: Use simpler animation approach
-      const animatedOpacity = pointAnimation;
-      const animatedScale = pointAnimation.interpolate({
-        inputRange: [0, 0.8, 1],
-        outputRange: [0, 1.2, 1],
-        extrapolate: "clamp",
-      });
-
       return (
-        <AnimatedCircle
+        <Circle
           key={index}
           cx={x}
           cy={y}
@@ -249,9 +295,7 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
           fill="#FFFFFF"
           stroke={COLORS.primary}
           strokeWidth={2}
-          opacity={animatedOpacity}
-          // Use scale transform
-          transform={`scale(${animatedScale})`}
+          opacity={pointsOpacity}
         />
       );
     });
@@ -323,21 +367,13 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
           {/* X axis labels */}
           {renderXAxisLabels()}
 
-          {/* Data line - FIX: Use strokeDashoffset instead of dynamic path */}
-          {pathRef.current && (
-            <AnimatedPath
-              d={pathRef.current}
-              fill="none"
-              stroke={COLORS.primary}
-              strokeWidth={3}
-              strokeDasharray={`${innerWidth * 2}`}
-              strokeDashoffset={pathAnimation.interpolate({
-                inputRange: [0, 1],
-                outputRange: [innerWidth * 2, 0],
-                extrapolate: "clamp",
-              })}
-            />
-          )}
+          {/* Data line - Using calculated path string instead of animation */}
+          <Path
+            d={createLinePath()}
+            fill="none"
+            stroke={COLORS.primary}
+            strokeWidth={3}
+          />
 
           {/* Data points */}
           {renderDataPoints()}
