@@ -1,5 +1,7 @@
 import Checkbox from "expo-checkbox";
 import { useNavigation } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useReducer, useCallback } from "react";
 import {
@@ -71,140 +73,214 @@ const CreateNewPassword = () => {
     }
   }, [error]);
 
-  // render modal
+  // render success modal
   const renderModal = () => (
     <Modal animationType="slide" transparent visible={modalVisible}>
       <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-        <View style={[styles.modalContainer]}>
+        <View style={styles.modalContainer}>
           <View
             style={[
-              styles.modalSubContainer,
+              styles.modalContent,
               {
-                backgroundColor: dark ? COLORS.dark2 : COLORS.secondaryWhite,
+                backgroundColor: dark ? COLORS.dark2 : COLORS.white,
               },
             ]}
           >
-            <Image
-              source={illustrations.passwordSuccess}
-              resizeMode="contain"
-              style={styles.modalIllustration}
-            />
+            <View style={styles.successIconContainer}>
+              <LinearGradient
+                colors={[COLORS.primary, "#3CAE5C"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.successIconGradient}
+              >
+                <Ionicons name="checkmark" size={40} color="#FFFFFF" />
+              </LinearGradient>
+            </View>
+
             <Text style={styles.modalTitle}>
               Mot de passe modifié avec succès!
             </Text>
+
             <Text
               style={[
-                styles.modalSubtitle,
+                styles.modalDescription,
                 {
-                  color: dark ? COLORS.greyscale300 : COLORS.greyscale600,
+                  color: dark ? COLORS.greyscale500 : COLORS.greyscale600,
                 },
               ]}
             >
               Lors de la prochaine connexion, veuillez utiliser le nouveau mot
               de passe.
             </Text>
-            <Button
-              title="Continuer"
-              filled
+
+            <TouchableOpacity
+              style={styles.continueButton}
               onPress={() => {
                 setModalVisible(false);
                 navigate("(tabs)");
               }}
-              style={{
-                width: "100%",
-                marginTop: 12,
-              }}
-            />
+              activeOpacity={0.7}
+            >
+              <LinearGradient
+                colors={[COLORS.primary, "#ff7043"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.continueGradient}
+              >
+                <Text style={styles.continueText}>Continuer</Text>
+                <Ionicons
+                  name="arrow-forward"
+                  size={18}
+                  color="#FFFFFF"
+                  style={styles.continueIcon}
+                />
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
   );
+
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header title="Réinitialiser mot de passe" />
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.logoContainer}>
-            <Image
-              source={dark ? illustrations.successDark : illustrations.success}
-              resizeMode="contain"
-              style={styles.success}
-            />
-          </View>
-          <Text
-            style={[
-              styles.title,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Créez votre nouveau mot de passe
-          </Text>
-          <Input
-            onInputChanged={inputChangedHandler}
-            errorText={formState.inputValidities.newPassword}
-            autoCapitalize="none"
-            id="newPassword"
-            placeholder="Nouveau mot de passe"
-            placeholderTextColor={dark ? COLORS.grayTie : COLORS.grayscale400}
-            icon={icons.padlock}
-            secureTextEntry
-          />
-          <Input
-            onInputChanged={inputChangedHandler}
-            errorText={formState.inputValidities.confirmNewPassword}
-            autoCapitalize="none"
-            id="confirmNewPassword"
-            placeholder="Confirmer le nouveau mot de passe"
-            placeholderTextColor={dark ? COLORS.grayTie : COLORS.grayscale400}
-            icon={icons.padlock}
-            secureTextEntry
-          />
-          <View style={styles.checkBoxContainer}>
-            <View style={{ flexDirection: "row" }}>
-              <Checkbox
-                style={styles.checkbox}
-                value={isChecked}
-                color={
-                  isChecked ? COLORS.primary : dark ? COLORS.primary : "gray"
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.contentContainer}>
+            <View style={styles.illustrationContainer}>
+              <Image
+                source={
+                  dark ? illustrations.successDark : illustrations.success
                 }
-                onValueChange={setChecked}
+                style={styles.illustration}
+                resizeMode="contain"
               />
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={[
-                    styles.privacy,
-                    {
-                      color: dark ? COLORS.white : COLORS.black,
-                    },
-                  ]}
+            </View>
+
+            <View style={styles.formContainer}>
+              <Text
+                style={[
+                  styles.title,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Créez votre nouveau mot de passe
+              </Text>
+
+              <Text
+                style={[
+                  styles.subtitle,
+                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                ]}
+              >
+                Votre mot de passe doit contenir au moins 8 caractères, incluant
+                des majuscules et des chiffres
+              </Text>
+
+              <View style={styles.inputsContainer}>
+                <Input
+                  onInputChanged={inputChangedHandler}
+                  errorText={formState.inputValidities.newPassword}
+                  autoCapitalize="none"
+                  id="newPassword"
+                  placeholder="Nouveau mot de passe"
+                  placeholderTextColor={
+                    dark ? COLORS.grayTie : COLORS.grayscale400
+                  }
+                  icon={icons.padlock}
+                  secureTextEntry
+                />
+
+                <Input
+                  onInputChanged={inputChangedHandler}
+                  errorText={formState.inputValidities.confirmNewPassword}
+                  autoCapitalize="none"
+                  id="confirmNewPassword"
+                  placeholder="Confirmer le nouveau mot de passe"
+                  placeholderTextColor={
+                    dark ? COLORS.grayTie : COLORS.grayscale400
+                  }
+                  icon={icons.padlock}
+                  secureTextEntry
+                />
+              </View>
+
+              <View style={styles.checkBoxContainer}>
+                <TouchableOpacity
+                  style={styles.checkboxWrapper}
+                  onPress={() => setChecked(!isChecked)}
+                  activeOpacity={0.7}
                 >
-                  Se souvenir de moi
-                </Text>
-                {/* "Besoin d'aide" link */}
-                <TouchableOpacity onPress={handleHelpPress}>
-                  <Text
+                  <Checkbox
                     style={[
-                      styles.helpLink,
+                      styles.checkbox,
                       {
-                        color: COLORS.primary,
+                        borderColor: isChecked
+                          ? COLORS.primary
+                          : dark
+                            ? COLORS.greyscale500
+                            : COLORS.grayscale400,
                       },
                     ]}
+                    value={isChecked}
+                    color={isChecked ? COLORS.primary : undefined}
+                    onValueChange={setChecked}
+                  />
+                  <Text
+                    style={[
+                      styles.checkboxLabel,
+                      { color: dark ? COLORS.white : COLORS.black },
+                    ]}
                   >
-                    Besoin d&apos;aide?
+                    Se souvenir de moi
                   </Text>
                 </TouchableOpacity>
               </View>
+
+              <TouchableOpacity
+                style={styles.helpLinkContainer}
+                onPress={handleHelpPress}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="help-circle-outline"
+                  size={18}
+                  color={COLORS.primary}
+                  style={styles.helpIcon}
+                />
+                <Text style={styles.helpLink}>Besoin d'aide?</Text>
+              </TouchableOpacity>
             </View>
           </View>
-          <View />
         </ScrollView>
-        <Button
-          title="Continuer"
-          filled
-          onPress={() => setModalVisible(true)}
-          style={styles.button}
-        />
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={() => setModalVisible(true)}
+            activeOpacity={0.7}
+          >
+            <LinearGradient
+              colors={[COLORS.primary, "#ff7043"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.submitGradient}
+            >
+              <Text style={styles.submitText}>Continuer</Text>
+              <Ionicons
+                name="arrow-forward"
+                size={18}
+                color="#FFFFFF"
+                style={styles.submitIcon}
+              />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
         {renderModal()}
       </View>
     </SafeAreaView>
@@ -218,88 +294,172 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: COLORS.white,
   },
-  success: {
-    width: SIZES.width * 0.8,
-    height: 250,
+  scrollContent: {
+    flexGrow: 1,
   },
-  logoContainer: {
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+  illustrationContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 52,
+    paddingVertical: 32,
+  },
+  illustration: {
+    width: SIZES.width * 0.8,
+    height: 220,
+  },
+  formContainer: {
+    width: "100%",
   },
   title: {
-    fontSize: 18,
-    fontFamily: "medium",
-    color: COLORS.black,
-    marginVertical: 12,
+    fontSize: 24,
+    fontFamily: "bold",
+    marginBottom: 12,
+  },
+  subtitle: {
+    fontSize: 14,
+    fontFamily: "regular",
+    marginBottom: 24,
+    lineHeight: 20,
+  },
+  inputsContainer: {
+    marginBottom: 16,
   },
   checkBoxContainer: {
+    marginBottom: 16,
+  },
+  checkboxWrapper: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 18,
   },
   checkbox: {
-    marginRight: 8,
-    height: 16,
-    width: 16,
+    marginRight: 12,
+    height: 20,
+    width: 20,
     borderRadius: 4,
-    borderColor: COLORS.primary,
     borderWidth: 2,
   },
-  privacy: {
-    fontSize: 12,
-    fontFamily: "regular",
-    color: COLORS.black,
+  checkboxLabel: {
+    fontSize: 15,
+    fontFamily: "medium",
   },
-  button: {
-    marginVertical: 6,
-    width: SIZES.width - 32,
-    borderRadius: 30,
+  helpLinkContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  helpIcon: {
+    marginRight: 8,
   },
   helpLink: {
-    fontSize: 12,
-    fontFamily: "regular",
+    fontSize: 15,
+    fontFamily: "medium",
     color: COLORS.primary,
     textDecorationLine: "underline",
-    marginTop: 12,
+  },
+  buttonContainer: {
+    padding: 24,
+    paddingTop: 16,
+  },
+  submitButton: {
+    borderRadius: 30,
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  submitGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    borderRadius: 30,
+  },
+  submitText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: "semibold",
+  },
+  submitIcon: {
+    marginLeft: 8,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 24,
+  },
+  modalContent: {
+    width: "100%",
+    borderRadius: 24,
+    padding: 32,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 15,
+    elevation: 10,
+  },
+  successIconContainer: {
+    marginBottom: 24,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  successIconGradient: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 24,
     fontFamily: "bold",
     color: COLORS.primary,
     textAlign: "center",
-    marginVertical: 12,
+    marginBottom: 16,
   },
-  modalSubtitle: {
+  modalDescription: {
     fontSize: 16,
     fontFamily: "regular",
-    color: COLORS.greyscale600,
     textAlign: "center",
-    marginVertical: 12,
+    marginBottom: 32,
+    lineHeight: 24,
   },
-  modalContainer: {
-    flex: 1,
+  continueButton: {
+    width: "100%",
+    borderRadius: 30,
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  continueGradient: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.4)",
+    paddingVertical: 16,
+    borderRadius: 30,
   },
-  modalSubContainer: {
-    height: 494,
-    width: SIZES.width * 0.9,
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
+  continueText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: "semibold",
   },
-  modalIllustration: {
-    height: 180,
-    width: 180,
-    marginVertical: 22,
+  continueIcon: {
+    marginLeft: 8,
   },
 });
 

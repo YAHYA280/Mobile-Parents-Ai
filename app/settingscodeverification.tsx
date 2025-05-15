@@ -1,8 +1,10 @@
 import { useNavigation } from "expo-router";
 import { OtpInput } from "react-native-otp-entry";
 import React, { useState, useEffect } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 
 import { COLORS } from "../constants";
 import Header from "../components/Header";
@@ -18,6 +20,7 @@ const SettingsCodeVerification = () => {
   const { navigate } = useNavigation<Nav>();
   const [time, setTime] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
+  const [otp, setOtp] = useState("");
   const { colors, dark } = useTheme();
 
   useEffect(() => {
@@ -35,88 +38,170 @@ const SettingsCodeVerification = () => {
   };
 
   const handleVerify = () => {
-    setIsLoading(true); 
-    
+    if (otp.length < 4) return;
+
+    setIsLoading(true);
+
     setTimeout(() => {
       setIsLoading(false);
       navigate("settingsresetpassword");
     }, 2000);
   };
 
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header title="Réinitialiser mot de passe" />
-        <ScrollView>
+
+        <View style={styles.contentContainer}>
+          <View style={styles.iconContainer}>
+            <LinearGradient
+              colors={[COLORS.primary, "#ff7043"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.iconBackground}
+            >
+              <Ionicons name="mail" size={32} color="#FFFFFF" />
+            </LinearGradient>
+          </View>
+
           <Text
             style={[
               styles.title,
-              {
-                color: dark ? COLORS.white : COLORS.black,
-              },
+              { color: dark ? COLORS.white : COLORS.black },
             ]}
           >
-            Le code a été envoyé à l&apos;email jack_Duboix@gmail.com
+            Code de Vérification
           </Text>
-          <OtpInput
-            numberOfDigits={4}
-            onTextChange={(text) => console.log(text)}
-            focusColor={COLORS.primary}
-            focusStickBlinkingDuration={500}
-            onFilled={(text) => console.log(`OTP is ${text}`)}
-            theme={{
-              pinCodeContainerStyle: {
-                backgroundColor: dark ? COLORS.dark2 : COLORS.secondaryWhite,
-                borderColor: dark ? COLORS.gray : COLORS.secondaryWhite,
-                borderWidth: 0.4,
-                borderRadius: 10,
-                height: 58,
-                width: 58,
-              },
-              pinCodeTextStyle: {
-                color: dark ? COLORS.white : COLORS.black,
-              },
-            }}
-          />
-          <View style={styles.codeContainer}>
-            <Text
-              style={[
-                styles.code,
-                {
-                  color: dark ? COLORS.white : COLORS.greyscale900,
+
+          <Text
+            style={[
+              styles.subtitle,
+              { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+            ]}
+          >
+            Le code a été envoyé à l'email{" "}
+            <Text style={styles.email}>jack_Duboix@gmail.com</Text>
+          </Text>
+
+          <View style={styles.otpContainer}>
+            <OtpInput
+              numberOfDigits={4}
+              onTextChange={(text) => setOtp(text)}
+              focusColor={COLORS.primary}
+              focusStickBlinkingDuration={500}
+              onFilled={(text) => setOtp(text)}
+              theme={{
+                pinCodeContainerStyle: {
+                  backgroundColor: dark ? COLORS.dark2 : "#F8F9FA",
+                  borderColor: dark ? COLORS.gray : "#E8E8E8",
+                  borderWidth: 1,
+                  borderRadius: 12,
+                  height: 64,
+                  width: 64,
+                  marginHorizontal: 8,
+                  ...styles.otpDigitContainer,
                 },
-              ]}
-            >
-              Renvoyer le code dans
-            </Text>
-            <Text style={styles.time}>{`  ${time} `}</Text>
-            <Text
-              style={[
-                styles.code,
-                {
-                  color: dark ? COLORS.white : COLORS.greyscale900,
+                pinCodeTextStyle: {
+                  color: dark ? COLORS.white : COLORS.black,
+                  fontSize: 24,
+                  fontFamily: "medium",
                 },
-              ]}
-            >
-              s
-            </Text>
-          </View>
-          <View style={styles.buttonContainer}>
-            <Button
-              title="Renvoyer le code"
-              filled={false}
-              style={[styles.button, styles.resendButton]}
-              onPress={handleResendCode}
+              }}
             />
-            <Button
-              title={isLoading ? "" : "Vérifier"}
-              filled
-              style={styles.button}
+          </View>
+
+          <View style={styles.timerContainer}>
+            {time > 0 ? (
+              <>
+                <Text
+                  style={[
+                    styles.timerText,
+                    { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                  ]}
+                >
+                  Renvoyer le code dans{" "}
+                </Text>
+                <View style={styles.timerBadge}>
+                  <Text style={styles.timerDigits}>{formatTime(time)}</Text>
+                </View>
+              </>
+            ) : (
+              <Text
+                style={[
+                  styles.timerText,
+                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                ]}
+              >
+                Vous n'avez pas reçu le code?
+              </Text>
+            )}
+          </View>
+
+          <View style={styles.buttonsContainer}>
+            {time === 0 ? (
+              <TouchableOpacity
+                style={styles.resendButton}
+                onPress={handleResendCode}
+                activeOpacity={0.7}
+              >
+                <LinearGradient
+                  colors={["rgba(255,142,105,0.2)", "rgba(255,142,105,0.1)"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.resendGradient}
+                >
+                  <Ionicons
+                    name="refresh"
+                    size={18}
+                    color={COLORS.primary}
+                    style={styles.resendIcon}
+                  />
+                  <Text style={styles.resendText}>Renvoyer le code</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.placeholderButton} />
+            )}
+
+            <TouchableOpacity
+              style={[
+                styles.verifyButton,
+                otp.length < 4 && styles.verifyButtonDisabled,
+              ]}
               onPress={handleVerify}
-              isLoading={isLoading}
-            />
+              disabled={otp.length < 4 || isLoading}
+              activeOpacity={0.7}
+            >
+              <LinearGradient
+                colors={[COLORS.primary, "#ff7043"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.verifyGradient}
+              >
+                {isLoading ? (
+                  <View style={styles.loadingIndicator} />
+                ) : (
+                  <>
+                    <Text style={styles.verifyText}>Vérifier</Text>
+                    <Ionicons
+                      name="arrow-forward"
+                      size={18}
+                      color="#FFFFFF"
+                      style={styles.verifyIcon}
+                    />
+                  </>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -129,49 +214,142 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: COLORS.white,
   },
-  title: {
-    fontSize: 18,
-    fontFamily: "medium",
-    color: COLORS.greyscale900,
-    textAlign: "center",
-    marginVertical: 54,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 24,
-  },
-  codeContainer: {
-    flexDirection: "row",
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 16,
     alignItems: "center",
-    marginVertical: 24,
-    justifyContent: "center",
   },
-  code: {
-    fontSize: 18,
-    fontFamily: "medium",
-    color: COLORS.greyscale900,
+  iconContainer: {
+    marginBottom: 24,
+  },
+  iconBackground: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  title: {
+    fontSize: 24,
+    fontFamily: "bold",
+    marginBottom: 12,
     textAlign: "center",
   },
-  time: {
-    fontFamily: "medium",
-    fontSize: 18,
+  subtitle: {
+    fontSize: 15,
+    fontFamily: "regular",
+    marginBottom: 32,
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  email: {
+    fontFamily: "semibold",
     color: COLORS.primary,
   },
-  button: {
-    borderRadius: 32,
-    flex: 1,
-    marginHorizontal: 8,
+  otpContainer: {
+    marginBottom: 24,
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
   },
+  otpDigitContainer: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  timerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 48,
+  },
+  timerText: {
+    fontSize: 14,
+    fontFamily: "medium",
+  },
+  timerBadge: {
+    backgroundColor: `${COLORS.primary}15`,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  timerDigits: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontFamily: "bold",
+  },
+  buttonsContainer: {
+    width: "100%",
+    marginTop: "auto",
+    marginBottom: 24,
+    gap: 16,
+  },
   resendButton: {
-    backgroundColor: "transparent",
-    borderColor: COLORS.primary,
-    borderWidth: 1,
+    borderRadius: 30,
+    overflow: "hidden",
+  },
+  resendGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    borderRadius: 30,
+  },
+  resendIcon: {
+    marginRight: 8,
+  },
+  resendText: {
+    color: COLORS.primary,
+    fontSize: 16,
+    fontFamily: "semibold",
+  },
+  placeholderButton: {
+    height: 52,
+  },
+  verifyButton: {
+    borderRadius: 30,
+    overflow: "hidden",
+  },
+  verifyButtonDisabled: {
+    opacity: 0.6,
+  },
+  verifyGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    borderRadius: 30,
+  },
+  verifyText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: "semibold",
+  },
+  verifyIcon: {
+    marginLeft: 8,
+  },
+  loadingIndicator: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+    borderTopColor: "transparent",
+    borderRightColor: "transparent",
+    animationName: "spin",
+    animationDuration: "1s",
+    animationIterationCount: "infinite",
+    animationTimingFunction: "linear",
   },
 });
 

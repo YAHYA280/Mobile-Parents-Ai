@@ -1,3 +1,4 @@
+// Enhanced profile.tsx
 import type { NavigationProp } from "@react-navigation/native";
 
 import { Image } from "expo-image";
@@ -5,14 +6,14 @@ import Input from "@/components/Input";
 import Button from "@/components/Button";
 import { useNavigation } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import RBSheet from "react-native-raw-bottom-sheet";
 import CountryFlag from "react-native-country-flag";
-import SettingsItem from "@/components/SettingsItem";
 import { icons, SIZES, COLORS, images } from "@/constants";
 import { ScrollView } from "react-native-virtualized-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { launchImagePicker } from "@/utils/ImagePickerHelper";
+import NotificationBell from "../../components/notifications/NotificationBell";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -23,7 +24,10 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  Platform,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { MotiView } from "moti";
 
 type Nav = {
   navigate: (value: string) => void;
@@ -33,8 +37,16 @@ interface HomeProps {
   navigation: any;
 }
 
+// Function to get first letter of each word
+const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .map((word) => word.charAt(0))
+    .join("")
+    .toUpperCase();
+};
 
-const SettingsScreen : React.FC<HomeProps> = () => {
+const SettingsScreen: React.FC<HomeProps> = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const [image, setImage] = useState(images.user7);
   const [name, setName] = useState("Jack Duboix");
@@ -51,18 +63,19 @@ const SettingsScreen : React.FC<HomeProps> = () => {
   const { dark, colors, setScheme } = useTheme();
 
   const [isDarkMode, setIsDarkMode] = useState(false);
+  // Dark mode state remains but toggle functionality removed as requested
   const refRBSheet = useRef<any>(null);
 
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("Français");
+  const [selectedLanguage, setSelectedLanguage] = useState("Fr");
 
   const languages = [
-    { id: "1", label: "Arabe", value: "Arabe", countryCode: "MA" },
-    { id: "2", label: "Français", value: "Français", countryCode: "FR" },
-    { id: "3", label: "Anglais", value: "Anglais", countryCode: "GB" },
-    { id: "4", label: "Espagnol", value: "Espagnol", countryCode: "ES" },
-    { id: "5", label: "Allemand", value: "Allemand", countryCode: "DE" },
-    { id: "6", label: "Italien", value: "Italien", countryCode: "IT" },
+    { id: "1", label: "Ar", value: "Ar", countryCode: "MA" },
+    { id: "2", label: "Fr", value: "Fr", countryCode: "FR" },
+    { id: "3", label: "An", value: "An", countryCode: "GB" },
+    { id: "4", label: "Es", value: "Es", countryCode: "ES" },
+    { id: "5", label: "Al", value: "Al", countryCode: "DE" },
+    { id: "6", label: "It", value: "It", countryCode: "IT" },
   ];
 
   const inputChangedHandler = useCallback(
@@ -95,26 +108,21 @@ const SettingsScreen : React.FC<HomeProps> = () => {
     setImage({ uri: tempUri });
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => {
-      const newMode = !prev;
-      setScheme(newMode ? "dark" : "light");
-      return newMode;
-    });
-  };
+  // Dark mode toggle removed as requested
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      <View style={[styles.viewRight, { marginLeft: 'auto' }]}>
+      <View style={styles.headerContent}>
+        <Text
+          style={[
+            styles.headerTitle,
+            { color: dark ? COLORS.white : COLORS.greyscale900 },
+          ]}
+        >
+          Profil
+        </Text>
         <TouchableOpacity onPress={() => navigation.navigate("notifications")}>
-          <Image
-            source={icons.notificationBell2}
-            resizeMode="contain"
-            style={[
-              styles.bellIcon,
-              { tintColor: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
-          />
+          <NotificationBell />
         </TouchableOpacity>
       </View>
     </View>
@@ -131,9 +139,15 @@ const SettingsScreen : React.FC<HomeProps> = () => {
           <View
             style={[
               styles.modalContent,
-              { backgroundColor: dark ? COLORS.black : COLORS.white },
+              { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
             ]}
           >
+            <View style={styles.modalHeaderIcon}>
+              <View style={styles.warningCircle}>
+                <Ionicons name="warning" size={32} color="#FFFFFF" />
+              </View>
+            </View>
+
             <Text
               style={[
                 styles.deleteTitle,
@@ -143,21 +157,28 @@ const SettingsScreen : React.FC<HomeProps> = () => {
               Êtes-vous sûr de vouloir supprimer votre compte ?
             </Text>
 
+            <Text
+              style={[
+                styles.deleteSubtitle,
+                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+              ]}
+            >
+              Cette action est irréversible et toutes vos données seront
+              définitivement supprimées.
+            </Text>
+
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={styles.saveButton}
+                style={styles.confirmDeleteButton}
                 onPress={handleDeleteAccount}
               >
-                <Text style={styles.saveButtonText}>Confirmer</Text>
+                <Text style={styles.confirmDeleteText}>Confirmer</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.cancelButton,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark3
-                      : COLORS.tansparentPrimary,
-                    borderColor: dark ? COLORS.dark3 : COLORS.tansparentPrimary,
+                    backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setConfirmationModalVisible(false)}
@@ -165,7 +186,7 @@ const SettingsScreen : React.FC<HomeProps> = () => {
                 <Text
                   style={[
                     styles.cancelButtonText,
-                    { color: dark ? COLORS.white : COLORS.primary },
+                    { color: dark ? COLORS.white : COLORS.greyscale900 },
                   ]}
                 >
                   Annuler
@@ -185,9 +206,11 @@ const SettingsScreen : React.FC<HomeProps> = () => {
           <View
             style={[
               styles.modalContent,
-              { backgroundColor: dark ? COLORS.black : COLORS.white },
+              { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
             ]}
           >
+            <View style={styles.modalDragHandle} />
+
             <Text
               style={[
                 styles.editTitle,
@@ -196,49 +219,48 @@ const SettingsScreen : React.FC<HomeProps> = () => {
             >
               Modifier le profil
             </Text>
-            <View
-              style={[
-                styles.separateLine,
-                {
-                  backgroundColor: dark
-                    ? COLORS.greyScale800
-                    : COLORS.grayscale200,
-                },
-              ]}
-            />
 
-            <View>
-              <Image source={image} contentFit="cover" style={styles.image} />
-              <TouchableOpacity onPress={pickImage} style={styles.editImage}>
-                <MaterialIcons name="edit" size={16} color={COLORS.white} />
+            <View style={styles.profileImageEdit}>
+              <Image
+                source={image}
+                contentFit="cover"
+                style={styles.editProfileImage}
+              />
+              <TouchableOpacity
+                onPress={pickImage}
+                style={styles.editImageButton}
+              >
+                <MaterialIcons name="edit" size={16} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
 
-            <Input
-              id="name"
-              value={name}
-              onInputChanged={inputChangedHandler}
-              placeholder="Nom Complet"
-              icon={icons.user}
-            />
+            <View style={styles.inputsContainer}>
+              <Input
+                id="name"
+                value={name}
+                onInputChanged={inputChangedHandler}
+                placeholder="Nom Complet"
+                icon={icons.user}
+              />
 
-            <Input
-              id="email"
-              value={email}
-              onInputChanged={inputChangedHandler}
-              placeholder="Email"
-              icon={icons.email}
-              keyboardType="email-address"
-            />
+              <Input
+                id="email"
+                value={email}
+                onInputChanged={inputChangedHandler}
+                placeholder="Email"
+                icon={icons.email}
+                keyboardType="email-address"
+              />
 
-            <Input
-              id="phone"
-              value={phone}
-              onInputChanged={inputChangedHandler}
-              placeholder="Téléphone"
-              icon={icons.telephone}
-              keyboardType="phone-pad"
-            />
+              <Input
+                id="phone"
+                value={phone}
+                onInputChanged={inputChangedHandler}
+                placeholder="Téléphone"
+                icon={icons.telephone}
+                keyboardType="phone-pad"
+              />
+            </View>
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -251,10 +273,7 @@ const SettingsScreen : React.FC<HomeProps> = () => {
                 style={[
                   styles.cancelButton,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark3
-                      : COLORS.tansparentPrimary,
-                    borderColor: dark ? COLORS.dark3 : COLORS.tansparentPrimary,
+                    backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setModalVisible(false)}
@@ -262,7 +281,7 @@ const SettingsScreen : React.FC<HomeProps> = () => {
                 <Text
                   style={[
                     styles.cancelButtonText,
-                    { color: dark ? COLORS.white : COLORS.primary },
+                    { color: dark ? COLORS.white : COLORS.greyscale900 },
                   ]}
                 >
                   Annuler
@@ -277,298 +296,387 @@ const SettingsScreen : React.FC<HomeProps> = () => {
 
   const renderProfile = () => {
     return (
-      <View style={styles.profileContainer}>
-        <View>
-          <Image source={image} contentFit="cover" style={styles.image} />
+      <View
+        style={[
+          styles.profileCard,
+          { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+        ]}
+      >
+        <LinearGradient
+          colors={[COLORS.primary, "#ff7043"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.profileCardHeader}
+        >
+          <View style={styles.profileInfo}>
+            <View style={styles.profileAvatarContainer}>
+              {image ? (
+                <Image
+                  source={image}
+                  contentFit="cover"
+                  style={styles.profileAvatar}
+                />
+              ) : (
+                <View style={styles.initialsContainer}>
+                  <Text style={styles.initialsText}>{getInitials(name)}</Text>
+                </View>
+              )}
+              <View style={styles.profileStatusDot} />
+            </View>
+
+            <View style={styles.nameEmailContainer}>
+              <Text style={styles.profileName}>{name}</Text>
+              <Text style={styles.profileEmail}>{email}</Text>
+            </View>
+          </View>
+
           <TouchableOpacity
-            style={styles.picContainer}
+            style={styles.editProfileButton}
             onPress={() => setModalVisible(true)}
           >
-            <MaterialIcons name="edit" size={16} color={COLORS.white} />
+            <Ionicons name="create-outline" size={20} color="#FFFFFF" />
+            <Text style={styles.editProfileText}>Modifier</Text>
           </TouchableOpacity>
-        </View>
-        <Text
-          style={[styles.label, { color: dark ? COLORS.white : COLORS.black }]}
-        >
-          <Text style={styles.bold}>Nom Complet: </Text>
-          {name}
-        </Text>
-        <Text
-          style={[styles.label, { color: dark ? COLORS.white : COLORS.black }]}
-        >
-          <Text style={styles.bold}>Email: </Text>
-          {email}
-        </Text>
-        <Text
-          style={[styles.label, { color: dark ? COLORS.white : COLORS.black }]}
-        >
-          <Text style={styles.bold}>Numéro de téléphone: </Text>
-          {phone}
-        </Text>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => setConfirmationModalVisible(true)}
-        >
-          <Text style={styles.deleteText}>Supprimer le compte</Text>
-        </TouchableOpacity>
+        </LinearGradient>
 
-        <View
-          style={[
-            styles.profileSeparatorLine,
-            {
-              backgroundColor: dark ? COLORS.greyScale800 : COLORS.grayscale200,
-            },
-          ]}
-        />
+        <View style={styles.phoneNumberContainer}>
+          <View style={styles.phoneNumberRow}>
+            <Ionicons
+              name="call-outline"
+              size={18}
+              color={dark ? COLORS.greyscale500 : COLORS.greyscale600}
+              style={styles.phoneIcon}
+            />
+            <Text
+              style={[
+                styles.phoneLabel,
+                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+              ]}
+            >
+              Numéro de téléphone
+            </Text>
+          </View>
+          <Text
+            style={[
+              styles.phoneValue,
+              { color: dark ? COLORS.white : COLORS.greyscale900 },
+            ]}
+          >
+            {phone}
+          </Text>
+        </View>
       </View>
     );
   };
 
-  const renderSettings = () => {
-    return (
-      <View
+  const renderSettingsItem = (
+    icon: string,
+    name: string,
+    onPress: () => void,
+    showArrow: boolean = true,
+    rightComponent?: React.ReactNode,
+    iconColor?: string
+  ) => (
+    <TouchableOpacity style={styles.settingsItemContainer} onPress={onPress}>
+      <View style={styles.settingsItemLeftContainer}>
+        <View
+          style={[
+            styles.settingsItemIconContainer,
+            iconColor ? { backgroundColor: `${iconColor}15` } : {},
+          ]}
+        >
+          <Ionicons
+            name={icon as any}
+            size={20}
+            color={iconColor || COLORS.primary}
+          />
+        </View>
+        <Text
+          style={[
+            styles.settingsItemText,
+            { color: dark ? COLORS.white : COLORS.greyscale900 },
+          ]}
+        >
+          {name}
+        </Text>
+      </View>
+
+      <View style={styles.settingsItemRightContainer}>
+        {rightComponent}
+        {showArrow && (
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={dark ? COLORS.greyscale500 : COLORS.greyscale600}
+          />
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderSettingsGroup = (title: string, children: React.ReactNode) => (
+    <View style={styles.settingsGroupContainer}>
+      <Text
         style={[
-          styles.settingsContainer,
-          { backgroundColor: dark ? "" : COLORS.white },
+          styles.settingsGroupTitle,
+          { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
         ]}
       >
-        <SettingsItem
-          icon={icons.shieldOutline}
-          name="Sécurité"
-          onPress={() => navigate("settingssecurity")}
-        />
-        <SettingsItem
-          icon={icons.walletOutline}
-          name="Abonnements"
-          onPress={() => navigate("abonnementActuel")}
-        />
-        <SettingsItem
-          icon={icons.cartOutline}
-          name="Transactions"
-          onPress={() => navigate("transactions")}
-        />
-        <SettingsItem
-          icon={icons.bell2}
-          name="Paramètres Notification"
-          onPress={() => navigate("settingsnotifications")}
-        />
-        
-        <SettingsItem
-          icon={icons.userOutline}
-          name="Gestion Enfants"
-          onPress={() => navigate("listeenfants")}
-        />
-        <TouchableOpacity
-          onPress={() => setIsLanguageModalOpen(true)}
-          style={styles.settingsItemContainer}
-        >
-          <View style={styles.leftContainer}>
-            <Image
-              source={icons.more}
-              contentFit="contain"
-              style={[
-                styles.settingsIcon,
-                {
-                  tintColor: dark ? COLORS.white : COLORS.greyscale900,
-                },
-              ]}
-            />
-            <Text
-              style={[
-                styles.settingsName,
-                {
-                  color: dark ? COLORS.white : COLORS.greyscale900,
-                },
-              ]}
-            >
-              Langue
-            </Text>
-          </View>
-          <View style={styles.rightContainer}>
-            <Text
-              style={[
-                styles.rightLanguage,
-                {
-                  color: dark ? COLORS.white : COLORS.greyscale900,
-                },
-              ]}
-            >
-              {selectedLanguage}
-            </Text>
-            <Image
-              source={icons.arrowRight}
-              contentFit="contain"
-              style={[
-                styles.settingsArrowRight,
-                {
-                  tintColor: dark ? COLORS.white : COLORS.greyscale900,
-                },
-              ]}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.settingsItemContainer}>
-          <View style={styles.leftContainer}>
-            <Image
-              source={icons.show}
-              contentFit="contain"
-              style={[
-                styles.settingsIcon,
-                {
-                  tintColor: dark ? COLORS.white : COLORS.greyscale900,
-                },
-              ]}
-            />
-            <Text
-              style={[
-                styles.settingsName,
-                {
-                  color: dark ? COLORS.white : COLORS.greyscale900,
-                },
-              ]}
-            >
-              Dark Mode
-            </Text>
-          </View>
-          <View style={styles.rightContainer}>
-            <Switch
-              value={isDarkMode}
-              onValueChange={toggleDarkMode}
-              thumbColor={isDarkMode ? "#fff" : COLORS.white}
-              trackColor={{ false: "#EEEEEE", true: COLORS.primary }}
-              ios_backgroundColor={COLORS.white}
-              style={styles.switch}
-            />
-          </View>
-        </TouchableOpacity>
+        {title}
+      </Text>
+      <View
+        style={[
+          styles.settingsGroupCard,
+          { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+        ]}
+      >
+        {children}
+      </View>
+    </View>
+  );
 
-        <TouchableOpacity
-          onPress={() => refRBSheet.current.open()}
-          style={styles.logoutContainer}
-        >
-          <View style={styles.logoutLeftContainer}>
-            <MaterialIcons
-              style={styles.logoutIcon}
-              name="logout"
-              size={24}
-              color="red"
-            />
+  const renderSettings = () => {
+    return (
+      <View style={styles.settingsContainer}>
+        {renderSettingsGroup(
+          "Compte",
+          <>
+            {renderSettingsItem("shield-outline", "Sécurité", () =>
+              navigate("settingssecurity")
+            )}
+            {renderSettingsItem("wallet-outline", "Abonnements", () =>
+              navigate("abonnementActuel")
+            )}
+            {renderSettingsItem("receipt-outline", "Transactions", () =>
+              navigate("transactions")
+            )}
+            {renderSettingsItem("notifications-outline", "Notifications", () =>
+              navigate("settingsnotifications")
+            )}
+            {renderSettingsItem("people-outline", "Gestion Enfants", () =>
+              navigate("listeenfants")
+            )}
+          </>
+        )}
 
-            <Text
-              style={[
-                styles.logoutName,
-                {
-                  color: "red",
-                },
-              ]}
-            >
-              Déconnexion
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        <Modal visible={isLanguageModalOpen} transparent animationType="slide">
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainerLanguage}>
-              <TouchableOpacity
-                onPress={() => setIsLanguageModalOpen(false)}
-                style={styles.closeButton}
+        {renderSettingsGroup(
+          "Préférences",
+          <>
+            {renderSettingsItem(
+              "language-outline",
+              "Langue",
+              () => setIsLanguageModalOpen(true),
+              true,
+              <Text
+                style={[
+                  styles.settingsItemRightText,
+                  { color: COLORS.primary },
+                ]}
               >
-                <MaterialIcons name="close" size={24} color={COLORS.primary} />
-              </TouchableOpacity>
-              <Text style={styles.modalTitle}>Choisir une langue</Text>
+                {selectedLanguage}
+              </Text>
+            )}
+          </>
+        )}
 
-              <FlatList
-                data={languages}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.languageOption}
-                    onPress={() => {
-                      setSelectedLanguage(item.value);
-                      setIsLanguageModalOpen(false);
-                    }}
-                  >
-                    <CountryFlag isoCode={item.countryCode} size={18} />
-                    <Text style={[styles.languageText]}>{item.label}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          </View>
-        </Modal>
+        {renderSettingsGroup(
+          "Autres",
+          <>
+            {renderSettingsItem("help-circle-outline", "Aide & Support", () =>
+              navigate("support")
+            )}
+            {renderSettingsItem("information-circle-outline", "À propos", () =>
+              navigate("about")
+            )}
+            {renderSettingsItem(
+              "log-out-outline",
+              "Déconnexion",
+              () => refRBSheet.current.open(),
+              false,
+              null,
+              "#F44336"
+            )}
+            {renderSettingsItem(
+              "trash-outline",
+              "Supprimer le compte",
+              () => setConfirmationModalVisible(true),
+              false,
+              null,
+              "#F44336"
+            )}
+          </>
+        )}
       </View>
     );
   };
 
   return (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[
+        styles.area,
+        { backgroundColor: dark ? COLORS.dark1 : colors.background },
+      ]}
+    >
+      <View style={styles.container}>
         {renderHeader()}
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           {renderProfile()}
           {renderSettings()}
         </ScrollView>
       </View>
+
+      {/* Logout Bottom Sheet */}
       <RBSheet
         ref={refRBSheet}
         closeOnPressMask
-        height={240}
+        height={280}
         customStyles={{
           wrapper: {
             backgroundColor: "rgba(0,0,0,0.5)",
           },
           draggableIcon: {
             backgroundColor: dark ? COLORS.gray2 : COLORS.grayscale200,
-            height: 4,
+            width: 40,
+            height: 5,
           },
           container: {
-            borderTopRightRadius: 32,
-            borderTopLeftRadius: 32,
-            height: 240,
-            backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+            borderTopRightRadius: 24,
+            borderTopLeftRadius: 24,
+            backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+            paddingTop: 16,
           },
         }}
       >
-        <Text style={styles.bottomTitle}>Déconnexion</Text>
-        <View
-          style={[
-            styles.separateLine,
-            {
-              backgroundColor: dark ? COLORS.greyScale800 : COLORS.grayscale200,
-            },
-          ]}
-        />
-        <Text
-          style={[
-            styles.bottomSubtitle,
-            {
-              color: dark ? COLORS.white : COLORS.black,
-            },
-          ]}
-        >
-          Êtes-vous sûr de vouloir vous déconnecter ?
-        </Text>
-        <View style={styles.bottomContainer}>
-          <Button
-            title="Oui, déconnexion"
-            filled
-            style={styles.logoutButton}
-            onPress={() => refRBSheet.current.close()}
-          />
-          <Button
-            title="Annuler"
-            style={{
-              width: (SIZES.width - 32) / 2 - 8,
-              backgroundColor: dark ? COLORS.dark3 : COLORS.tansparentPrimary,
-              borderRadius: 32,
-              borderColor: dark ? COLORS.dark3 : COLORS.tansparentPrimary,
-            }}
-            textColor={dark ? COLORS.white : COLORS.primary}
-            onPress={() => refRBSheet.current.close()}
-          />
+        <View style={styles.logoutSheetContent}>
+          <View style={styles.logoutIconContainer}>
+            <Ionicons name="log-out" size={32} color={COLORS.primary} />
+          </View>
+
+          <Text
+            style={[
+              styles.logoutTitle,
+              { color: dark ? COLORS.white : COLORS.black },
+            ]}
+          >
+            Déconnexion
+          </Text>
+
+          <Text
+            style={[
+              styles.logoutSubtitle,
+              { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+            ]}
+          >
+            Êtes-vous sûr de vouloir vous déconnecter ?
+          </Text>
+
+          <View style={styles.logoutButtonsContainer}>
+            <TouchableOpacity
+              style={styles.confirmLogoutButton}
+              onPress={() => refRBSheet.current.close()}
+            >
+              <Text style={styles.confirmLogoutText}>Oui, déconnexion</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.cancelLogoutButton,
+                { backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100 },
+              ]}
+              onPress={() => refRBSheet.current.close()}
+            >
+              <Text
+                style={[
+                  styles.cancelLogoutText,
+                  { color: dark ? COLORS.white : COLORS.greyscale900 },
+                ]}
+              >
+                Annuler
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </RBSheet>
+
+      {/* Language Selection Modal */}
+      <Modal visible={isLanguageModalOpen} transparent animationType="slide">
+        <View style={styles.languageModalContainer}>
+          <View
+            style={[
+              styles.languageModalContent,
+              { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
+            ]}
+          >
+            <View style={styles.modalDragHandle} />
+
+            <View style={styles.languageModalHeader}>
+              <Text
+                style={[
+                  styles.languageModalTitle,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Choisir une langue
+              </Text>
+              <TouchableOpacity
+                style={styles.closeLanguageButton}
+                onPress={() => setIsLanguageModalOpen(false)}
+              >
+                <Ionicons
+                  name="close"
+                  size={24}
+                  color={dark ? COLORS.white : COLORS.greyscale900}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <FlatList
+              data={languages}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.languageOption,
+                    selectedLanguage === item.value &&
+                      styles.languageOptionSelected,
+                  ]}
+                  onPress={() => {
+                    setSelectedLanguage(item.value);
+                    setIsLanguageModalOpen(false);
+                  }}
+                >
+                  <View style={styles.languageOptionFlag}>
+                    <CountryFlag isoCode={item.countryCode} size={22} />
+                  </View>
+                  <Text
+                    style={[
+                      styles.languageOptionText,
+                      { color: dark ? COLORS.white : COLORS.greyscale900 },
+                      selectedLanguage === item.value && {
+                        color: COLORS.primary,
+                        fontFamily: "semibold",
+                      },
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                  {selectedLanguage === item.value && (
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={22}
+                      color={COLORS.primary}
+                    />
+                  )}
+                </TouchableOpacity>
+              )}
+              contentContainerStyle={styles.languageList}
+            />
+          </View>
+        </View>
+      </Modal>
 
       {renderDeleteConfirmModal()}
       {renderProfileModal()}
@@ -579,306 +687,445 @@ const SettingsScreen : React.FC<HomeProps> = () => {
 const styles = StyleSheet.create({
   area: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: "#f8f9fa",
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
-    marginBottom: 20,
+  },
+  scrollContent: {
+    paddingBottom: 30,
   },
   headerContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 16,
+    borderBottomColor: "rgba(0,0,0,0.05)",
+    borderBottomWidth: 0,
+  },
+  headerContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 12,
-    borderBottomColor: COLORS.secondaryWhite,
-    shadowColor: COLORS.white,
-    elevation: 0,
   },
-  image: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 10,
-    marginTop: 19,
+  headerTitle: {
+    fontSize: 28,
+    fontFamily: "bold",
   },
-  label: {
-    fontSize: 14,
-    marginBottom: 5,
+  notificationButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.05)",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
   },
-  bold: {
-    fontWeight: "bold",
-  },
-  deleteButton: {
-    marginTop: 10,
+  notificationBadge: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: COLORS.primary,
-    padding: 12,
-    borderRadius: 8,
-    width: "70%",
+    borderWidth: 1.5,
+    borderColor: "#FFFFFF",
+  },
+  profileCard: {
+    borderRadius: 16,
+    overflow: "hidden",
+    margin: 16,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  profileCardHeader: {
+    padding: 16,
+    paddingBottom: 20,
+  },
+  profileInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  profileAvatarContainer: {
+    position: "relative",
+    marginRight: 16,
+  },
+  profileAvatar: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.3)",
+  },
+  initialsContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.3)",
+  },
+  initialsText: {
+    color: "#FFFFFF",
+    fontSize: 24,
+    fontFamily: "bold",
+  },
+  profileStatusDot: {
+    position: "absolute",
+    bottom: 3,
+    right: 3,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: "#4CAF50",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+  },
+  nameEmailContainer: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 20,
+    fontFamily: "bold",
+    color: "#FFFFFF",
+    marginBottom: 4,
+  },
+  profileEmail: {
+    fontSize: 14,
+    color: "rgba(255,255,255,0.85)",
+    fontFamily: "medium",
+  },
+  editProfileButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignSelf: "flex-start",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginTop: 8,
+  },
+  editProfileText: {
+    marginLeft: 6,
+    color: "#FFFFFF",
+    fontFamily: "medium",
+    fontSize: 14,
+  },
+  phoneNumberContainer: {
+    padding: 16,
+  },
+  phoneNumberRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  phoneIcon: {
+    marginRight: 8,
+  },
+  phoneLabel: {
+    fontSize: 14,
+    fontFamily: "medium",
+  },
+  phoneValue: {
+    fontSize: 16,
+    fontFamily: "medium",
+    marginLeft: 26,
+  },
+  settingsContainer: {
+    paddingHorizontal: 16,
+  },
+  settingsGroupContainer: {
+    marginBottom: 24,
+  },
+  settingsGroupTitle: {
+    fontSize: 14,
+    fontFamily: "medium",
+    textTransform: "uppercase",
+    marginBottom: 12,
+    marginLeft: 8,
+  },
+  settingsGroupCard: {
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  settingsItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.05)",
+  },
+  settingsItemLeftContainer: {
+    flexDirection: "row",
     alignItems: "center",
   },
-  deleteText: {
-    color: "#fff",
-    fontWeight: "bold",
+  settingsItemIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: `${COLORS.primary}15`,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  settingsItemText: {
+    fontSize: 16,
+    fontFamily: "medium",
+  },
+  settingsItemRightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  settingsItemRightText: {
     fontSize: 14,
+    fontFamily: "medium",
+    marginRight: 8,
+  },
+  switch: {
+    transform: [{ scale: 0.8 }],
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContainerLanguage: {
-    backgroundColor: COLORS.primary,
-    padding: 24,
-    borderRadius: 16,
-    width: "100%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 6,
+    padding: 16,
   },
   modalContent: {
-    backgroundColor: COLORS.white,
-    padding: 20,
-    paddingTop: 10,
-    borderRadius: 10,
     width: "100%",
+    borderRadius: 24,
+    padding: 24,
     alignItems: "center",
-    zIndex: 100,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 24,
+    elevation: 10,
   },
-  deleteTitle: {
-    fontSize: 18,
-    textAlign: "center",
-    fontWeight: "bold",
-    marginBottom: 10,
-    marginTop: 10,
+  modalDragHandle: {
+    width: 40,
+    height: 5,
+    backgroundColor: "rgba(0,0,0,0.1)",
+    borderRadius: 2.5,
+    marginBottom: 16,
   },
-  modalTitle: {
-    fontSize: 22,
-    textAlign: "center",
-    fontWeight: "bold",
-    marginBottom: 10,
+  editTitle: {
+    fontSize: 20,
+    fontFamily: "bold",
+    marginBottom: 24,
+  },
+  profileImageEdit: {
+    position: "relative",
+    marginBottom: 24,
+  },
+  editProfileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: "rgba(0,0,0,0.05)",
+  },
+  editImageButton: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+  },
+  inputsContainer: {
+    width: "100%",
+    marginBottom: 24,
   },
   modalButtons: {
     flexDirection: "row",
-    justifyContent: "space-between",
     width: "100%",
-    marginTop: 20,
+    gap: 12,
   },
   saveButton: {
-    backgroundColor: COLORS.primary,
-    padding: 10,
-    borderRadius: 5,
     flex: 1,
-    marginRight: 5,
+    backgroundColor: COLORS.primary,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
   },
   saveButtonText: {
-    color: COLORS.white,
-    textAlign: "center",
-    fontWeight: "bold",
+    color: "#FFFFFF",
+    fontFamily: "semibold",
+    fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: COLORS.tansparentPrimary,
-    padding: 10,
-    borderRadius: 5,
     flex: 1,
-    marginLeft: 5,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
   },
   cancelButtonText: {
-    color: COLORS.primary,
+    fontFamily: "semibold",
+    fontSize: 16,
+  },
+  modalHeaderIcon: {
+    marginBottom: 24,
+  },
+  warningCircle: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "#F44336",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  deleteTitle: {
+    fontSize: 20,
+    fontFamily: "bold",
     textAlign: "center",
-    fontWeight: "bold",
+    marginBottom: 12,
   },
-  profileContainer: {
-    alignItems: "center",
-    borderBottomColor: COLORS.grayscale400,
-    paddingVertical: 20,
+  deleteSubtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 24,
+    lineHeight: 20,
   },
-  picContainer: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
+  confirmDeleteButton: {
+    flex: 1,
+    backgroundColor: "#F44336",
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: "center",
+  },
+  confirmDeleteText: {
+    color: "#FFFFFF",
+    fontFamily: "semibold",
+    fontSize: 16,
+  },
+  languageModalContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  languageModalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 16,
+    paddingTop: 12,
+    alignItems: "center",
+    maxHeight: "70%",
+    width: "100%",
+  },
+  languageModalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+  languageModalTitle: {
+    fontSize: 20,
+    fontFamily: "bold",
+  },
+  closeLanguageButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
-    backgroundColor: COLORS.primary,
-    position: "absolute",
-    bottom: 70,
-    top: 0,
-    left: 170,
-  },
-  editImage: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: COLORS.primary,
-    position: "absolute",
-    right: 0,
-    bottom: 12,
+  },
+  languageList: {
+    width: "100%",
+    paddingHorizontal: 50,
   },
   languageOption: {
-    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 50,
+    borderRadius: 12,
+    marginBottom: 8,
+    width: "100%",
+  },
+  languageOptionSelected: {
+    backgroundColor: `${COLORS.primary}10`,
+  },
+  languageOptionFlag: {
+    marginRight: 16,
+  },
+  languageOptionText: {
     fontSize: 16,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  settingsContainer: {
-    marginVertical: 0,
+    fontFamily: "regular",
     flex: 1,
-    backgroundColor: COLORS.white,
-    padding: 16,
-    paddingTop: 7,
-    marginBottom: 32,
-    marginTop: -20,
+    paddingLeft: 4,
   },
-  settingsItemContainer: {
-    width: SIZES.width - 32,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 12,
-  },
-  leftContainer: {
-    flexDirection: "row",
+  logoutSheetContent: {
+    padding: 24,
     alignItems: "center",
   },
-  settingsIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.greyscale900,
-  },
-  settingsName: {
-    fontSize: 18,
-    fontFamily: "semiBold",
-    color: COLORS.greyscale900,
-    marginLeft: 12,
-  },
-  settingsArrowRight: {
-    width: 24,
-    height: 24,
-    tintColor: COLORS.greyscale900,
-  },
-  rightContainer: {
-    flexDirection: "row",
+  logoutIconContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: `${COLORS.primary}15`,
+    justifyContent: "center",
     alignItems: "center",
+    marginBottom: 16,
   },
-  rightLanguage: {
-    fontSize: 18,
-    fontFamily: "semiBold",
-    color: COLORS.greyscale900,
-    marginRight: 8,
-  },
-
-  switch: {
-    marginLeft: 8,
-    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
-  },
-  logoutContainer: {
-    width: SIZES.width - 32,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 12,
-  },
-  logoutLeftContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  logoutIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.greyscale900,
-  },
-  logoutName: {
-    fontSize: 18,
-    fontFamily: "semiBold",
-    color: COLORS.greyscale900,
-    marginLeft: 12,
-  },
-  bottomContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 12,
-    paddingHorizontal: 16,
-  },
-
-  logoutButton: {
-    width: (SIZES.width - 32) / 2 - 8,
-    backgroundColor: COLORS.primary,
-    borderRadius: 32,
-  },
-
-  bottomTitle: {
-    fontSize: 24,
-    fontFamily: "semiBold",
-    color: "red",
-    textAlign: "center",
-    marginTop: 12,
-  },
-  editTitle: {
-    fontSize: 24,
-    fontFamily: "semiBold",
-    color: COLORS.black,
-    textAlign: "center",
-    marginTop: 0,
-  },
-  bottomSubtitle: {
+  logoutTitle: {
     fontSize: 20,
-    fontFamily: "semiBold",
-    color: COLORS.greyscale900,
+    fontFamily: "bold",
+    marginBottom: 8,
+  },
+  logoutSubtitle: {
+    fontSize: 14,
     textAlign: "center",
-    marginVertical: 28,
+    marginBottom: 24,
+    lineHeight: 20,
   },
-  separateLine: {
-    width: SIZES.width,
-    height: 1,
-    backgroundColor: COLORS.grayscale200,
-    marginTop: 12,
-  },
-
-  profileSeparatorLine: {
-    width: "90%",
-    height: 1,
-    backgroundColor: COLORS.grayscale200,
-    marginTop: 25,
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  languageText: {
-    fontSize: 18,
-    marginLeft: 10,
-  },
-  closeButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 999,
-    backgroundColor: COLORS.white,
-    position: "absolute",
-    right: 16,
-    top: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 9999,
-  },
-  viewRight: {
+  logoutButtonsContainer: {
     flexDirection: "row",
+    width: "100%",
+    gap: 12,
+  },
+  confirmLogoutButton: {
+    flex: 1,
+    backgroundColor: COLORS.primary,
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: "center",
   },
-  bellIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.black,
-    marginRight: 8,
+  confirmLogoutText: {
+    color: "#FFFFFF",
+    fontFamily: "semibold",
+    fontSize: 16,
+  },
+  cancelLogoutButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  cancelLogoutText: {
+    fontFamily: "semibold",
+    fontSize: 16,
   },
 });
 
