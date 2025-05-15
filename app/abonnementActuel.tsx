@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Image,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -329,9 +330,10 @@ const AbonnementActuel: React.FC = () => {
   if (error) {
     return renderErrorState();
   }
-
+  const statusBarHeight =
+    Platform.OS === "ios" ? -60 : StatusBar.currentHeight || 0;
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { paddingTop: statusBarHeight }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"

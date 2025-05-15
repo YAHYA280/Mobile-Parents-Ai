@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -229,21 +230,18 @@ const AbonnementCatalogue: React.FC = () => {
   if (error) {
     return renderError();
   }
+  const statusBarHeight =
+    Platform.OS === "ios" ? -60 : StatusBar.currentHeight || 0;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { paddingTop: statusBarHeight }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
 
-      <Header
-        title="Plans d'abonnement"
-        onBackPress={() => router.back()}
-        rightIcon="help-circle-outline"
-        onRightIconPress={() => {}}
-      />
+      <Header title="Plans d'abonnement" onBackPress={() => router.back()} />
 
       {/* Wrap the entire content in a ScrollView for vertical scrolling */}
       <ScrollView
