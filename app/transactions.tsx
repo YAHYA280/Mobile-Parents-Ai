@@ -1,189 +1,130 @@
-import type { ListRenderItemInfo } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Animated,
+  Dimensions,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { MotiView } from "moti";
+import { useNavigation } from "@react-navigation/native";
+import { useTheme } from "@/theme/ThemeProvider";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { COLORS, TYPOGRAPHY, RADIUS, SHADOWS } from "@/constants/theme";
+import Header from "@/components/ui/Header";
+import Card from "@/components/ui/Card";
+import Alert from "@/components/ui/Alert";
+import Button from "@/components/ui/Button";
+
+// Mock data types
 import type { TransactionStatus } from "@/utils/translation";
 import type { TRANSACTION } from "@/contexts/type/transaction";
-
-import { Feather } from "@expo/vector-icons";
-import { useTheme } from "@/theme/ThemeProvider";
-import { icons, FONTS, COLORS } from "@/constants";
-import { useNavigation } from "@react-navigation/native";
-import React, { useRef, useState, useEffect } from "react";
-import { ScrollView } from "react-native-virtualized-view";
-import TransactionCard from "@/components/TransactionCard";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { translateTransactionStatus } from "@/utils/translation";
 import {
   TRANSACTION_STATUS_OPTIONS,
   transactions as initialTransactions,
 } from "@/data/_mock/_transaction";
-import {
-  View,
-  Text,
-  Image,
-  Modal,
-  FlatList,
-  Animated,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+
+const { width } = Dimensions.get("window");
+
+// Filter types
+type FilterType = "status" | "date";
+
+// Date filter options
+const DATE_FILTER_OPTIONS = {
+  all: "Toutes les dates",
+  today: "Aujourd'hui",
+  week: "Cette semaine",
+  month: "Ce mois",
+  year: "Cette année",
+};
 
 const Transactions = () => {
-  const { dark, colors } = useTheme();
   const navigation = useNavigation();
+  const { dark, colors } = useTheme();
+
+  // State
   const [transactions, setTransactions] =
     useState<TRANSACTION[]>(initialTransactions);
   const [filteredTransactions, setFilteredTransactions] =
     useState<TRANSACTION[]>(initialTransactions);
   const [selectedTransaction, setSelectedTransaction] =
     useState<TRANSACTION | null>(null);
-  const [selectedTransactions, setSelectedTransactions] = useState<
-    TRANSACTION[]
-  >([]);
-  const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const [deletedTransactions, setDeletedTransactions] = useState<TRANSACTION[]>(
-    []
-  );
   const [showUndoNotification, setShowUndoNotification] = useState(false);
+  const [deletedTransaction, setDeletedTransaction] =
+    useState<TRANSACTION | null>(null);
+
+  // Filter state
+  const [activeFilter, setActiveFilter] = useState<FilterType>("status");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedDate, setSelectedDate] = useState<string>("all");
 
-  // Animation pour la notification d'annulation
+  // Animation
   const undoNotificationOpacity = useRef(new Animated.Value(0)).current;
+  const undoTimerRef = useRef<number | null>(null);
 
-  // Timer pour masquer la notification d'annulation
-  const undoTimerRef = useRef<NodeJS.Timeout | null>(null);
-
+  // Effect to filter transactions
   useEffect(() => {
-    // Filtrer d'abord par le searchQuery
-    let filtered = transactions;
+    let filtered = [...transactions];
 
-    if (searchQuery.trim() !== "") {
-      filtered = filtered.filter((item) =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Ensuite filtrer par statut si un statut autre que "All" est sélectionné
-    if (selectedStatus !== "all") {
+    // Apply status filter if active
+    if (activeFilter === "status" && selectedStatus !== "all") {
       filtered = filtered.filter(
         (item) => item.status.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
 
-    setFilteredTransactions(filtered);
-  }, [searchQuery, transactions, selectedStatus]);
-
-  const renderTransactionStatusItem = ({
-    item,
-  }: ListRenderItemInfo<{ id: string; value: TransactionStatus }>) => (
-    <TouchableOpacity
-      style={{
-        backgroundColor:
-          selectedStatus === item.id ? COLORS.primary : "transparent",
-        padding: 10,
-        marginVertical: 5,
-        borderColor: COLORS.primary,
-        borderWidth: 1.3,
-        borderRadius: 24,
-        marginRight: 12,
-        height: 40,
-        marginBottom: 20,
-      }}
-      onPress={() => setSelectedStatus(item.id)}
-    >
-      <Text
-        style={{
-          color: selectedStatus === item.id ? COLORS.white : COLORS.primary,
-        }}
-      >
-        {translateTransactionStatus(item.id)}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const toggleTransactionSelection = (transaction: TRANSACTION) => {
-    if (isSelectionMode) {
-      const isSelected = selectedTransactions.some(
-        (item) => item.id === transaction.id
-      );
-      if (isSelected) {
-        setSelectedTransactions(
-          selectedTransactions.filter((item) => item.id !== transaction.id)
+    // Apply date filter if active (mock implementation)
+    if (activeFilter === "date" && selectedDate !== "all") {
+      // This would be implemented with actual date logic in a real app
+      // For now, just filter randomly to simulate date filtering
+      if (selectedDate === "today") {
+        filtered = filtered.slice(
+          0,
+          Math.max(1, Math.floor(filtered.length * 0.3))
         );
-        if (selectedTransactions.length === 1) {
-          setIsSelectionMode(false);
-        }
-      } else {
-        setSelectedTransactions([...selectedTransactions, transaction]);
+      } else if (selectedDate === "week") {
+        filtered = filtered.slice(
+          0,
+          Math.max(2, Math.floor(filtered.length * 0.5))
+        );
+      } else if (selectedDate === "month") {
+        filtered = filtered.slice(
+          0,
+          Math.max(3, Math.floor(filtered.length * 0.7))
+        );
       }
-    } else {
-      setSelectedTransaction(transaction);
-      setIsDeleteModalVisible(true);
     }
+
+    setFilteredTransactions(filtered);
+  }, [transactions, activeFilter, selectedStatus, selectedDate]);
+
+  const handleDeleteTransaction = (transaction: TRANSACTION) => {
+    setSelectedTransaction(transaction);
+    setIsDeleteModalVisible(true);
   };
 
-  const handleLongPress = (transaction: TRANSACTION) => {
-    setIsSelectionMode(true);
-    setSelectedTransactions([transaction]);
-  };
-
-  const handleDeleteSelectedTransactions = () => {
-    if (selectedTransactions.length > 0) {
-      setDeletedTransactions(selectedTransactions);
-
-      const updatedTransactions = transactions.filter(
-        (item) =>
-          !selectedTransactions.some((selected) => selected.id === item.id)
-      );
-
-      setTransactions(updatedTransactions);
-      setIsDeleteModalVisible(false);
-      setIsSelectionMode(false);
-      setSelectedTransactions([]);
-
-      setShowUndoNotification(true);
-
-      Animated.timing(undoNotificationOpacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-
-      if (undoTimerRef.current) {
-        clearTimeout(undoTimerRef.current);
-      }
-
-      undoTimerRef.current = setTimeout(() => {
-        hideUndoNotification();
-      }, 5000);
-    }
-  };
-
-  const handleDeleteSingleTransaction = () => {
+  const confirmDeleteTransaction = () => {
     if (selectedTransaction) {
-      // Sauvegarder la transaction supprimée pour une restauration possible
-      setDeletedTransactions([selectedTransaction]);
-
-      // Supprimer la transaction
+      setDeletedTransaction(selectedTransaction);
       setTransactions(
-        transactions.filter((item) => item.id !== selectedTransaction.id)
+        transactions.filter((t) => t.id !== selectedTransaction.id)
       );
       setIsDeleteModalVisible(false);
       setSelectedTransaction(null);
 
-      // Afficher la notification d'annulation
+      // Show undo notification
       setShowUndoNotification(true);
-
-      // Animation pour afficher la notification
       Animated.timing(undoNotificationOpacity, {
         toValue: 1,
         duration: 300,
         useNativeDriver: true,
       }).start();
 
-      // Définir un timer pour masquer la notification après 5 secondes
+      // Auto-hide notification after 5 seconds
       if (undoTimerRef.current) {
         clearTimeout(undoTimerRef.current);
       }
@@ -195,22 +136,20 @@ const Transactions = () => {
   };
 
   const handleUndoDelete = () => {
-    if (deletedTransactions.length > 0) {
-      // Restaurer les transactions supprimées
-      setTransactions([...transactions, ...deletedTransactions]);
+    if (deletedTransaction) {
+      setTransactions([...transactions, deletedTransaction]);
       hideUndoNotification();
     }
   };
 
   const hideUndoNotification = () => {
-    // Animation pour masquer la notification
     Animated.timing(undoNotificationOpacity, {
       toValue: 0,
       duration: 300,
       useNativeDriver: true,
     }).start(() => {
       setShowUndoNotification(false);
-      setDeletedTransactions([]);
+      setDeletedTransaction(null);
     });
 
     if (undoTimerRef.current) {
@@ -219,216 +158,362 @@ const Transactions = () => {
     }
   };
 
-  const toggleSearch = () => {
-    setIsSearchActive(!isSearchActive);
-    if (isSearchActive) {
-      setSearchQuery("");
+  const getStatusConfig = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "paid":
+        return {
+          color: COLORS.greeen || "#4CAF50", // Using app's green color
+          icon: "checkmark-circle",
+          label: "Payé",
+          bg: "rgba(76, 175, 80, 0.1)",
+          gradient: ["#4CAF50", "#43A047"],
+        };
+      case "pending":
+        return {
+          color: COLORS.secondary || "#FFC107", // Using app's secondary color
+          icon: "time",
+          label: "En attente",
+          bg: "rgba(255, 193, 7, 0.1)",
+          gradient: ["#FFC107", "#FFB300"],
+        };
+      case "failed":
+      case "canceled":
+        return {
+          color: COLORS.error || "#F44336", // Using app's error color
+          icon: "close-circle",
+          label: "Annulé",
+          bg: "rgba(244, 67, 54, 0.1)",
+          gradient: ["#F44336", "#E53935"],
+        };
+      default:
+        return {
+          color: COLORS.gray3 || "#9E9E9E", // Grey
+          icon: "help-circle",
+          label: "Inconnu",
+          bg: "rgba(158, 158, 158, 0.1)",
+          gradient: ["#9E9E9E", "#757575"],
+        };
     }
   };
 
-  const cancelSelectionMode = () => {
-    setIsSelectionMode(false);
-    setSelectedTransactions([]);
-  };
-
-  const renderHeader = () => (
-    <View style={styles.headerContainer}>
-      {isSelectionMode ? (
-        <View style={styles.selectionHeaderContainer}>
-          <TouchableOpacity onPress={cancelSelectionMode}>
-            <Image
-              source={icons.cancelSquare}
-              resizeMode="contain"
-              style={[
-                styles.deleteIcon,
-                {
-                  tintColor: COLORS.error,
-                },
-              ]}
-            />
-          </TouchableOpacity>
+  const renderFilters = () => (
+    <View style={styles.filtersContainer}>
+      <View style={styles.filterTypeContainer}>
+        <TouchableOpacity
+          style={[
+            styles.filterTypeButton,
+            activeFilter === "status" && styles.activeFilterTypeButton,
+            {
+              backgroundColor: dark
+                ? activeFilter === "status"
+                  ? "rgba(255, 142, 105, 0.2)"
+                  : "rgba(255, 255, 255, 0.05)"
+                : activeFilter === "status"
+                  ? "rgba(255, 142, 105, 0.1)"
+                  : "rgba(0, 0, 0, 0.03)",
+            },
+          ]}
+          onPress={() => setActiveFilter("status")}
+        >
+          <Ionicons
+            name="options-outline"
+            size={18}
+            color={
+              activeFilter === "status"
+                ? COLORS.primary
+                : dark
+                  ? COLORS.gray2
+                  : COLORS.gray3
+            }
+          />
           <Text
             style={[
-              styles.selectionCountText,
+              styles.filterTypeButtonText,
               {
-                color: dark ? COLORS.white : COLORS.greyscale900,
+                color:
+                  activeFilter === "status"
+                    ? COLORS.primary
+                    : dark
+                      ? COLORS.gray2
+                      : COLORS.gray3,
               },
             ]}
           >
-            {selectedTransactions.length} sélectionné
-            {selectedTransactions.length > 1 ? "s" : ""}
+            Statut
           </Text>
-          <TouchableOpacity
-            style={styles.deleteSelectedButton}
-            onPress={() => setIsDeleteModalVisible(true)}
-          >
-            <Image
-              source={icons.trash}
-              resizeMode="contain"
-              style={[
-                styles.deleteIcon,
-                {
-                  tintColor: COLORS.error,
-                },
-              ]}
-            />
-          </TouchableOpacity>
-        </View>
-      ) : isSearchActive ? (
-        <View style={styles.searchBarContainer}>
-          <TouchableOpacity onPress={toggleSearch}>
-            <Image
-              source={icons.back}
-              resizeMode="contain"
-              style={[
-                styles.searchIcon,
-                {
-                  tintColor: dark ? COLORS.secondaryWhite : COLORS.greyscale900,
-                },
-              ]}
-            />
-          </TouchableOpacity>
-          <TextInput
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.filterTypeButton,
+            activeFilter === "date" && styles.activeFilterTypeButton,
+            {
+              backgroundColor: dark
+                ? activeFilter === "date"
+                  ? "rgba(255, 142, 105, 0.2)"
+                  : "rgba(255, 255, 255, 0.05)"
+                : activeFilter === "date"
+                  ? "rgba(255, 142, 105, 0.1)"
+                  : "rgba(0, 0, 0, 0.03)",
+            },
+          ]}
+          onPress={() => setActiveFilter("date")}
+        >
+          <Ionicons
+            name="calendar-outline"
+            size={18}
+            color={
+              activeFilter === "date"
+                ? COLORS.primary
+                : dark
+                  ? COLORS.gray2
+                  : COLORS.gray3
+            }
+          />
+          <Text
             style={[
-              styles.searchInput,
+              styles.filterTypeButtonText,
               {
-                color: dark ? COLORS.white : COLORS.greyscale900,
-                borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                color:
+                  activeFilter === "date"
+                    ? COLORS.primary
+                    : dark
+                      ? COLORS.gray2
+                      : COLORS.gray3,
               },
             ]}
-            placeholder="Rechercher une transaction..."
-            placeholderTextColor={
-              dark ? COLORS.greyscale500 : COLORS.greyScale400
-            }
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus
-          />
-          {searchQuery !== "" && (
-            <TouchableOpacity onPress={() => setSearchQuery("")}>
-              <Image
-                source={icons.cancelSquare}
-                resizeMode="contain"
-                style={[
-                  styles.clearIcon,
-                  {
-                    tintColor: dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.greyscale900,
-                  },
-                ]}
-              />
-            </TouchableOpacity>
-          )}
-        </View>
-      ) : (
-        <>
-          <View style={styles.headerLeft}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Feather
-                name="arrow-left"
-                size={24}
-                color={dark ? COLORS.white : COLORS.black}
-              />
-            </TouchableOpacity>
-            <Text
-              style={[
-                styles.headerTitle,
-                {
-                  color: dark ? COLORS.white : COLORS.greyscale900,
-                },
-              ]}
+          >
+            Date
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Filter options based on active filter type */}
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={
+          activeFilter === "status"
+            ? Object.entries(TRANSACTION_STATUS_OPTIONS).map(
+                ([key, value]) => ({ id: key, label: value })
+              )
+            : Object.entries(DATE_FILTER_OPTIONS).map(([key, value]) => ({
+                id: key,
+                label: value,
+              }))
+        }
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.filterOptionsContainer}
+        renderItem={({ item, index }) => {
+          const isActive =
+            activeFilter === "status"
+              ? selectedStatus === item.id
+              : selectedDate === item.id;
+
+          return (
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing", duration: 300, delay: index * 50 }}
             >
-              Transactions
-            </Text>
-          </View>
-          <View style={styles.headerRight}>
-            <TouchableOpacity onPress={toggleSearch}>
-              <Image
-                source={icons.search2}
-                resizeMode="contain"
+              <TouchableOpacity
                 style={[
-                  styles.searchIcon,
+                  styles.filterOption,
+                  isActive && styles.activeFilterOption,
                   {
-                    tintColor: dark
-                      ? COLORS.secondaryWhite
-                      : COLORS.greyscale900,
+                    backgroundColor: isActive
+                      ? "rgba(255, 142, 105, 0.1)"
+                      : dark
+                        ? "rgba(255, 255, 255, 0.05)"
+                        : "rgba(0, 0, 0, 0.03)",
+                    borderColor: isActive ? COLORS.primary : "transparent",
                   },
                 ]}
-              />
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+                onPress={() => {
+                  if (activeFilter === "status") {
+                    setSelectedStatus(item.id);
+                  } else {
+                    setSelectedDate(item.id);
+                  }
+                }}
+              >
+                <Text
+                  style={[
+                    styles.filterOptionText,
+                    {
+                      color: isActive
+                        ? COLORS.primary
+                        : dark
+                          ? COLORS.gray2
+                          : COLORS.gray3,
+                    },
+                  ]}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            </MotiView>
+          );
+        }}
+      />
     </View>
   );
 
-  const renderDeleteModal = () => (
-    <Modal
-      animationType="fade"
-      transparent
-      visible={isDeleteModalVisible}
-      onRequestClose={() => setIsDeleteModalVisible(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View
-          style={[
-            styles.modalContainer,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
-        >
-          <Text
-            style={[
-              styles.modalTitle,
-              { color: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
-          >
-            Supprimer {isSelectionMode ? "les transactions" : "la transaction"}
-          </Text>
-          <Text
-            style={[
-              styles.modalText,
-              { color: dark ? COLORS.secondaryWhite : COLORS.greyScale700 },
-            ]}
-          >
-            {isSelectionMode
-              ? `Voulez-vous vraiment supprimer ${selectedTransactions.length} transaction${selectedTransactions.length > 1 ? "s" : ""} ?`
-              : `Voulez-vous vraiment supprimer cette transaction${selectedTransaction ? ` de ${selectedTransaction.name}` : ""} ?`}
-          </Text>
+  const renderTransactionItem = ({
+    item,
+    index,
+  }: {
+    item: TRANSACTION;
+    index: number;
+  }) => {
+    const statusConfig = getStatusConfig(item.status);
+    const amount = 120.0 + index * 15.75; // Generate varied amounts for visual variety
 
-          <View style={styles.modalActions}>
-            <TouchableOpacity
+    return (
+      <MotiView
+        from={{ opacity: 0, translateY: 15 }}
+        animate={{ opacity: 1, translateY: 0 }}
+        transition={{ type: "timing", duration: 350, delay: index * 70 }}
+      >
+        <Card style={styles.transactionCard} shadowLevel="medium">
+          <View style={styles.transactionCardInner}>
+            {/* Left side - Status indicator with full height */}
+            <View
               style={[
-                styles.modalButton,
-                { backgroundColor: dark ? COLORS.dark3 : COLORS.tertiaryWhite },
+                styles.statusIndicatorContainer,
+                { backgroundColor: statusConfig.color },
               ]}
-              onPress={() => setIsDeleteModalVisible(false)}
-            >
-              <Text
-                style={[
-                  styles.buttonText,
-                  { color: dark ? COLORS.white : COLORS.greyscale900 },
-                ]}
-              >
-                Annuler
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.deleteButton]}
-              onPress={
-                isSelectionMode
-                  ? handleDeleteSelectedTransactions
-                  : handleDeleteSingleTransaction
-              }
-            >
-              <Text style={[styles.buttonText, styles.deleteButtonText]}>
-                Supprimer
-              </Text>
-            </TouchableOpacity>
+            />
+
+            {/* Right side - Transaction content */}
+            <View style={styles.transactionContent}>
+              <View style={styles.transactionHeader}>
+                <View style={styles.transactionInfo}>
+                  <Text
+                    style={[
+                      styles.transactionName,
+                      { color: dark ? COLORS.white : COLORS.black },
+                    ]}
+                  >
+                    {item.name}
+                  </Text>
+                  <View style={styles.transactionMeta}>
+                    <Text style={styles.transactionId}>
+                      #{item.id.slice(0, 6)}
+                    </Text>
+                    <Text style={styles.transactionDate}>• 15 Mai 2025</Text>
+                  </View>
+                </View>
+
+                <View style={styles.amountContainer}>
+                  <Text
+                    style={[
+                      styles.amount,
+                      {
+                        color:
+                          item.status.toLowerCase() === "canceled"
+                            ? COLORS.error
+                            : statusConfig.color,
+                      },
+                    ]}
+                  >
+                    -${amount.toFixed(2)}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.transactionFooter}>
+                <View
+                  style={[
+                    styles.statusBadge,
+                    { backgroundColor: `${statusConfig.color}20` },
+                  ]}
+                >
+                  <Ionicons
+                    name={statusConfig.icon as any}
+                    size={14}
+                    color={statusConfig.color}
+                  />
+                  <Text
+                    style={[styles.statusText, { color: statusConfig.color }]}
+                  >
+                    {statusConfig.label}
+                  </Text>
+                </View>
+
+                <View style={styles.actionButtons}>
+                  <TouchableOpacity
+                    style={styles.iconButton}
+                    onPress={() => navigation.navigate("ereceipt" as never)}
+                  >
+                    <Ionicons
+                      name="receipt-outline"
+                      size={16}
+                      color={dark ? COLORS.white : COLORS.black}
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.iconButton, styles.deleteIconButton]}
+                    onPress={() => handleDeleteTransaction(item)}
+                  >
+                    <Ionicons
+                      name="trash-outline"
+                      size={16}
+                      color={COLORS.error}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
           </View>
-        </View>
+        </Card>
+      </MotiView>
+    );
+  };
+
+  const renderEmptyState = () => (
+    <MotiView
+      from={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", damping: 16 }}
+      style={styles.emptyStateContainer}
+    >
+      <View
+        style={[
+          styles.emptyIconContainer,
+          {
+            backgroundColor: dark
+              ? "rgba(255,255,255,0.05)"
+              : "rgba(0,0,0,0.03)",
+          },
+        ]}
+      >
+        <Ionicons
+          name="receipt-outline"
+          size={64}
+          color={dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.2)"}
+        />
       </View>
-    </Modal>
+
+      <Text
+        style={[
+          styles.emptyTitle,
+          { color: dark ? COLORS.white : COLORS.black },
+        ]}
+      >
+        Aucune transaction
+      </Text>
+
+      <Text
+        style={[
+          styles.emptyDescription,
+          { color: dark ? COLORS.gray2 : COLORS.gray3 },
+        ]}
+      >
+        Les transactions apparaîtront ici lorsque vous en effectuerez
+      </Text>
+    </MotiView>
   );
 
   const renderUndoNotification = () => (
@@ -438,271 +523,322 @@ const Transactions = () => {
         {
           opacity: undoNotificationOpacity,
           backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+          transform: [
+            {
+              translateY: undoNotificationOpacity.interpolate({
+                inputRange: [0, 1],
+                outputRange: [20, 0],
+              }),
+            },
+          ],
         },
       ]}
     >
-      <Text
-        style={[
-          styles.undoNotificationText,
-          { color: dark ? COLORS.white : COLORS.greyscale900 },
-        ]}
-      >
-        {deletedTransactions.length > 1
-          ? `${deletedTransactions.length} transactions supprimées`
-          : "Transaction supprimée"}
-      </Text>
-      <TouchableOpacity onPress={handleUndoDelete}>
-        <Text style={styles.undoButton}>ANNULER</Text>
+      <View style={styles.undoNotificationContent}>
+        <Ionicons
+          name="trash-outline"
+          size={22}
+          color={COLORS.error}
+          style={styles.undoNotificationIcon}
+        />
+        <Text
+          style={[
+            styles.undoNotificationText,
+            { color: dark ? COLORS.white : COLORS.greyscale900 },
+          ]}
+        >
+          Transaction supprimée
+        </Text>
+      </View>
+
+      <TouchableOpacity style={styles.undoButton} onPress={handleUndoDelete}>
+        <Text style={styles.undoButtonText}>ANNULER</Text>
       </TouchableOpacity>
     </Animated.View>
   );
-  // In your renderTransactionItem function in Transactions.tsx
-  const renderTransactionItem = ({ item }: { item: TRANSACTION }) => {
-    const isSelected = selectedTransactions.some(
-      (selected) => selected.id === item.id
-    );
 
-    return (
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => toggleTransactionSelection(item)}
-        onLongPress={() => handleLongPress(item)}
-        delayLongPress={300}
-      >
-        <View style={styles.transactionContainer}>
-          {isSelectionMode && (
-            <View
-              style={[
-                styles.selectionIndicator,
-                isSelected && styles.selectedIndicator,
-              ]}
-            >
-              {isSelected && (
-                <Image
-                  source={icons.check}
-                  resizeMode="contain"
-                  style={styles.checkIcon}
-                />
-              )}
-            </View>
-          )}
-          <View style={{ flex: 1 }}>
-            <TransactionCard
-              name={item.name}
-              image={item.image}
-              status={item.status}
-              selected={isSelected}
-              isSelectionMode={isSelectionMode}
-            />
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
   return (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        {renderHeader()}
-        <View
-          style={[
-            styles.statusFilterContainer,
-            { backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite },
-          ]}
-        >
-          <FlatList
-            data={Object.entries(TRANSACTION_STATUS_OPTIONS).map(
-              ([key, label]) => ({
-                id: key,
-                value: label,
-              })
-            )}
-            keyExtractor={(item) => item.id}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            renderItem={renderTransactionStatusItem}
-          />
-        </View>
-        <ScrollView
-          style={[
-            styles.scrollView,
-            {
-              backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite,
-            },
-          ]}
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: dark ? COLORS.dark1 : "#F8F9FA" },
+      ]}
+    >
+      <Header
+        title="Transactions"
+        subtitle={`${filteredTransactions.length} transactions`}
+        onBackPress={() => navigation.goBack()}
+      />
+
+      {renderFilters()}
+
+      {filteredTransactions.length > 0 ? (
+        <FlatList
+          data={filteredTransactions}
+          keyExtractor={(item) => item.id}
+          renderItem={renderTransactionItem}
+          contentContainerStyle={styles.transactionsList}
           showsVerticalScrollIndicator={false}
-        >
-          {filteredTransactions.length > 0 ? (
-            <FlatList
-              style={[{ paddingBottom: 73 }]}
-              data={filteredTransactions}
-              keyExtractor={(item) => item.id}
-              renderItem={renderTransactionItem}
-            />
-          ) : (
-            <View style={styles.emptyContainer}>
-              <Image
-                source={icons.emptyContent}
-                resizeMode="contain"
-                style={[styles.emptyIcon]}
-              />
-              <Text
-                style={[
-                  styles.emptyText,
-                  { color: dark ? COLORS.white : COLORS.greyscale900 },
-                ]}
-              >
-                {searchQuery.trim() !== ""
-                  ? "Aucun résultat trouvé"
-                  : "Aucune transaction"}
-              </Text>
-              {searchQuery.trim() !== "" && (
-                <TouchableOpacity
-                  style={styles.clearSearchButton}
-                  onPress={() => setSearchQuery("")}
-                >
-                  <Text style={styles.clearSearchText}>
-                    Effacer la recherche
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-        </ScrollView>
-      </View>
-      {renderDeleteModal()}
+        />
+      ) : (
+        renderEmptyState()
+      )}
+
+      <Alert
+        visible={isDeleteModalVisible}
+        title="Supprimer la transaction"
+        message={`Voulez-vous vraiment supprimer cette transaction${selectedTransaction ? ` de ${selectedTransaction.name}` : ""} ?`}
+        buttons={[
+          {
+            text: "Annuler",
+            style: "cancel",
+            onPress: () => setIsDeleteModalVisible(false),
+          },
+          {
+            text: "Supprimer",
+            style: "destructive",
+            onPress: confirmDeleteTransaction,
+          },
+        ]}
+      />
+
       {showUndoNotification && renderUndoNotification()}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  area: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
   },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.05)',
-  },
-  selectionHeaderContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  selectionCountText: {
-    fontSize: 18,
-    fontFamily: "semibold",
-    flex: 1,
-    marginLeft: 16,
-  },
-  deleteSelectedButton: {
-    padding: 8,
-  },
-  deleteIcon: {
-    width: 24,
-    height: 24,
-  },
-  searchBarContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    paddingRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    marginLeft: 8,
-    fontFamily: "regular",
-  },
-  clearIcon: {
-    width: 20,
-    height: 20,
-    marginLeft: 8,
-  },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  backButton: {
-    padding: 4,
-    marginRight: 16,
-  },
-  headerTitle: {
-    ...FONTS.h2,
-    color: COLORS.black,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignContent: "center",
-  },
-  searchIcon: {
-    width: 24,
-    height: 24,
-    tintColor: COLORS.black,
-  },
-  scrollView: {
-    paddingVertical: 5,
-    backgroundColor: COLORS.tertiaryWhite,
+  filtersContainer: {
     paddingHorizontal: 16,
+    paddingTop: 8,
   },
-  transactionContainer: {
+  filterTypeContainer: {
     flexDirection: "row",
-    alignItems: "center",
-  },
-  selectionIndicator: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: COLORS.greyScale400,
-    marginRight: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  selectedIndicator: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary,
-  },
-  checkIcon: {
-    width: 14,
-    height: 14,
-    tintColor: COLORS.white,
-  },
-  emptyContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 80,
-  },
-  emptyIcon: {
-    width: 100,
-    height: 100,
     marginBottom: 16,
   },
-  emptyText: {
-    fontSize: 16,
-    fontFamily: "medium",
-    color: COLORS.greyscale900,
-    marginBottom: 12,
+  filterTypeButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginRight: 12,
   },
-  clearSearchButton: {
-    padding: 8,
+  activeFilterTypeButton: {
+    borderWidth: 1,
+    borderColor: "rgba(255, 142, 105, 0.3)",
   },
-  clearSearchText: {
+  filterTypeButtonText: {
     fontSize: 14,
     fontFamily: "medium",
+    marginLeft: 6,
+  },
+  filterOptionsContainer: {
+    paddingRight: 16,
+    paddingBottom: 16,
+  },
+  filterOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginRight: 8,
+    borderWidth: 1,
+  },
+  activeFilterOption: {
+    borderWidth: 1,
+  },
+  filterOptionText: {
+    fontSize: 13,
+    fontFamily: "medium",
+  },
+  dateFilterContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  datePickerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    flex: 1,
+    maxWidth: width - 90,
+  },
+  activeDatePickerButton: {
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+  calendarIcon: {
+    marginRight: 8,
+  },
+  datePickerText: {
+    fontSize: 14,
+    fontFamily: "medium",
+  },
+  clearDateButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(244, 67, 54, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 8,
+  },
+  transactionsList: {
+    padding: 16,
+    paddingBottom: 100,
+  },
+  transactionCard: {
+    marginBottom: 12,
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  transactionCardInner: {
+    flexDirection: "row",
+  },
+  statusIndicatorContainer: {
+    width: 8,
+  },
+  transactionContent: {
+    flex: 1,
+    padding: 16,
+  },
+  transactionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 16,
+  },
+  transactionInfo: {
+    flex: 1,
+  },
+  transactionName: {
+    fontSize: 16,
+    fontFamily: "semibold",
+    marginBottom: 4,
+  },
+  transactionMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  transactionId: {
+    fontSize: 13,
+    fontFamily: "regular",
+    color: "#999",
+  },
+  transactionDate: {
+    fontSize: 13,
+    fontFamily: "regular",
+    color: "#999",
+    marginLeft: 4,
+  },
+  amountContainer: {
+    marginLeft: 16,
+    alignItems: "flex-end",
+  },
+  amount: {
+    fontSize: 18,
+    fontFamily: "bold",
+  },
+  transactionFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 16,
+  },
+  statusText: {
+    fontSize: 13,
+    fontFamily: "medium",
+    marginLeft: 6,
+  },
+  actionButtons: {
+    flexDirection: "row",
+  },
+  iconButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    marginLeft: 8,
+  },
+  deleteIconButton: {
+    backgroundColor: "rgba(244, 67, 54, 0.1)",
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
+  emptyIconContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontFamily: "bold",
+    marginBottom: 8,
+  },
+  emptyDescription: {
+    fontSize: 14,
+    fontFamily: "regular",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  undoNotification: {
+    position: "absolute",
+    bottom: 20,
+    left: 16,
+    right: 16,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  undoNotificationContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  undoNotificationIcon: {
+    marginRight: 10,
+  },
+  undoNotificationText: {
+    fontSize: 14,
+    fontFamily: "medium",
+  },
+  undoButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    backgroundColor: "rgba(255, 142, 105, 0.1)",
+  },
+  undoButtonText: {
+    fontSize: 12,
+    fontFamily: "bold",
     color: COLORS.primary,
   },
   modalOverlay: {
@@ -710,87 +846,72 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
   },
-  modalContainer: {
-    width: "85%",
-    borderRadius: 16,
-    padding: 24,
-    backgroundColor: COLORS.white,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+  calendarCard: {
+    width: width - 40,
+    padding: 16,
+    borderRadius: 20,
   },
-  modalTitle: {
+  calendarHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  calendarTitle: {
     fontSize: 18,
     fontFamily: "bold",
+  },
+  calendarNavigation: {
+    flexDirection: "row",
+  },
+  calendarNavButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 8,
+  },
+  weekDaysRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginBottom: 12,
-    color: COLORS.greyscale900,
   },
-  modalText: {
-    fontSize: 16,
-    fontFamily: "regular",
-    marginBottom: 24,
-    color: COLORS.greyScale700,
-  },
-  modalActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 22,
-    alignItems: "center",
-    marginHorizontal: 5,
-    backgroundColor: COLORS.tertiaryWhite,
-  },
-  deleteButton: {
-    backgroundColor: COLORS.error,
-  },
-  buttonText: {
+  weekDayText: {
+    fontSize: 12,
     fontFamily: "medium",
-    fontSize: 16,
-    color: COLORS.greyscale900,
+    width: 32,
+    textAlign: "center",
   },
-  deleteButtonText: {
-    color: COLORS.white,
-  },
-  undoNotification: {
-    position: "absolute",
-    bottom: 20,
-    left: "5%",
-    right: "5%",
-    backgroundColor: COLORS.white,
-    borderRadius: 8,
+  calendarGrid: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    flexWrap: "wrap",
+    justifyContent: "space-around",
   },
-  undoNotificationText: {
+  calendarDay: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 4,
+  },
+  selectedCalendarDay: {
+    backgroundColor: COLORS.primary,
+  },
+  calendarDayText: {
     fontSize: 14,
     fontFamily: "medium",
-    color: COLORS.greyscale900,
   },
-  undoButton: {
-    fontSize: 14,
-    fontFamily: "bold",
-    color: COLORS.primary,
+  calendarActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 16,
   },
-  statusFilterContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 0,
-    zIndex: 1,
-    backgroundColor: COLORS.tertiaryWhite,
+  calendarButton: {
+    marginLeft: 12,
   },
 });
 
