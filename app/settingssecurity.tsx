@@ -1,6 +1,4 @@
-import { Image } from "expo-image";
 import Header from "@/components/Header";
-import Button from "@/components/Button";
 import { useNavigation } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
