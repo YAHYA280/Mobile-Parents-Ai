@@ -17,7 +17,7 @@ import { COLORS, TYPOGRAPHY, RADIUS, SHADOWS } from "@/constants/theme";
 import Header from "@/components/ui/Header";
 import Card from "@/components/ui/Card";
 import Alert from "@/components/ui/Alert";
-import Button from "@/components/ui/Button";
+import CalendarModal from "@/components/CalendarModal"; // Import the new CalendarModal component
 
 // Mock data types
 import type { TransactionStatus } from "@/utils/translation";
@@ -39,6 +39,7 @@ const DATE_FILTER_OPTIONS = {
   week: "Cette semaine",
   month: "Ce mois",
   year: "Cette année",
+  custom: "Période personnalisée",
 };
 
 const Transactions = () => {
@@ -62,6 +63,16 @@ const Transactions = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<string>("all");
 
+  // Calendar state
+  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+  const [dateRange, setDateRange] = useState<{
+    startDate: Date | null;
+    endDate: Date | null;
+  }>({
+    startDate: null,
+    endDate: null,
+  });
+
   // Animation
   const undoNotificationOpacity = useRef(new Animated.Value(0)).current;
   const undoTimerRef = useRef<number | null>(null);
@@ -77,30 +88,76 @@ const Transactions = () => {
       );
     }
 
-    // Apply date filter if active (mock implementation)
-    if (activeFilter === "date" && selectedDate !== "all") {
-      // This would be implemented with actual date logic in a real app
-      // For now, just filter randomly to simulate date filtering
+    // Apply date filter if active
+    if (activeFilter === "date") {
       if (selectedDate === "today") {
+        // Filter for today's transactions
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        // Mock implementation - would need actual date fields in transactions
         filtered = filtered.slice(
           0,
           Math.max(1, Math.floor(filtered.length * 0.3))
         );
       } else if (selectedDate === "week") {
+        // Filter for this week's transactions
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay()); // Go to Sunday
+
+        // Mock implementation
         filtered = filtered.slice(
           0,
           Math.max(2, Math.floor(filtered.length * 0.5))
         );
       } else if (selectedDate === "month") {
+        // Filter for this month's transactions
+        // Mock implementation
         filtered = filtered.slice(
           0,
           Math.max(3, Math.floor(filtered.length * 0.7))
         );
+      } else if (selectedDate === "year") {
+        // Filter for this year's transactions
+        // Mock implementation
+        filtered = filtered.slice(
+          0,
+          Math.max(4, Math.floor(filtered.length * 0.9))
+        );
+      } else if (
+        selectedDate === "custom" &&
+        (dateRange.startDate || dateRange.endDate)
+      ) {
+        // Apply custom date range filter
+        // In a real app, each transaction would have a date field to filter by
+        // For mock purposes, we'll filter a subset of transactions
+
+        if (dateRange.startDate && dateRange.endDate) {
+          // Filter transactions between start and end dates
+          // Mock implementation - simulate 40-70% of transactions based on date range size
+          const daysDiff = Math.floor(
+            (dateRange.endDate.getTime() - dateRange.startDate.getTime()) /
+              (1000 * 60 * 60 * 24)
+          );
+          const filterRatio = Math.min(0.7, Math.max(0.4, daysDiff / 30));
+          filtered = filtered.slice(
+            0,
+            Math.floor(filtered.length * filterRatio)
+          );
+        } else if (dateRange.startDate) {
+          // Filter transactions from start date
+          // Mock implementation - show 50% of transactions
+          filtered = filtered.slice(0, Math.floor(filtered.length * 0.5));
+        }
       }
     }
 
     setFilteredTransactions(filtered);
-  }, [transactions, activeFilter, selectedStatus, selectedDate]);
+  }, [transactions, activeFilter, selectedStatus, selectedDate, dateRange]);
 
   const handleDeleteTransaction = (transaction: TRANSACTION) => {
     setSelectedTransaction(transaction);
@@ -156,6 +213,44 @@ const Transactions = () => {
       clearTimeout(undoTimerRef.current);
       undoTimerRef.current = null;
     }
+  };
+
+  // Handle date range selection from calendar
+  const handleDateRangeSelect = (
+    startDate: Date | null,
+    endDate: Date | null
+  ) => {
+    setDateRange({ startDate, endDate });
+    if (startDate || endDate) {
+      setSelectedDate("custom");
+    }
+  };
+
+  // Show calendar modal
+  const showCalendar = () => {
+    setIsCalendarVisible(true);
+  };
+
+  // Format date for display
+  const formatDateDisplay = (date: Date | null) => {
+    if (!date) return "";
+    return date.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // Get display text for custom date range
+  const getDateRangeDisplayText = () => {
+    if (dateRange.startDate && dateRange.endDate) {
+      return `${formatDateDisplay(dateRange.startDate)} - ${formatDateDisplay(dateRange.endDate)}`;
+    } else if (dateRange.startDate) {
+      return `À partir du ${formatDateDisplay(dateRange.startDate)}`;
+    } else if (dateRange.endDate) {
+      return `Jusqu'au ${formatDateDisplay(dateRange.endDate)}`;
+    }
+    return "Période personnalisée";
   };
 
   const getStatusConfig = (status: string) => {
@@ -288,7 +383,35 @@ const Transactions = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Filter options based on active filter type */}
+      {/* Custom Date Range Display */}
+      {activeFilter === "date" &&
+        selectedDate === "custom" &&
+        (dateRange.startDate || dateRange.endDate) && (
+          <View style={styles.dateRangeContainer}>
+            <TouchableOpacity
+              style={[
+                styles.dateRangeButton,
+                {
+                  backgroundColor: dark
+                    ? "rgba(255, 255, 255, 0.1)"
+                    : "rgba(0, 0, 0, 0.05)",
+                },
+              ]}
+              onPress={showCalendar}
+            >
+              <Ionicons
+                name="calendar"
+                size={18}
+                color={COLORS.primary}
+                style={styles.dateRangeIcon}
+              />
+              <Text style={[styles.dateRangeText, { color: COLORS.primary }]}>
+                {getDateRangeDisplayText()}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
       <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -334,6 +457,9 @@ const Transactions = () => {
                     setSelectedStatus(item.id);
                   } else {
                     setSelectedDate(item.id);
+                    if (item.id === "custom") {
+                      showCalendar();
+                    }
                   }
                 }}
               >
@@ -602,6 +728,14 @@ const Transactions = () => {
         ]}
       />
 
+      {/* Calendar Modal */}
+      <CalendarModal
+        visible={isCalendarVisible}
+        onClose={() => setIsCalendarVisible(false)}
+        onSelectDateRange={handleDateRangeSelect}
+        dark={dark}
+      />
+
       {showUndoNotification && renderUndoNotification()}
     </SafeAreaView>
   );
@@ -654,39 +788,26 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "medium",
   },
-  dateFilterContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
+  // New styles for date range display
+  dateRangeContainer: {
+    marginBottom: 12,
+    paddingHorizontal: 4,
   },
-  datePickerButton: {
+  dateRangeButton: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 20,
-    flex: 1,
-    maxWidth: width - 90,
-  },
-  activeDatePickerButton: {
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.primary,
   },
-  calendarIcon: {
+  dateRangeIcon: {
     marginRight: 8,
   },
-  datePickerText: {
+  dateRangeText: {
     fontSize: 14,
     fontFamily: "medium",
-  },
-  clearDateButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(244, 67, 54, 0.1)",
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 8,
   },
   transactionsList: {
     padding: 16,
@@ -840,78 +961,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "bold",
     color: COLORS.primary,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  calendarCard: {
-    width: width - 40,
-    padding: 16,
-    borderRadius: 20,
-  },
-  calendarHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  calendarTitle: {
-    fontSize: 18,
-    fontFamily: "bold",
-  },
-  calendarNavigation: {
-    flexDirection: "row",
-  },
-  calendarNavButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 8,
-  },
-  weekDaysRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 12,
-  },
-  weekDayText: {
-    fontSize: 12,
-    fontFamily: "medium",
-    width: 32,
-    textAlign: "center",
-  },
-  calendarGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
-  },
-  calendarDay: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 4,
-  },
-  selectedCalendarDay: {
-    backgroundColor: COLORS.primary,
-  },
-  calendarDayText: {
-    fontSize: 14,
-    fontFamily: "medium",
-  },
-  calendarActions: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 16,
-  },
-  calendarButton: {
-    marginLeft: 12,
   },
 });
 
