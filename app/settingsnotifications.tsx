@@ -1,10 +1,9 @@
 import { Image } from "expo-image";
-import Header from "@/components/Header";
 import React, { useMemo, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-virtualized-view";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -16,6 +15,7 @@ import {
 
 import { icons, COLORS } from "../constants";
 import { useTheme } from "../theme/ThemeProvider";
+import Header from "../components/ui/Header"; // Updated import path
 
 // Component props
 interface SectionHeaderProps {
@@ -159,6 +159,7 @@ const NotificationToggle: React.FC<NotificationToggleProps> = React.memo(
 // Main component
 const SettingsNotifications = () => {
   const { colors, dark } = useTheme();
+  const navigation = useNavigation();
 
   const [mainNotificationsEnabled, setMainNotificationsEnabled] =
     useState(true);
@@ -212,159 +213,157 @@ const SettingsNotifications = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header title="Notifications" />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Header
+        title="Notifications"
+        subtitle="Gérer les préférences de notification"
+        onBackPress={() => navigation.goBack()}
+      />
 
-        <ScrollView
-          style={styles.settingsContainer}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
+      <ScrollView
+        style={styles.settingsContainer}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View
+          style={[
+            styles.mainToggleCard,
+            { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
+          ]}
         >
-          <View
+          <View style={styles.mainToggleHeaderContainer}>
+            <View style={styles.mainToggleIconContainer}>
+              <LinearGradient
+                colors={[COLORS.primary, "#ff7043"]}
+                style={styles.mainToggleGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Ionicons name="notifications" size={24} color="#FFFFFF" />
+              </LinearGradient>
+            </View>
+            <View style={styles.mainToggleTextContainer}>
+              <Text
+                style={[
+                  styles.mainToggleTitle,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Notifications
+              </Text>
+              <Text
+                style={[
+                  styles.mainToggleSubtitle,
+                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                ]}
+              >
+                {mainNotificationsEnabled
+                  ? "Activées pour tous les éléments"
+                  : "Toutes les notifications sont désactivées"}
+              </Text>
+            </View>
+            <Switch
+              value={mainNotificationsEnabled}
+              onValueChange={(value) => setMainNotificationsEnabled(value)}
+              trackColor={{
+                false: dark ? COLORS.dark3 : "#EEEEEE",
+                true: COLORS.primary,
+              }}
+              thumbColor={COLORS.white}
+              ios_backgroundColor={dark ? COLORS.dark3 : "#EEEEEE"}
+            />
+          </View>
+        </View>
+
+        {mainNotificationsEnabled && (
+          <>
+            <View style={styles.sectionContainer}>
+              <SectionHeader
+                title="Types de notifications"
+                dark={dark}
+                isOpen={openSections.notificationTypes}
+                onToggle={toggleNotificationTypesSection}
+              />
+
+              {renderSectionContent(
+                openSections.notificationTypes,
+                <>
+                  <NotificationToggle
+                    label="Progrès de l'enfant"
+                    value={notificationSettings.childProgress}
+                    onValueChange={() => handleToggleChange("childProgress")}
+                    dark={dark}
+                    icon="trending-up"
+                  />
+                  <NotificationToggle
+                    label="Rappels d'objectifs"
+                    value={notificationSettings.objectiveReminders}
+                    onValueChange={() =>
+                      handleToggleChange("objectiveReminders")
+                    }
+                    dark={dark}
+                    icon="flag"
+                  />
+                  <NotificationToggle
+                    label="Mises à jour de l'application"
+                    value={notificationSettings.appUpdates}
+                    onValueChange={() => handleToggleChange("appUpdates")}
+                    dark={dark}
+                    icon="refresh-circle"
+                  />
+                </>
+              )}
+            </View>
+
+            <View style={styles.sectionContainer}>
+              <SectionHeader
+                title="Préférences de communication"
+                dark={dark}
+                isOpen={openSections.communicationPrefs}
+                onToggle={toggleCommunicationSection}
+              />
+
+              {renderSectionContent(
+                openSections.communicationPrefs,
+                <>
+                  <NotificationToggle
+                    label="Messages et alertes"
+                    value={notificationSettings.messages}
+                    onValueChange={() => handleToggleChange("messages")}
+                    dark={dark}
+                    icon="chatbubble"
+                  />
+                  <NotificationToggle
+                    label="Newsletter et offres"
+                    value={notificationSettings.newsletter}
+                    onValueChange={() => handleToggleChange("newsletter")}
+                    dark={dark}
+                    icon="mail"
+                  />
+                </>
+              )}
+            </View>
+          </>
+        )}
+
+        <View style={styles.footerContainer}>
+          <Text
             style={[
-              styles.mainToggleCard,
-              { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
+              styles.footerText,
+              { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
             ]}
           >
-            <View style={styles.mainToggleHeaderContainer}>
-              <View style={styles.mainToggleIconContainer}>
-                <LinearGradient
-                  colors={[COLORS.primary, "#ff7043"]}
-                  style={styles.mainToggleGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                >
-                  <Ionicons name="notifications" size={24} color="#FFFFFF" />
-                </LinearGradient>
-              </View>
-              <View style={styles.mainToggleTextContainer}>
-                <Text
-                  style={[
-                    styles.mainToggleTitle,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
-                  Notifications
-                </Text>
-                <Text
-                  style={[
-                    styles.mainToggleSubtitle,
-                    { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-                  ]}
-                >
-                  {mainNotificationsEnabled
-                    ? "Activées pour tous les éléments"
-                    : "Toutes les notifications sont désactivées"}
-                </Text>
-              </View>
-              <Switch
-                value={mainNotificationsEnabled}
-                onValueChange={(value) => setMainNotificationsEnabled(value)}
-                trackColor={{
-                  false: dark ? COLORS.dark3 : "#EEEEEE",
-                  true: COLORS.primary,
-                }}
-                thumbColor={COLORS.white}
-                ios_backgroundColor={dark ? COLORS.dark3 : "#EEEEEE"}
-              />
-            </View>
-          </View>
-
-          {mainNotificationsEnabled && (
-            <>
-              <View style={styles.sectionContainer}>
-                <SectionHeader
-                  title="Types de notifications"
-                  dark={dark}
-                  isOpen={openSections.notificationTypes}
-                  onToggle={toggleNotificationTypesSection}
-                />
-
-                {renderSectionContent(
-                  openSections.notificationTypes,
-                  <>
-                    <NotificationToggle
-                      label="Progrès de l'enfant"
-                      value={notificationSettings.childProgress}
-                      onValueChange={() => handleToggleChange("childProgress")}
-                      dark={dark}
-                      icon="trending-up"
-                    />
-                    <NotificationToggle
-                      label="Rappels d'objectifs"
-                      value={notificationSettings.objectiveReminders}
-                      onValueChange={() =>
-                        handleToggleChange("objectiveReminders")
-                      }
-                      dark={dark}
-                      icon="flag"
-                    />
-                    <NotificationToggle
-                      label="Mises à jour de l'application"
-                      value={notificationSettings.appUpdates}
-                      onValueChange={() => handleToggleChange("appUpdates")}
-                      dark={dark}
-                      icon="refresh-circle"
-                    />
-                  </>
-                )}
-              </View>
-
-              <View style={styles.sectionContainer}>
-                <SectionHeader
-                  title="Préférences de communication"
-                  dark={dark}
-                  isOpen={openSections.communicationPrefs}
-                  onToggle={toggleCommunicationSection}
-                />
-
-                {renderSectionContent(
-                  openSections.communicationPrefs,
-                  <>
-                    <NotificationToggle
-                      label="Messages et alertes"
-                      value={notificationSettings.messages}
-                      onValueChange={() => handleToggleChange("messages")}
-                      dark={dark}
-                      icon="chatbubble"
-                    />
-                    <NotificationToggle
-                      label="Newsletter et offres"
-                      value={notificationSettings.newsletter}
-                      onValueChange={() => handleToggleChange("newsletter")}
-                      dark={dark}
-                      icon="mail"
-                    />
-                  </>
-                )}
-              </View>
-            </>
-          )}
-
-          <View style={styles.footerContainer}>
-            <Text
-              style={[
-                styles.footerText,
-                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-              ]}
-            >
-              Les paramètres de notification vous permettent de contrôler
-              comment et quand vous recevez des alertes concernant l'activité de
-              vos enfants et les mises à jour de l'application.
-            </Text>
-          </View>
-        </ScrollView>
-      </View>
-    </SafeAreaView>
+            Les paramètres de notification vous permettent de contrôler comment
+            et quand vous recevez des alertes concernant l'activité de vos
+            enfants et les mises à jour de l'application.
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  area: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
   container: {
     flex: 1,
     backgroundColor: COLORS.white,

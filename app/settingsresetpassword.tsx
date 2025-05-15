@@ -2,7 +2,6 @@ import Checkbox from "expo-checkbox";
 import { useNavigation } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useReducer, useCallback } from "react";
 import {
   View,
@@ -17,14 +16,14 @@ import {
 } from "react-native";
 
 import Input from "../components/Input";
-import Header from "../components/Header";
-import Button from "../components/Button";
+import Header from "../components/ui/Header";
 import { useTheme } from "../theme/ThemeProvider";
 import { reducer } from "../utils/reducers/formReducers";
 import { validateInput } from "../utils/actions/formActions";
 import { SIZES, icons, COLORS, illustrations } from "../constants";
 
 type Nav = {
+  goBack: any;
   navigate: (value: string) => void;
 };
 
@@ -43,7 +42,7 @@ const initialState = {
 };
 
 const CreateNewPassword = () => {
-  const { navigate } = useNavigation<Nav>();
+  const navigation = useNavigation<Nav>();
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
   const [error, setError] = useState(null);
   const [isChecked, setChecked] = useState(false);
@@ -117,7 +116,7 @@ const CreateNewPassword = () => {
               style={styles.continueButton}
               onPress={() => {
                 setModalVisible(false);
-                navigate("(tabs)");
+                navigation.navigate("(tabs)");
               }}
               activeOpacity={0.7}
             >
@@ -143,155 +142,152 @@ const CreateNewPassword = () => {
   );
 
   return (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header title="Réinitialiser mot de passe" />
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <View style={styles.contentContainer}>
-            <View style={styles.illustrationContainer}>
-              <Image
-                source={
-                  dark ? illustrations.successDark : illustrations.success
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Header
+        title="Réinitialiser mot de passe"
+        subtitle="Créer un nouveau mot de passe"
+        onBackPress={() => navigation.goBack()}
+      />
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.contentContainer}>
+          <View style={styles.illustrationContainer}>
+            <Image
+              source={dark ? illustrations.successDark : illustrations.success}
+              style={styles.illustration}
+              resizeMode="contain"
+            />
+          </View>
+
+          <View style={styles.formContainer}>
+            <Text
+              style={[
+                styles.title,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Créez votre nouveau mot de passe
+            </Text>
+
+            <Text
+              style={[
+                styles.subtitle,
+                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+              ]}
+            >
+              Votre mot de passe doit contenir au moins 8 caractères, incluant
+              des majuscules et des chiffres
+            </Text>
+
+            <View style={styles.inputsContainer}>
+              <Input
+                onInputChanged={inputChangedHandler}
+                errorText={formState.inputValidities.newPassword}
+                autoCapitalize="none"
+                id="newPassword"
+                placeholder="Nouveau mot de passe"
+                placeholderTextColor={
+                  dark ? COLORS.grayTie : COLORS.grayscale400
                 }
-                style={styles.illustration}
-                resizeMode="contain"
+                icon={icons.padlock}
+                secureTextEntry
+              />
+
+              <Input
+                onInputChanged={inputChangedHandler}
+                errorText={formState.inputValidities.confirmNewPassword}
+                autoCapitalize="none"
+                id="confirmNewPassword"
+                placeholder="Confirmer le nouveau mot de passe"
+                placeholderTextColor={
+                  dark ? COLORS.grayTie : COLORS.grayscale400
+                }
+                icon={icons.padlock}
+                secureTextEntry
               />
             </View>
 
-            <View style={styles.formContainer}>
-              <Text
-                style={[
-                  styles.title,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
-                Créez votre nouveau mot de passe
-              </Text>
-
-              <Text
-                style={[
-                  styles.subtitle,
-                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-                ]}
-              >
-                Votre mot de passe doit contenir au moins 8 caractères, incluant
-                des majuscules et des chiffres
-              </Text>
-
-              <View style={styles.inputsContainer}>
-                <Input
-                  onInputChanged={inputChangedHandler}
-                  errorText={formState.inputValidities.newPassword}
-                  autoCapitalize="none"
-                  id="newPassword"
-                  placeholder="Nouveau mot de passe"
-                  placeholderTextColor={
-                    dark ? COLORS.grayTie : COLORS.grayscale400
-                  }
-                  icon={icons.padlock}
-                  secureTextEntry
-                />
-
-                <Input
-                  onInputChanged={inputChangedHandler}
-                  errorText={formState.inputValidities.confirmNewPassword}
-                  autoCapitalize="none"
-                  id="confirmNewPassword"
-                  placeholder="Confirmer le nouveau mot de passe"
-                  placeholderTextColor={
-                    dark ? COLORS.grayTie : COLORS.grayscale400
-                  }
-                  icon={icons.padlock}
-                  secureTextEntry
-                />
-              </View>
-
-              <View style={styles.checkBoxContainer}>
-                <TouchableOpacity
-                  style={styles.checkboxWrapper}
-                  onPress={() => setChecked(!isChecked)}
-                  activeOpacity={0.7}
-                >
-                  <Checkbox
-                    style={[
-                      styles.checkbox,
-                      {
-                        borderColor: isChecked
-                          ? COLORS.primary
-                          : dark
-                            ? COLORS.greyscale500
-                            : COLORS.grayscale400,
-                      },
-                    ]}
-                    value={isChecked}
-                    color={isChecked ? COLORS.primary : undefined}
-                    onValueChange={setChecked}
-                  />
-                  <Text
-                    style={[
-                      styles.checkboxLabel,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
-                  >
-                    Se souvenir de moi
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
+            <View style={styles.checkBoxContainer}>
               <TouchableOpacity
-                style={styles.helpLinkContainer}
-                onPress={handleHelpPress}
+                style={styles.checkboxWrapper}
+                onPress={() => setChecked(!isChecked)}
                 activeOpacity={0.7}
               >
-                <Ionicons
-                  name="help-circle-outline"
-                  size={18}
-                  color={COLORS.primary}
-                  style={styles.helpIcon}
+                <Checkbox
+                  style={[
+                    styles.checkbox,
+                    {
+                      borderColor: isChecked
+                        ? COLORS.primary
+                        : dark
+                          ? COLORS.greyscale500
+                          : COLORS.grayscale400,
+                    },
+                  ]}
+                  value={isChecked}
+                  color={isChecked ? COLORS.primary : undefined}
+                  onValueChange={setChecked}
                 />
-                <Text style={styles.helpLink}>Besoin d'aide?</Text>
+                <Text
+                  style={[
+                    styles.checkboxLabel,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  Se souvenir de moi
+                </Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </ScrollView>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => setModalVisible(true)}
-            activeOpacity={0.7}
-          >
-            <LinearGradient
-              colors={[COLORS.primary, "#ff7043"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.submitGradient}
+            <TouchableOpacity
+              style={styles.helpLinkContainer}
+              onPress={handleHelpPress}
+              activeOpacity={0.7}
             >
-              <Text style={styles.submitText}>Continuer</Text>
               <Ionicons
-                name="arrow-forward"
+                name="help-circle-outline"
                 size={18}
-                color="#FFFFFF"
-                style={styles.submitIcon}
+                color={COLORS.primary}
+                style={styles.helpIcon}
               />
-            </LinearGradient>
-          </TouchableOpacity>
+              <Text style={styles.helpLink}>Besoin d'aide?</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+      </ScrollView>
 
-        {renderModal()}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={() => setModalVisible(true)}
+          activeOpacity={0.7}
+        >
+          <LinearGradient
+            colors={[COLORS.primary, "#ff7043"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+            <Text style={styles.submitText}>Continuer</Text>
+            <Ionicons
+              name="arrow-forward"
+              size={18}
+              color="#FFFFFF"
+              style={styles.submitIcon}
+            />
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+
+      {renderModal()}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  area: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
   container: {
     flex: 1,
     backgroundColor: COLORS.white,

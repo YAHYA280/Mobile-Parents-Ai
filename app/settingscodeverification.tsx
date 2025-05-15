@@ -2,22 +2,22 @@ import { useNavigation } from "expo-router";
 import { OtpInput } from "react-native-otp-entry";
 import React, { useState, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { COLORS } from "../constants";
-import Header from "../components/Header";
+import Header from "../components/ui/Header"; // Updated import path
 import Button from "../components/Button";
 import { useTheme } from "../theme/ThemeProvider";
 
 type Nav = {
+  goBack: any;
   navigate: (value: string) => void;
 };
 
 // OTP verification screen
 const SettingsCodeVerification = () => {
-  const { navigate } = useNavigation<Nav>();
+  const navigation = useNavigation<Nav>();
   const [time, setTime] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState("");
@@ -44,7 +44,7 @@ const SettingsCodeVerification = () => {
 
     setTimeout(() => {
       setIsLoading(false);
-      navigate("settingsresetpassword");
+      navigation.navigate("settingsresetpassword");
     }, 2000);
   };
 
@@ -55,163 +55,158 @@ const SettingsCodeVerification = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header title="Réinitialiser mot de passe" />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Header
+        title="Réinitialiser mot de passe"
+        subtitle="Vérification du code"
+        onBackPress={() => navigation.goBack()}
+      />
 
-        <View style={styles.contentContainer}>
-          <View style={styles.iconContainer}>
-            <LinearGradient
-              colors={[COLORS.primary, "#ff7043"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.iconBackground}
-            >
-              <Ionicons name="mail" size={32} color="#FFFFFF" />
-            </LinearGradient>
-          </View>
-
-          <Text
-            style={[
-              styles.title,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
+      <View style={styles.contentContainer}>
+        <View style={styles.iconContainer}>
+          <LinearGradient
+            colors={[COLORS.primary, "#ff7043"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.iconBackground}
           >
-            Code de Vérification
-          </Text>
+            <Ionicons name="mail" size={32} color="#FFFFFF" />
+          </LinearGradient>
+        </View>
 
-          <Text
-            style={[
-              styles.subtitle,
-              { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-            ]}
-          >
-            Le code a été envoyé à l'email{" "}
-            <Text style={styles.email}>jack_Duboix@gmail.com</Text>
-          </Text>
+        <Text
+          style={[styles.title, { color: dark ? COLORS.white : COLORS.black }]}
+        >
+          Code de Vérification
+        </Text>
 
-          <View style={styles.otpContainer}>
-            <OtpInput
-              numberOfDigits={4}
-              onTextChange={(text) => setOtp(text)}
-              focusColor={COLORS.primary}
-              focusStickBlinkingDuration={500}
-              onFilled={(text) => setOtp(text)}
-              theme={{
-                pinCodeContainerStyle: {
-                  backgroundColor: dark ? COLORS.dark2 : "#F8F9FA",
-                  borderColor: dark ? COLORS.gray : "#E8E8E8",
-                  borderWidth: 1,
-                  borderRadius: 12,
-                  height: 64,
-                  width: 64,
-                  marginHorizontal: 8,
-                  ...styles.otpDigitContainer,
-                },
-                pinCodeTextStyle: {
-                  color: dark ? COLORS.white : COLORS.black,
-                  fontSize: 24,
-                  fontFamily: "medium",
-                },
-              }}
-            />
-          </View>
+        <Text
+          style={[
+            styles.subtitle,
+            { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+          ]}
+        >
+          Le code a été envoyé à l'email{" "}
+          <Text style={styles.email}>jack_Duboix@gmail.com</Text>
+        </Text>
 
-          <View style={styles.timerContainer}>
-            {time > 0 ? (
-              <>
-                <Text
-                  style={[
-                    styles.timerText,
-                    { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-                  ]}
-                >
-                  Renvoyer le code dans{" "}
-                </Text>
-                <View style={styles.timerBadge}>
-                  <Text style={styles.timerDigits}>{formatTime(time)}</Text>
-                </View>
-              </>
-            ) : (
+        <View style={styles.otpContainer}>
+          <OtpInput
+            numberOfDigits={4}
+            onTextChange={(text) => setOtp(text)}
+            focusColor={COLORS.primary}
+            focusStickBlinkingDuration={500}
+            onFilled={(text) => setOtp(text)}
+            theme={{
+              pinCodeContainerStyle: {
+                backgroundColor: dark ? COLORS.dark2 : "#F8F9FA",
+                borderColor: dark ? COLORS.gray : "#E8E8E8",
+                borderWidth: 1,
+                borderRadius: 12,
+                height: 64,
+                width: 64,
+                marginHorizontal: 8,
+                ...styles.otpDigitContainer,
+              },
+              pinCodeTextStyle: {
+                color: dark ? COLORS.white : COLORS.black,
+                fontSize: 24,
+                fontFamily: "medium",
+              },
+            }}
+          />
+        </View>
+
+        <View style={styles.timerContainer}>
+          {time > 0 ? (
+            <>
               <Text
                 style={[
                   styles.timerText,
                   { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
                 ]}
               >
-                Vous n'avez pas reçu le code?
+                Renvoyer le code dans{" "}
               </Text>
-            )}
-          </View>
-
-          <View style={styles.buttonsContainer}>
-            {time === 0 ? (
-              <TouchableOpacity
-                style={styles.resendButton}
-                onPress={handleResendCode}
-                activeOpacity={0.7}
-              >
-                <LinearGradient
-                  colors={["rgba(255,142,105,0.2)", "rgba(255,142,105,0.1)"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.resendGradient}
-                >
-                  <Ionicons
-                    name="refresh"
-                    size={18}
-                    color={COLORS.primary}
-                    style={styles.resendIcon}
-                  />
-                  <Text style={styles.resendText}>Renvoyer le code</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.placeholderButton} />
-            )}
-
-            <TouchableOpacity
+              <View style={styles.timerBadge}>
+                <Text style={styles.timerDigits}>{formatTime(time)}</Text>
+              </View>
+            </>
+          ) : (
+            <Text
               style={[
-                styles.verifyButton,
-                otp.length < 4 && styles.verifyButtonDisabled,
+                styles.timerText,
+                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
               ]}
-              onPress={handleVerify}
-              disabled={otp.length < 4 || isLoading}
+            >
+              Vous n'avez pas reçu le code?
+            </Text>
+          )}
+        </View>
+
+        <View style={styles.buttonsContainer}>
+          {time === 0 ? (
+            <TouchableOpacity
+              style={styles.resendButton}
+              onPress={handleResendCode}
               activeOpacity={0.7}
             >
               <LinearGradient
-                colors={[COLORS.primary, "#ff7043"]}
+                colors={["rgba(255,142,105,0.2)", "rgba(255,142,105,0.1)"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                style={styles.verifyGradient}
+                style={styles.resendGradient}
               >
-                {isLoading ? (
-                  <View style={styles.loadingIndicator} />
-                ) : (
-                  <>
-                    <Text style={styles.verifyText}>Vérifier</Text>
-                    <Ionicons
-                      name="arrow-forward"
-                      size={18}
-                      color="#FFFFFF"
-                      style={styles.verifyIcon}
-                    />
-                  </>
-                )}
+                <Ionicons
+                  name="refresh"
+                  size={18}
+                  color={COLORS.primary}
+                  style={styles.resendIcon}
+                />
+                <Text style={styles.resendText}>Renvoyer le code</Text>
               </LinearGradient>
             </TouchableOpacity>
-          </View>
+          ) : (
+            <View style={styles.placeholderButton} />
+          )}
+
+          <TouchableOpacity
+            style={[
+              styles.verifyButton,
+              otp.length < 4 && styles.verifyButtonDisabled,
+            ]}
+            onPress={handleVerify}
+            disabled={otp.length < 4 || isLoading}
+            activeOpacity={0.7}
+          >
+            <LinearGradient
+              colors={[COLORS.primary, "#ff7043"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.verifyGradient}
+            >
+              {isLoading ? (
+                <View style={styles.loadingIndicator} />
+              ) : (
+                <>
+                  <Text style={styles.verifyText}>Vérifier</Text>
+                  <Ionicons
+                    name="arrow-forward"
+                    size={18}
+                    color="#FFFFFF"
+                    style={styles.verifyIcon}
+                  />
+                </>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  area: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
