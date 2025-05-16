@@ -100,7 +100,7 @@ const PlansComparison: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["right", "bottom", "left"]}>
       <Header title="Comparaison des plans" onBackPress={() => router.back()} />
 
       <View style={styles.headerContainer}>
