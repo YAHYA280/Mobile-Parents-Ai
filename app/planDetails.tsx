@@ -330,7 +330,7 @@ const PlanDetails: React.FC = () => {
   );
 
   const renderErrorState = () => (
-    <SafeAreaView style={styles.area}>
+    <SafeAreaView style={styles.area} edges={["right", "bottom", "left"]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
@@ -369,7 +369,7 @@ const PlanDetails: React.FC = () => {
   const planEmoji = getPlanEmoji(selectedCatalogue.id);
 
   return (
-    <SafeAreaView style={styles.area}>
+    <SafeAreaView style={styles.area} edges={["right", "bottom", "left"]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
