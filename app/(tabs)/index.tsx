@@ -31,8 +31,6 @@ import ChildProgressCard from "@/components/home/ChildProgressCard";
 import RecentActivityCard from "@/components/home/RecentActivityCard";
 import UpcomingHomeworkCard from "@/components/home/UpcomingHomeworkCard";
 
-const { width, height } = Dimensions.get("window");
-
 type Nav = {
   navigate: (value: string) => void;
 };
