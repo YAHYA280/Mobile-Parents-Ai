@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import Button from "@/components/Button";
 import Header from "@/components/ui/Header";
 import { useNavigation } from "expo-router";
-import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/theme/ThemeProvider";
 import { icons, COLORS, images } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
