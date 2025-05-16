@@ -1,6 +1,6 @@
 import { COLORS } from "@/constants";
 import React, { useState } from "react";
-import Header from "@/components/Header";
+import Header from "@/components/ui/Header";
 import Button from "@/components/Button";
 import { useTheme } from "@/theme/ThemeProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -175,8 +175,12 @@ const ChildPreferencesScreen = () => {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
+      edges={["right", "bottom", "left"]}
     >
-      <Header title="Préférences et restrictions" />
+      <Header
+        title="Préférences et restrictions"
+        onBackPress={() => navigation.goBack()}
+      />
 
       <ScrollView
         style={styles.scrollView}

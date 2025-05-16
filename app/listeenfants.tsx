@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import Button from "@/components/Button";
+import Header from "@/components/ui/Header";
 import { useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -210,7 +211,6 @@ const ListeEnfantsScreen = () => {
 
           <View style={styles.infoContainer}>
             <View style={styles.nameContainer}>
-              
               <Text
                 style={[
                   styles.childName,
@@ -273,35 +273,14 @@ const ListeEnfantsScreen = () => {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
+      edges={["right", "bottom", "left"]}
     >
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-            <Feather
-              name="arrow-left"
-              size={24}
-              color={dark ? COLORS.white : COLORS.black}
-            />
-          </TouchableOpacity>
-          
-          <Text
-            style={[
-              styles.headerTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Mes Enfants
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={styles.addButtonContainer}
-          onPress={() => navigation.navigate("addchild")}
-        >
-          <Image source={icons.plus} style={styles.addIcon} />
-        </TouchableOpacity>
-      </View>
-
+      <Header
+        title="Mes Enfants"
+        onBackPress={handleGoBack}
+        rightIcon="add"
+        onRightIconPress={() => navigation.navigate("addchild")}
+      />
       <FlatList
         data={children}
         keyExtractor={(item) => item.id}
@@ -337,41 +316,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 20,
-  },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontFamily: "bold",
-    color: COLORS.black,
-  },
-  backButton: {
-    padding: 4,
-    marginRight: 16,
-  },
-  addButtonContainer: {
-    backgroundColor: COLORS.primary,
-    padding: 8,
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addIcon: {
-    width: 20,
-    height: 20,
-    tintColor: COLORS.white,
   },
   listContainer: {
     padding: 16,
@@ -451,9 +395,9 @@ const styles = StyleSheet.create({
     bottom: 5,
     right: 0,
     borderWidth: 2,
-    borderColor: COLORS.white, 
+    borderColor: COLORS.white,
     zIndex: 15,
-    elevation: 3, 
+    elevation: 3,
   },
   childName: {
     fontSize: 18,

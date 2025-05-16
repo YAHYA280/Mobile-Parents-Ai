@@ -1,74 +1,149 @@
-import type { NavigationProp } from "@react-navigation/native";
-import type {
-  ViewStyle,
-  TextStyle,
-  ImageStyle,
-  ImageSourcePropType} from "react-native";
-
 import React from "react";
-import { Image } from "expo-image";
-import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
+  TouchableOpacity,
   StyleSheet,
-  TouchableOpacity
+  StatusBar,
+  Platform,
 } from "react-native";
-
-import { useTheme } from "../theme/ThemeProvider";
-import { SIZES, icons, COLORS } from "../constants";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/theme/ThemeProvider";
+import { COLORS, SPACING, TYPOGRAPHY, COLOORS } from "@/constants/theme";
 
 interface HeaderProps {
   title: string;
+  onBackPress?: () => void;
+  rightIcon?: string;
+  onRightIconPress?: () => void;
+  showBackButton?: boolean;
+  transparent?: boolean;
+  subtitle?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ title }) => {
-  const navigation = useNavigation<NavigationProp<any>>();
+const Header: React.FC<HeaderProps> = ({
+  title,
+  onBackPress,
+  rightIcon,
+  onRightIconPress,
+  showBackButton = true,
+  transparent = false,
+  subtitle,
+}) => {
   const { colors, dark } = useTheme();
 
   return (
     <View
       style={[
         styles.container,
-        {
-          backgroundColor: dark ? COLORS.dark1 : COLORS.white,
-        },
+        transparent
+          ? styles.transparentContainer
+          : { backgroundColor: colors.background },
       ]}
     >
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Image
-          source={icons.back as ImageSourcePropType}
-          contentFit="contain"
-          style={[
-            styles.backIcon,
-            {
-              tintColor: colors.text,
-            },
-          ]}
-        />
-      </TouchableOpacity>
-      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+      <StatusBar
+        barStyle={dark ? "light-content" : "dark-content"}
+        backgroundColor="transparent"
+        translucent
+      />
+      <View style={styles.headerContent}>
+        <View style={styles.leftSection}>
+          {showBackButton && (
+            <TouchableOpacity style={styles.backButton} onPress={onBackPress}>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={dark ? COLORS.white : COLORS.black}
+              />
+            </TouchableOpacity>
+          )}
+          <View>
+            <Text
+              style={[
+                styles.title,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              {title}
+            </Text>
+            {subtitle && (
+              <Text
+                style={[
+                  styles.subtitle,
+                  { color: dark ? COLORS.gray2 : COLORS.gray3 },
+                ]}
+              >
+                {subtitle}
+              </Text>
+            )}
+          </View>
+        </View>
+
+        {rightIcon && (
+          <TouchableOpacity
+            style={styles.rightButton}
+            onPress={onRightIconPress}
+          >
+            <Ionicons
+              name={rightIcon as any}
+              size={24}
+              color={COLOORS.primary.main}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.white,
-    width: SIZES.width - 32,
+    width: "100%",
+    // No paddingTop here - this is key
+  },
+  transparentContainer: {
+    backgroundColor: "transparent",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  headerContent: {
     flexDirection: "row",
     alignItems: "center",
-  } as ViewStyle,
-  backIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 16,
-  } as ImageStyle,
+    justifyContent: "space-between",
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+  },
+  leftSection: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.05)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: SPACING.md,
+  },
   title: {
-    fontSize: 22,
-    fontFamily: "bold",
-    color: COLORS.black,
-  } as TextStyle,
+    ...TYPOGRAPHY.h2,
+  },
+  subtitle: {
+    ...TYPOGRAPHY.body2,
+    marginTop: 2,
+  },
+  rightButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.05)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 export default Header;

@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import React, { useState } from "react";
-import Header from "@/components/Header";
+import Header from "@/components/ui/Header";
 import Button from "@/components/Button";
 import { useNavigation } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -157,7 +157,10 @@ const ChildAccount = () => {
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <Header title="Enfant introuvable" />
+        <Header
+          title="Enfant introuvable"
+          onBackPress={() => navigation.goBack()}
+        />
         <View style={{ padding: 16 }}>
           <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
             Désolé, aucune donnée trouvée pour cet enfant.
@@ -336,17 +339,15 @@ const ChildAccount = () => {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
+      edges={["right", "bottom", "left"]}
     >
       {/* Header + Settings button */}
-      <View style={styles.header}>
-        <Header title={childData.name} />
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={() => setShowSettingsModal(true)}
-        >
-          <Image source={icons.settings} style={styles.settingsIcon} />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title={childData.name}
+        rightIcon="settings-outline"
+        onRightIconPress={() => setShowSettingsModal(true)}
+        onBackPress={() => navigation.goBack()}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -545,23 +546,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingRight: 16,
-  },
-  settingsButton: {
-    padding: 8,
-    left: -19,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary,
-  },
-  settingsIcon: {
-    width: 24,
-    height: 24,
-    tintColor: COLORS.white,
   },
   scrollView: {
     flex: 1,

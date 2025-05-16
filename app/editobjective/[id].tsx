@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
-import Header from "@/components/Header";
 import Button from "@/components/Button";
 import { icons, COLORS } from "@/constants";
+import Header from "@/components/ui/Header";
 import { useTheme } from "@/theme/ThemeProvider";
 import React, { useState, useEffect } from "react";
 import RNPickerSelect from "react-native-picker-select";
@@ -137,10 +137,7 @@ const EditObjectiveScreen = () => {
     return `${date.toLocaleDateString()} ${date
       .getHours()
       .toString()
-      .padStart(2, "0")}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
+      .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
   };
 
   // Start date picker handler
@@ -151,7 +148,7 @@ const EditObjectiveScreen = () => {
 
     // If start date is after end date, adjust end date
     if (currentDate > endDate) {
-      setEndDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000)); 
+      setEndDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000));
     }
   };
 
@@ -163,10 +160,7 @@ const EditObjectiveScreen = () => {
     if (currentDate >= startDate) {
       setEndDate(currentDate);
     } else {
-      Alert.alert(
-        "Erreur",
-        "La date de fin doit être après la date de début."
-      );
+      Alert.alert("Erreur", "La date de fin doit être après la date de début.");
     }
   };
 
@@ -280,7 +274,7 @@ const EditObjectiveScreen = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <Header title="Modifier l'objectif" />
+      <Header title="Modifier l'objectif" onBackPress={handleBack} />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -305,9 +299,7 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.textInput,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}
@@ -333,9 +325,7 @@ const EditObjectiveScreen = () => {
                   styles.textInput,
                   styles.textArea,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}
@@ -363,9 +353,7 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -428,9 +416,7 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -493,9 +479,7 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.dateButton,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setShowStartDatePicker(true)}
@@ -537,9 +521,7 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.dateButton,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setShowEndDatePicker(true)}
@@ -582,9 +564,7 @@ const EditObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -645,9 +625,7 @@ const EditObjectiveScreen = () => {
                   styles.textInput,
                   styles.textArea,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}

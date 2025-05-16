@@ -2,7 +2,7 @@ import type { ViewStyle, TextStyle, ImageStyle } from "react-native";
 
 import { Image } from "expo-image";
 import Input from "@/components/Input";
-import Header from "@/components/Header";
+import Header from "@/components/ui/Header";
 import Button from "@/components/Button";
 import { useTheme } from "@/theme/ThemeProvider";
 import { icons, COLORS, images } from "@/constants";
@@ -12,12 +12,7 @@ import { validateInput } from "@/utils/actions/formActions";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { launchImagePicker } from "@/utils/ImagePickerHelper";
 import { useNavigation, useLocalSearchParams } from "expo-router";
-import React, {
-  useState,
-  useEffect,
-  useReducer,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useReducer, useCallback } from "react";
 import {
   View,
   Text,
@@ -132,10 +127,8 @@ const EditChildScreen = () => {
     // If there's no childData, do nothing – but still call this effect
     if (!childData) return;
 
-    const nameChanged =
-      formState.inputValues.fullName !== childData.name;
-    const ageChanged =
-      formState.inputValues.age !== String(childData.age);
+    const nameChanged = formState.inputValues.fullName !== childData.name;
+    const ageChanged = formState.inputValues.age !== String(childData.age);
     const gradeChanged = selectedGrade !== childData.grade;
     const imageChanged = image !== childData.avatar;
 
@@ -220,8 +213,9 @@ const EditChildScreen = () => {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
+        edges={["right", "bottom", "left"]}
       >
-        <Header title="Enfant introuvable" />
+        <Header title="Enfant introuvable" onBackPress={handleBack} />
         <View style={{ padding: 16 }}>
           <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
             Désolé, aucune donnée trouvée pour cet enfant.
@@ -314,7 +308,7 @@ const EditChildScreen = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <Header title="Modifier les informations" />
+      <Header title="Modifier les informations" onBackPress={handleBack} />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}

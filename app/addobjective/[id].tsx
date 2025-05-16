@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import React, { useState } from "react";
-import Header from "@/components/Header";
+import Header from "@/components/ui/Header";
 import Button from "@/components/Button";
 import { icons, COLORS } from "@/constants";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -55,7 +55,9 @@ const AddObjectiveScreen = () => {
   const [description, setDescription] = useState("");
   const [subject, setSubject] = useState<string | null>(null);
   const [priority, setPriority] = useState<string | null>(null);
-  const [initialStatus, setInitialStatus] = useState<string | null>("not_started");
+  const [initialStatus, setInitialStatus] = useState<string | null>(
+    "not_started"
+  );
 
   // États pour les dates
   const [startDate, setStartDate] = useState(new Date());
@@ -75,10 +77,7 @@ const AddObjectiveScreen = () => {
     return `${date.toLocaleDateString()} ${date
       .getHours()
       .toString()
-      .padStart(2, "0")}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
+      .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
   };
 
   // Gestionnaires de changement de date (date de début)
@@ -89,7 +88,7 @@ const AddObjectiveScreen = () => {
 
     // Ajuster la date de fin si la date de début dépasse la date de fin
     if (currentDate > endDate) {
-      setEndDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000)); 
+      setEndDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000));
     }
   };
 
@@ -135,8 +134,12 @@ const AddObjectiveScreen = () => {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
+      edges={["right", "bottom", "left"]}
     >
-      <Header title="Ajouter un objectif" />
+      <Header
+        title="Ajouter un objectif"
+        onBackPress={() => navigation.goBack()}
+      />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -161,9 +164,7 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.textInput,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}
@@ -189,9 +190,7 @@ const AddObjectiveScreen = () => {
                   styles.textInput,
                   styles.textArea,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}
@@ -219,9 +218,7 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -282,9 +279,7 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -345,9 +340,7 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.dateButton,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setShowStartDatePicker(true)}
@@ -390,9 +383,7 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.dateButton,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
                 onPress={() => setShowEndDatePicker(true)}
@@ -436,9 +427,7 @@ const AddObjectiveScreen = () => {
                 style={[
                   styles.pickerContainer,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                   },
                 ]}
               >
@@ -497,9 +486,7 @@ const AddObjectiveScreen = () => {
                   styles.textInput,
                   styles.textArea,
                   {
-                    backgroundColor: dark
-                      ? COLORS.dark2
-                      : COLORS.greyscale100,
+                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
                     color: dark ? COLORS.white : COLORS.black,
                   },
                 ]}
@@ -605,7 +592,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginLeft: 8,
-    backgroundColor: COLORS.greeen, 
+    backgroundColor: COLORS.greeen,
     borderColor: COLORS.greeen,
   },
 });
