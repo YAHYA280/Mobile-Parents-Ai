@@ -31,8 +31,11 @@ import ChildProgressCard from "@/components/home/ChildProgressCard";
 import RecentActivityCard from "@/components/home/RecentActivityCard";
 import UpcomingHomeworkCard from "@/components/home/UpcomingHomeworkCard";
 
+// Import CHILDREN_DATA
+import { CHILDREN_DATA, enhanceActivity } from "@/data/Enfants/CHILDREN_DATA";
+
 type Nav = {
-  navigate: (value: string) => void;
+  navigate: (value: string, params?: object) => void;
 };
 
 const Index = () => {
@@ -40,69 +43,85 @@ const Index = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const scrollY = useSharedValue(0);
 
-  // Mock data for child progress
-  const childrenProgress = [
-    {
-      id: "1",
-      name: "Thomas Dubois",
-      progress: 75,
-      profileImage: images.user7,
-      lastActivity: "2 heures",
-      subjects: [
-        { name: "Mathématiques", progress: 80 },
-        { name: "Français", progress: 65 },
-      ],
-    },
-    {
-      id: "2",
-      name: "Marie Laurent",
-      progress: 65,
-      profileImage: images.user3,
-      lastActivity: "4 heures",
-      subjects: [
-        { name: "Histoire", progress: 70 },
-        { name: "Sciences", progress: 60 },
-      ],
-    },
-  ];
+  // Map CHILDREN_DATA to the format required by ChildProgressCard
+  const childrenProgress = CHILDREN_DATA.map((child) => {
+    // Extract progress value (remove % sign)
+    const progressValue = parseFloat(child.progress.replace("%", "")) || 0;
 
-  // Mock data for recent activities
-  const recentActivities = [
-    {
-      id: "1",
-      childName: "Thomas Dubois",
-      activity: "A terminé un exercice de mathématiques",
-      time: "2 heures",
-      score: "85%",
-    },
-    {
-      id: "2",
-      childName: "Marie Laurent",
-      activity: "A commencé le chapitre Histoire - Moyen Âge",
-      time: "4 heures",
-      score: null,
-    },
-  ];
+    // Get the most recent activity for lastActivity
+    const lastActivity =
+      child.activitesRecentes.length > 0
+        ? child.activitesRecentes[0].duree || "0 min"
+        : "N/A";
 
-  // Mock data for upcoming homework
-  const upcomingHomework = [
-    {
-      id: "1",
-      subject: "Mathématiques",
-      title: "Équations du second degré",
-      dueDate: "Demain",
-      childName: "Thomas Dubois",
-      progress: 20,
-    },
-    {
-      id: "2",
-      subject: "Français",
-      title: "Dissertation sur Victor Hugo",
-      dueDate: "3 jours",
-      childName: "Marie Laurent",
-      progress: 0,
-    },
-  ];
+    // Map subjects data (take first 2 for simplicity)
+    const mappedSubjects = child.subjects.slice(0, 2).map((subject) => {
+      // Calculate average progress for each subject based on activities
+      const subjectActivities = child.activitesRecentes.filter(
+        (act) => act.matiere === subject.name
+      );
+
+      const subjectProgress =
+        subjectActivities.length > 0
+          ? subjectActivities.reduce((sum, act) => {
+              if (act.score && act.score.includes("/")) {
+                const [num, denom] = act.score.split("/").map(Number);
+                return sum + (num / denom) * 100;
+              }
+              return sum;
+            }, 0) / subjectActivities.length
+          : 65; // Default value if no data
+
+      return {
+        name: subject.name,
+        progress: Math.round(subjectProgress),
+      };
+    });
+
+    return {
+      id: String(child.id),
+      name: child.name,
+      progress: progressValue,
+      profileImage: child.profileImage,
+      lastActivity: "2 heures", // Default value
+      subjects:
+        mappedSubjects.length > 0
+          ? mappedSubjects
+          : [
+              { name: "Mathématiques", progress: 65 },
+              { name: "Français", progress: 70 },
+            ],
+    };
+  });
+
+  // Map recent activities from CHILDREN_DATA
+  const recentActivities = CHILDREN_DATA.flatMap((child, childIndex) =>
+    child.activitesRecentes.slice(0, 1).map((activity, activityIndex) => ({
+      // Create a unique ID by combining child ID and activity index/ID
+      id: `${child.id}-${activity.id || activityIndex}`,
+      childName: child.name,
+      activity: activity.activite,
+      time: activity.duree,
+      score: activity.score || null,
+    }))
+  ).slice(0, 2);
+
+  // Create upcoming homework data based on subjects and activities
+  const upcomingHomework = CHILDREN_DATA.flatMap((child, childIndex) =>
+    child.subjects.flatMap((subject, subjectIndex) =>
+      subject.chapters.flatMap((chapter, chapterIndex) =>
+        chapter.exercises.slice(0, 1).map((exercise, exerciseIndex) => ({
+          // Create a truly unique key by combining multiple IDs
+          id: `${child.id}-${subjectIndex}-${chapterIndex}-${exerciseIndex}`,
+          subject: subject.name,
+          title: exercise.name,
+          dueDate: exerciseIndex === 0 ? "Demain" : "3 jours",
+          childName: child.name,
+          progress: exerciseIndex === 0 ? 20 : 0,
+        }))
+      )
+    )
+  ).slice(0, 2);
 
   // Quick actions data
   const quickActions = [
@@ -247,7 +266,7 @@ const Index = () => {
               </View>
               <TouchableOpacity
                 style={styles.viewAllButton}
-                onPress={() => navigate("Enfants")}
+                onPress={() => navigate("listeenfants")}
               >
                 <Text style={styles.viewAllText}>Voir tout</Text>
                 <Ionicons
@@ -267,7 +286,9 @@ const Index = () => {
                   profileImage={child.profileImage}
                   lastActivity={child.lastActivity}
                   subjects={child.subjects}
-                  onPress={() => navigate(`/Enfants/home?childId=${child.id}`)}
+                  onPress={() =>
+                    navigate(`Enfants/home`, { childId: child.id })
+                  }
                 />
               ))}
             </View>

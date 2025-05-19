@@ -3,11 +3,11 @@ import { Tabs } from "expo-router";
 import { Paths } from "@/navigation";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
-import { View, Text, StyleSheet, Platform } from "react-native";
+import { StyleSheet, Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../constants";
 
-// Clean Tab Bar component with better icons and NO borders
+// Direct modification of the existing tab bar to make it floating
 const TabLayout = () => {
   const { dark } = useTheme();
   const insets = useSafeAreaInsets();
@@ -22,24 +22,32 @@ const TabLayout = () => {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: Platform.OS !== "ios",
-        // Completely override all styles that might create borders
+        // Modified to create floating effect
         tabBarStyle: {
           position: "absolute",
-          height: Platform.OS === "ios" ? 78 : 55,
-          paddingBottom: Platform.OS === "ios" ? insets.bottom : 8,
+          height: Platform.OS === "ios" ? 80 : 75,
+          paddingBottom: Platform.OS === "ios" ? insets.bottom : 10,
+          paddingTop: 10,
           backgroundColor: tabBarBackground,
+
+          // Floating styles
+          marginHorizontal: 20,
+          marginBottom: 20,
+          borderRadius: 30,
           borderTopWidth: 0,
-          borderWidth: 0,
-          borderColor: "transparent",
-          borderTopColor: "transparent",
-          elevation: 0,
-          shadowColor: "transparent",
-          shadowOpacity: 0,
-          shadowOffset: { height: 0, width: 0 },
-          shadowRadius: 0,
+          borderWidth: 1,
+          borderColor: dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
+
+          // Shadow
+          elevation: 10,
+          shadowColor: dark ? "#000" : COLORS.primary,
+          shadowOpacity: 0.2,
+          shadowOffset: { height: 8, width: 0 },
+          shadowRadius: 14,
         },
         tabBarItemStyle: {
           borderTopWidth: 0,
+          paddingTop: 5,
         },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -50,18 +58,19 @@ const TabLayout = () => {
         tabBarActiveTintColor: activeIconColor,
         tabBarInactiveTintColor: inactiveIconColor,
       }}
-      // Adding a sceneContainerStyle to ensure no margins/padding around screens
     >
       <Tabs.Screen
         name={Paths.Index}
         options={{
           title: "Accueil",
           tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? "home" : "home-outline"}
-              size={24}
-              color={color}
-            />
+            <View style={focused ? styles.activeIconContainer : null}>
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
+                size={24}
+                color={color}
+              />
+            </View>
           ),
         }}
       />
@@ -70,11 +79,13 @@ const TabLayout = () => {
         options={{
           title: "Enfants",
           tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? "people" : "people-outline"}
-              size={24}
-              color={color}
-            />
+            <View style={focused ? styles.activeIconContainer : null}>
+              <Ionicons
+                name={focused ? "people" : "people-outline"}
+                size={24}
+                color={color}
+              />
+            </View>
           ),
         }}
       />
@@ -83,11 +94,13 @@ const TabLayout = () => {
         options={{
           title: "Support",
           tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? "chatbubble" : "chatbubble-outline"}
-              size={22}
-              color={color}
-            />
+            <View style={focused ? styles.activeIconContainer : null}>
+              <Ionicons
+                name={focused ? "chatbubble" : "chatbubble-outline"}
+                size={22}
+                color={color}
+              />
+            </View>
           ),
         }}
       />
@@ -96,16 +109,30 @@ const TabLayout = () => {
         options={{
           title: "Profil",
           tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? "person" : "person-outline"}
-              size={24}
-              color={color}
-            />
+            <View style={focused ? styles.activeIconContainer : null}>
+              <Ionicons
+                name={focused ? "person" : "person-outline"}
+                size={24}
+                color={color}
+              />
+            </View>
           ),
         }}
       />
     </Tabs>
   );
 };
+
+const styles = StyleSheet.create({
+  activeIconContainer: {
+    backgroundColor: `${COLORS.primary}15`,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: -5,
+  },
+});
 
 export default TabLayout;
