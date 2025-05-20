@@ -121,6 +121,11 @@ const AbonnementActuel: React.FC = () => {
   const planEmoji = getPlanEmoji(abonnement);
   const isSuspended = abonnement?.status === "suspended";
   const isExpired = abonnement?.status === "expired";
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const onHeaderLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    setHeaderHeight(height);
+  };
 
   // Handlers
   const navigateToHome = useCallback(() => {
@@ -340,17 +345,19 @@ const AbonnementActuel: React.FC = () => {
         translucent
       />
 
-      <Header
-        title="Abonnement Actuel"
-        subtitle="Détails de votre plan actuel"
-        onBackPress={() => router.back()}
-        rightIcon="notifications-outline"
-        onRightIconPress={navigateToNotifications}
-      />
+      <View style={styles.headerContainer} onLayout={onHeaderLayout}>
+        <Header
+          title="Abonnement Actuel"
+          onBackPress={() => router.back()}
+          subtitle="Détails de votre plan actuel"
+        />
+      </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={
+          (styles.scrollContent, { paddingTop: headerHeight })
+        }
       >
         {!abonnement ? (
           <NoSubscriptionView onChoosePlan={navigateToHome} />
@@ -666,6 +673,19 @@ const AbonnementActuel: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    zIndex: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3.84,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",

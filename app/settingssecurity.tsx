@@ -109,18 +109,25 @@ const SettingsSecurity = () => {
     }));
   };
 
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const onHeaderLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    setHeaderHeight(height);
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header
-        title="Sécurité"
-        onBackPress={() => navigation.goBack()}
-        onRightIconPress={() => console.log("Security info pressed")}
-      />
+      <View style={styles.headerContainer} onLayout={onHeaderLayout}>
+        <Header title="Sécurité" onBackPress={() => navigation.goBack()} />
+      </View>
 
       <ScrollView
         style={styles.contentContainer}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: headerHeight },
+        ]}
       >
         <View style={styles.pageHeaderContainer}>
           <LinearGradient
@@ -240,6 +247,19 @@ const SettingsSecurity = () => {
 };
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    zIndex: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3.84,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.white,

@@ -49,6 +49,7 @@ const AbonnementCatalogue: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(0); // New state for header height
 
   // Animation
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -108,6 +109,12 @@ const AbonnementCatalogue: React.FC = () => {
       ]).start();
     }
   }, [loading, error, fadeAnim, translateAnim]);
+
+  // Function to measure the header height
+  const onHeaderLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    setHeaderHeight(height);
+  };
 
   // Dot indicators animation
   const renderDotIndicators = () => {
@@ -177,12 +184,15 @@ const AbonnementCatalogue: React.FC = () => {
         backgroundColor="transparent"
         translucent
       />
-      <Header
-        title="Plans d'abonnement"
-        onBackPress={() => router.back()}
-        rightIcon="help-circle-outline"
-        onRightIconPress={() => {}}
-      />
+      {/* Fixed header in loading state */}
+      <View style={styles.headerContainer}>
+        <Header
+          title="Plans d'abonnement"
+          onBackPress={() => router.back()}
+          rightIcon="help-circle-outline"
+          onRightIconPress={() => {}}
+        />
+      </View>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLOORS.primary.main} />
       </View>
@@ -197,12 +207,15 @@ const AbonnementCatalogue: React.FC = () => {
         backgroundColor="transparent"
         translucent
       />
-      <Header
-        title="Plans d'abonnement"
-        onBackPress={() => router.back()}
-        rightIcon="help-circle-outline"
-        onRightIconPress={() => {}}
-      />
+      {/* Fixed header in error state */}
+      <View style={styles.headerContainer}>
+        <Header
+          title="Plans d'abonnement"
+          onBackPress={() => router.back()}
+          rightIcon="help-circle-outline"
+          onRightIconPress={() => {}}
+        />
+      </View>
       <View style={styles.errorContainer}>
         <Ionicons
           name="alert-circle-outline"
@@ -230,23 +243,27 @@ const AbonnementCatalogue: React.FC = () => {
   if (error) {
     return renderError();
   }
-  const statusBarHeight =
-    Platform.OS === "ios" ? -60 : StatusBar.currentHeight || 0;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { paddingTop: statusBarHeight }]}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
 
-      <Header title="Plans d'abonnement" onBackPress={() => router.back()} />
+      {/* Sticky Header - Place outside the ScrollView */}
+      <View style={styles.headerContainer} onLayout={onHeaderLayout}>
+        <Header title="Plans d'abonnement" onBackPress={() => router.back()} />
+      </View>
 
-      {/* Wrap the entire content in a ScrollView for vertical scrolling */}
+      {/* ScrollView with padding to account for the header */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollViewContent}
+        contentContainerStyle={[
+          styles.scrollViewContent,
+          { paddingTop: headerHeight }, // Dynamic padding based on header height
+        ]}
       >
         <MotiView
           style={styles.container}
@@ -332,6 +349,23 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+  },
+  // Header container styles for sticky header
+  headerContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    zIndex: 10, // Ensure header stays above other content
+    elevation: 5, // Android shadow
+    shadowColor: "#000", // iOS shadow
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 3.84,
   },
   scrollViewContent: {
     paddingBottom: SPACING.xl,
