@@ -12,7 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MotiView } from "moti";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/theme/ThemeProvider";
-import { COLORS, RADIUS } from "@/constants/theme";
+import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY } from "@/constants/theme";
 import { formatDuration } from "@/utils/formatUtils";
 import FeatureItem from "./FeatureItem";
 import { lightenColor } from "@/utils/colorUtils";
@@ -74,24 +74,34 @@ const PricingCard: React.FC<PricingCardProps> = ({
   return (
     <MotiView
       style={styles.cardOuterContainer}
-      from={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
+      from={{ opacity: 0, scale: 0.9, translateY: 20 }}
+      animate={{ opacity: 1, scale: 1, translateY: 0 }}
       transition={{ delay: 200 + index * 100, type: "spring", damping: 15 }}
     >
+      {/* Award Icon at Top */}
       <View style={styles.awardIconContainer}>
-        <View
-          style={[
-            styles.awardIconCircle,
-            { backgroundColor: `${planColor}20` },
-          ]}
+        <LinearGradient
+          colors={[planColor, getLightenedColor(planColor, 15)]}
+          style={styles.awardIconCircle}
         >
           <Text style={styles.emojiIcon}>{planEmoji}</Text>
-        </View>
+        </LinearGradient>
       </View>
 
+      {/* Discount Ribbon */}
       {option.discountPercentage ? (
-        <View style={styles.ribbonContainer}>
-          <View style={[styles.ribbon, { backgroundColor: RIBBON_COLOR }]}>
+        <MotiView
+          style={styles.ribbonContainer}
+          from={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 300 + index * 100, type: "spring", damping: 10 }}
+        >
+          <LinearGradient
+            colors={[RIBBON_COLOR, getLightenedColor(RIBBON_COLOR, 15)]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.ribbon}
+          >
             <Ionicons
               name="pricetag"
               size={12}
@@ -101,11 +111,13 @@ const PricingCard: React.FC<PricingCardProps> = ({
             <Text style={styles.ribbonText}>
               {option.discountPercentage}% OFF
             </Text>
-          </View>
-        </View>
+          </LinearGradient>
+        </MotiView>
       ) : null}
 
+      {/* Main Card Container */}
       <View style={styles.planContainer}>
+        {/* Header Section with Gradient */}
         <LinearGradient
           colors={[planColor, getLightenedColor(planColor, 15)]}
           start={{ x: 0, y: 0 }}
@@ -129,6 +141,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
           </View>
         </LinearGradient>
 
+        {/* Body Section with Features */}
         <View
           style={[
             styles.planBodySection,
@@ -137,24 +150,22 @@ const PricingCard: React.FC<PricingCardProps> = ({
             },
           ]}
         >
-          {featuresToShow.length > 0 && (
-            <ScrollView
-              style={styles.featuresScrollView}
-              showsVerticalScrollIndicator={false}
-            >
-              {featuresToShow.map((feature, i) => (
-                <FeatureItem
-                  key={i}
-                  feature={feature}
-                  index={i}
-                  color={planColor}
-                />
-              ))}
-              <View style={{ height: 80 }} />
-            </ScrollView>
-          )}
+          <Text style={styles.featuresTitle}>Caractéristiques Incluses</Text>
 
-          <View style={styles.buttonPositioner}>
+          {/* Features List */}
+          <View style={styles.featuresListContainer}>
+            {featuresToShow.map((feature, i) => (
+              <FeatureItem
+                key={i}
+                feature={feature}
+                index={i}
+                color={planColor}
+              />
+            ))}
+          </View>
+
+          {/* Button Section */}
+          <View style={styles.buttonSection}>
             <TouchableOpacity
               style={[
                 styles.getStartedButton,
@@ -195,50 +206,41 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     marginHorizontal: 8,
     position: "relative",
+    paddingTop: 15, // Space for the award icon
   },
   awardIconContainer: {
     position: "absolute",
-    top: -15,
+    top: 0,
     left: "50%",
-    marginLeft: -20,
+    marginLeft: -25,
     zIndex: 10,
   },
   awardIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(254, 120, 98, 0.2)",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...SHADOWS.medium,
   },
   emojiIcon: {
-    fontSize: 20,
+    fontSize: 22,
   },
   ribbonContainer: {
     position: "absolute",
-    top: 30,
+    top: 60,
     right: -5,
     zIndex: 10,
   },
   ribbon: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#E53935",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
-    shadowColor: "#E53935",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    ...SHADOWS.small,
   },
   ribbonIcon: {
     marginRight: 4,
@@ -247,20 +249,20 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 12,
     fontFamily: "bold",
+    letterSpacing: 0.5,
   },
   planContainer: {
     borderRadius: RADIUS.lg,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
+    ...SHADOWS.large,
+    // Make the overall card taller
+    minHeight: 550, // Increased from previous value
   },
   planHeaderSection: {
     padding: 24,
     position: "relative",
     overflow: "hidden",
+    paddingTop: 40, // Extra space for the award icon
   },
   decorativeCircle1: {
     position: "absolute",
@@ -284,42 +286,59 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   planTypeLabel: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: "semibold",
-    color: "rgba(255, 255, 255, 0.9)",
+    color: "#FFFFFF",
     marginBottom: 8,
     textTransform: "uppercase",
     letterSpacing: 1,
+    textShadowColor: "rgba(0, 0, 0, 0.15)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   planPriceContainer: {
     flexDirection: "row",
     alignItems: "baseline",
   },
   planPrice: {
-    fontSize: 36,
+    fontSize: 42,
     fontFamily: "bold",
     color: "#FFFFFF",
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   planPeriod: {
     fontSize: 16,
     fontFamily: "medium",
-    color: "rgba(255, 255, 255, 0.8)",
+    color: "rgba(255, 255, 255, 0.9)",
     marginLeft: 4,
   },
   planBodySection: {
     padding: 24,
     borderBottomLeftRadius: RADIUS.lg,
     borderBottomRightRadius: RADIUS.lg,
-    minHeight: 300,
+    // Make the body section taller
+    flex: 1, // Use flex to expand and fill the card
+    display: "flex",
+    flexDirection: "column",
   },
-  featuresScrollView: {
-    maxHeight: 320,
+  featuresTitle: {
+    ...TYPOGRAPHY.subtitle1,
+    marginBottom: 16,
+    color: "#333",
   },
-  buttonPositioner: {
-    position: "absolute",
-    bottom: 24,
-    left: 24,
-    right: 24,
+  // Replace scrollView with direct container
+  featuresListContainer: {
+    marginBottom: 16,
+    flex: 1, // Allow the features to take available space
+  },
+  // Create a separate section for the button
+  buttonSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.05)",
   },
   getStartedButton: {
     height: 56,
@@ -327,14 +346,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    ...SHADOWS.medium,
   },
   disabledButton: {
-    opacity: 0.5,
+    opacity: 0.7, // Increased from 0.5 for better visibility
   },
   selectedButton: {
     borderWidth: 2,

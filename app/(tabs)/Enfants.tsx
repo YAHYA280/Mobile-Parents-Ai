@@ -55,20 +55,6 @@ const EnfantsList: React.FC = () => {
     </MotiView>
   );
 
-  // Render welcome card with animation
-  const renderWelcomeCard = () => (
-    <MotiView
-      from={{ opacity: 0, translateY: 20 }}
-      animate={{ opacity: 1, translateY: 0 }}
-      transition={{ type: "timing", duration: 500 }}
-      style={styles.welcomeCard}
-    >
-      <Text style={styles.welcomeText}>
-        Suivez le progrès et les activités de vos enfants facilement
-      </Text>
-    </MotiView>
-  );
-
   // Render child card with staggered animation
   const renderChildCard = ({ item, index }: { item: Child; index: number }) => {
     // Parse progress percentage
@@ -201,7 +187,6 @@ const EnfantsList: React.FC = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderChildCard}
         contentContainerStyle={styles.listContainer}
-        ListHeaderComponent={renderWelcomeCard}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>

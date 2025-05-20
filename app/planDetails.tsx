@@ -91,6 +91,7 @@ const PlanDetails: React.FC = () => {
     message: "",
     buttons: [{ text: "OK", onPress: () => {} }],
   });
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   // Refs
   const scrollViewRef = useRef<ScrollView>(null);
@@ -276,6 +277,12 @@ const PlanDetails: React.FC = () => {
     []
   );
 
+  // Measure header height
+  const onHeaderLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    setHeaderHeight(height);
+  };
+
   // Derived State
   const pricingOptions = useMemo<PricingOption[]>(() => {
     if (!selectedCatalogue) return [];
@@ -336,7 +343,10 @@ const PlanDetails: React.FC = () => {
         backgroundColor="transparent"
         translucent
       />
-      <Header title="Détails du Plan" onBackPress={() => router.back()} />
+      {/* Sticky Header */}
+      <View style={styles.headerContainer}>
+        <Header title="Détails du Plan" onBackPress={() => router.back()} />
+      </View>
       <View style={styles.errorContainer}>
         <View style={styles.errorContent}>
           <Ionicons
@@ -376,83 +386,98 @@ const PlanDetails: React.FC = () => {
         translucent
       />
 
-      <Header title="Détails du Plan" onBackPress={() => router.back()} />
-
-      <View style={styles.planTitleContainer}>
-        <View
-          style={[
-            styles.planIconContainer,
-            { backgroundColor: `${planColor}20` },
-          ]}
-        >
-          <Text style={styles.planEmoji}>{planEmoji}</Text>
-        </View>
-        <Text style={styles.planTitle}>{selectedCatalogue.planName}</Text>
+      {/* Sticky Header */}
+      <View style={styles.headerContainer} onLayout={onHeaderLayout}>
+        <Header title="Détails du Plan" onBackPress={() => router.back()} />
       </View>
-
-      <Text style={styles.headingSubtitle}>
-        {"Commencez avec "}
-        <Text style={[styles.highlightedText, { color: COLOORS.primary.main }]}>
-          14 jours d&apos;essai gratuit
-        </Text>
-        . Changez de plan à tout moment.
-      </Text>
 
       <ScrollView
-        ref={scrollViewRef}
-        horizontal
-        pagingEnabled
-        snapToInterval={CARD_WIDTH + 16}
-        decelerationRate="fast"
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContainer}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
+        contentContainerStyle={{
+          paddingTop: headerHeight,
+          paddingBottom: SPACING.xl,
+        }}
       >
-        {pricingOptions.map((option, index) => (
-          <PricingCard
-            key={index}
-            option={option}
-            index={index}
-            planColor={planColor}
-            planEmoji={planEmoji}
-            onSelect={handleSubscriptionUpdate}
-            isCurrentPlan={
-              currentSubscription?.planId === selectedCatalogue.id &&
-              currentSubscription?.duration === option.apiDuration
-            }
-            buttonText={getButtonState(option).text}
-            buttonDisabled={getButtonState(option).disabled}
-            features={option.features}
-            loading={updating}
-          />
-        ))}
-      </ScrollView>
-
-      <View style={styles.paginationContainer}>
-        {pricingOptions.map((_, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => {
-              scrollViewRef.current?.scrollTo({
-                x: index * CARD_WIDTH,
-                animated: true,
-              });
-              setActiveDot(index);
-            }}
+        <View style={styles.planTitleContainer}>
+          <View
+            style={[
+              styles.planIconContainer,
+              { backgroundColor: `${planColor}20` },
+            ]}
           >
-            <View
-              style={[
-                styles.paginationDot,
-                { backgroundColor: "#D1D5DB" },
-                activeDot === index
-                  ? [styles.paginationDotActive, { backgroundColor: planColor }]
-                  : {},
-              ]}
+            <Text style={styles.planEmoji}>{planEmoji}</Text>
+          </View>
+          <Text style={styles.planTitle}>{selectedCatalogue.planName}</Text>
+        </View>
+
+        <Text style={styles.headingSubtitle}>
+          {"Commencez avec "}
+          <Text
+            style={[styles.highlightedText, { color: COLOORS.primary.main }]}
+          >
+            14 jours d&apos;essai gratuit
+          </Text>
+          . Changez de plan à tout moment.
+        </Text>
+
+        <ScrollView
+          ref={scrollViewRef}
+          horizontal
+          pagingEnabled
+          snapToInterval={CARD_WIDTH + 16}
+          decelerationRate="fast"
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContainer}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        >
+          {pricingOptions.map((option, index) => (
+            <PricingCard
+              key={index}
+              option={option}
+              index={index}
+              planColor={planColor}
+              planEmoji={planEmoji}
+              onSelect={handleSubscriptionUpdate}
+              isCurrentPlan={
+                currentSubscription?.planId === selectedCatalogue.id &&
+                currentSubscription?.duration === option.apiDuration
+              }
+              buttonText={getButtonState(option).text}
+              buttonDisabled={getButtonState(option).disabled}
+              features={option.features}
+              loading={updating}
             />
-          </TouchableOpacity>
-        ))}
-      </View>
+          ))}
+        </ScrollView>
+
+        <View style={styles.paginationContainer}>
+          {pricingOptions.map((_, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => {
+                scrollViewRef.current?.scrollTo({
+                  x: index * CARD_WIDTH,
+                  animated: true,
+                });
+                setActiveDot(index);
+              }}
+            >
+              <View
+                style={[
+                  styles.paginationDot,
+                  { backgroundColor: "#D1D5DB" },
+                  activeDot === index
+                    ? [
+                        styles.paginationDotActive,
+                        { backgroundColor: planColor },
+                      ]
+                    : {},
+                ]}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
 
       <Alert
         visible={alertConfig.visible}
@@ -471,6 +496,23 @@ const styles = StyleSheet.create({
   area: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+  },
+  // Add sticky header styles
+  headerContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    zIndex: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 3.84,
   },
   loadingContainer: {
     flex: 1,
