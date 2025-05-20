@@ -21,7 +21,6 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
 import { COLORS } from "../../../constants/theme";
-import { useTheme } from "../../../theme/ThemeProvider";
 import { useActivityFilters } from "./filtre";
 import {
   SearchBar,

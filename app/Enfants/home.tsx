@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Dimensions,
   StatusBar,
-  Animated,
+  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -34,6 +34,7 @@ import {
   enhanceActivity,
 } from "../../data/Enfants/CHILDREN_DATA";
 import type { Child } from "../../data/Enfants/CHILDREN_DATA";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Constants
 const { width } = Dimensions.get("window");
@@ -56,102 +57,74 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({
   activeTab,
   onTabPress,
 }) => {
-  // Animation values for tab indicator
-  const indicatorPosition = useRef(
-    new Animated.Value(activeTab * (width / 3))
-  ).current;
-
-  // Animate tab indicator
-  useEffect(() => {
-    Animated.spring(indicatorPosition, {
-      toValue: activeTab * (width / 3),
-      tension: 60,
-      friction: 9,
-      useNativeDriver: true,
-    }).start();
-  }, [activeTab]);
+  const insets = useSafeAreaInsets();
 
   return (
     <View
       style={{
-        height: 70,
-        backgroundColor: "white",
+        height: Platform.OS === "ios" ? 75 : 70, // Adjusted height for Android
+        backgroundColor: "#FFFFFF", // Using solid color instead of rgba
         position: "absolute",
-        bottom: -25,
-        left: 0,
-        right: 0,
-        borderTopWidth: 1,
-        borderTopColor: "rgba(0, 0, 0, 0.05)",
-        elevation: 10,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        flexDirection: "row",
-        paddingBottom: 8,
+        bottom: Platform.OS === "ios" ? 13 : 20, // More space on Android
+        left: 20,
+        right: 20,
+        paddingBottom:
+          Platform.OS === "ios" ? Math.max(insets.bottom - 10, 5) : 10, // Safe area padding
         paddingTop: 8,
+        borderRadius: 30,
+        borderWidth: 1,
+        borderColor: "rgba(0,0,0,0.05)",
+
+        // Improved shadow properties for Android
+        elevation: 10,
+        shadowColor: COLORS.primary,
+        shadowOpacity: 0.15,
+        shadowOffset: { height: 5, width: 0 },
+        shadowRadius: 10,
+
+        flexDirection: "row",
+        zIndex: 100,
       }}
     >
-      {/* Tab Indicator */}
-      <Animated.View
-        style={{
-          position: "absolute",
-          top: 6,
-          left: 0,
-          width: width / 3,
-          height: "100%",
-          transform: [{ translateX: indicatorPosition }],
-          zIndex: 0,
-        }}
-      >
-        <View
-          style={{
-            width: 50,
-            height: 50,
-            borderRadius: 25,
-            backgroundColor: "rgba(0, 149, 255, 0.08)",
-            marginHorizontal: (width / 3 - 50) / 2,
-          }}
-        />
-      </Animated.View>
-
       {/* Aperçu Tab */}
       <TouchableOpacity
         style={{
           flex: 1,
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 1,
+          flexDirection: "column",
         }}
         onPress={() => onTabPress(0)}
+        activeOpacity={0.7} // Improved touch feedback
       >
-        <FontAwesomeIcon
-          icon={faHome}
-          size={22}
-          color={activeTab === 0 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
-        />
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor:
+              activeTab === 0 ? "rgba(0, 149, 255, 0.08)" : "transparent",
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faHome}
+            size={22}
+            color={activeTab === 0 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
+          />
+        </View>
         <Text
           style={{
             color: activeTab === 0 ? COLORS.primary : "rgba(0, 0, 0, 0.4)",
             fontSize: 12,
             fontWeight: "600",
-            marginTop: 4,
+            marginTop: 2,
+            textAlign: "center",
           }}
         >
           Aperçu
         </Text>
-        {activeTab === 0 && (
-          <View
-            style={{
-              position: "absolute",
-              bottom: -10,
-              width: 6,
-              height: 6,
-              borderRadius: 3,
-              backgroundColor: COLORS.primary,
-            }}
-          />
-        )}
       </TouchableOpacity>
 
       {/* Activités Tab */}
@@ -160,37 +133,39 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({
           flex: 1,
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 1,
+          flexDirection: "column",
         }}
         onPress={() => onTabPress(1)}
+        activeOpacity={0.7}
       >
-        <FontAwesomeIcon
-          icon={faBookOpen}
-          size={22}
-          color={activeTab === 1 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
-        />
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor:
+              activeTab === 1 ? "rgba(0, 149, 255, 0.08)" : "transparent",
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faBookOpen}
+            size={22}
+            color={activeTab === 1 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
+          />
+        </View>
         <Text
           style={{
             color: activeTab === 1 ? COLORS.primary : "rgba(0, 0, 0, 0.4)",
             fontSize: 12,
             fontWeight: "600",
-            marginTop: 4,
+            marginTop: 2,
+            textAlign: "center",
           }}
         >
           Activités
         </Text>
-        {activeTab === 1 && (
-          <View
-            style={{
-              position: "absolute",
-              bottom: -10,
-              width: 6,
-              height: 6,
-              borderRadius: 3,
-              backgroundColor: COLORS.primary,
-            }}
-          />
-        )}
       </TouchableOpacity>
 
       {/* Suivi Tab */}
@@ -199,37 +174,38 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({
           flex: 1,
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 1,
         }}
         onPress={() => onTabPress(2)}
+        activeOpacity={0.7}
       >
-        <FontAwesomeIcon
-          icon={faChartLine}
-          size={22}
-          color={activeTab === 2 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
-        />
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor:
+              activeTab === 2 ? "rgba(0, 149, 255, 0.08)" : "transparent",
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faChartLine}
+            size={22}
+            color={activeTab === 2 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
+          />
+        </View>
         <Text
           style={{
             color: activeTab === 2 ? COLORS.primary : "rgba(0, 0, 0, 0.4)",
             fontSize: 12,
             fontWeight: "600",
-            marginTop: 4,
+            marginTop: 2,
+            textAlign: "center",
           }}
         >
           Suivi
         </Text>
-        {activeTab === 2 && (
-          <View
-            style={{
-              position: "absolute",
-              bottom: -10,
-              width: 6,
-              height: 6,
-              borderRadius: 3,
-              backgroundColor: COLORS.primary,
-            }}
-          />
-        )}
       </TouchableOpacity>
     </View>
   );
@@ -243,7 +219,6 @@ interface OverviewProps {
 
 const Overview: React.FC<OverviewProps> = ({ child, scrollViewRef }) => {
   const progressValue = parseFloat(child.progress.replace("%", ""));
-  const progressConfig = getProgressColor(progressValue);
   const recentActivity = enhanceActivity(child.activitesRecentes[0]);
 
   // Helper function to render subject tags
@@ -631,7 +606,8 @@ const EnfantsHome: React.FC = () => {
               paddingBottom: 20,
               alignItems: "center",
               justifyContent: "center",
-              height: 209,
+              // Use flex instead of fixed height
+              paddingTop: 20,
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.05,
@@ -659,11 +635,9 @@ const EnfantsHome: React.FC = () => {
 
             <View
               style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
+                width: "100%",
                 alignItems: "center",
+                paddingTop: 40,
               }}
             >
               <View
@@ -674,9 +648,7 @@ const EnfantsHome: React.FC = () => {
                   borderWidth: 4,
                   borderColor: "#FFFFFF",
                   overflow: "hidden",
-                  position: "absolute",
-                  top: -60,
-                  zIndex: 10,
+                  marginBottom: 20,
                   shadowColor: "#000",
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.15,
@@ -696,18 +668,9 @@ const EnfantsHome: React.FC = () => {
 
               <View
                 style={{
-                  backgroundColor: "#FFFFFF",
                   width: "100%",
-                  paddingTop: 60,
-                  paddingBottom: 20,
                   alignItems: "center",
-                  borderTopLeftRadius: 30,
-                  borderTopRightRadius: 30,
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: -3 },
-                  shadowOpacity: 0.05,
-                  shadowRadius: 4,
-                  elevation: 2,
+                  paddingHorizontal: 20,
                 }}
               >
                 <View
@@ -715,7 +678,6 @@ const EnfantsHome: React.FC = () => {
                     flexDirection: "row",
                     alignItems: "center",
                     marginBottom: 5,
-                    marginTop: 20,
                   }}
                 >
                   <FontAwesomeIcon
@@ -765,12 +727,10 @@ const EnfantsHome: React.FC = () => {
         )}
 
         {/* Main Content Area */}
-        <View style={{ flex: 1 }}>
-          {renderContent()}
+        <View style={{ flex: 1, paddingBottom: 0 }}>{renderContent()}</View>
 
-          {/* Custom Tab Bar */}
-          <CustomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
-        </View>
+        {/* Custom Tab Bar */}
+        <CustomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
       </View>
     </SafeAreaView>
   );

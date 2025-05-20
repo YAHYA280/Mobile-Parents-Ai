@@ -252,7 +252,6 @@ const AbonnementCatalogue: React.FC = () => {
         translucent
       />
 
-      {/* Sticky Header - Place outside the ScrollView */}
       <View style={styles.headerContainer} onLayout={onHeaderLayout}>
         <Header title="Plans d'abonnement" onBackPress={() => router.back()} />
       </View>

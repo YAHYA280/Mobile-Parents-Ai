@@ -196,7 +196,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <View
       style={{
-        backgroundColor: "rgba(0,0,0,0.03)",
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
