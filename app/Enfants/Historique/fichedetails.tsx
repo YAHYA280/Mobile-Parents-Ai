@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   Share,
   Animated,
-  Dimensions,
   ActivityIndicator,
   Alert,
 } from "react-native";
