@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0, // Increased bottom padding
   },
   bottomSpacer: {
-    height: 50, // Extra space at the bottom of the ScrollView
+    height: 0, // Extra space at the bottom of the ScrollView
   },
   bottomContainer: {
     paddingBottom: 30, // Add some padding to the bottom container

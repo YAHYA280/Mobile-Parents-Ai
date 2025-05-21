@@ -104,8 +104,6 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({
             width: 48,
             height: 48,
             borderRadius: 24,
-            backgroundColor:
-              activeTab === 0 ? "rgba(0, 149, 255, 0.08)" : "transparent",
           }}
         >
           <FontAwesomeIcon
@@ -145,8 +143,6 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({
             width: 48,
             height: 48,
             borderRadius: 24,
-            backgroundColor:
-              activeTab === 1 ? "rgba(0, 149, 255, 0.08)" : "transparent",
           }}
         >
           <FontAwesomeIcon
@@ -185,8 +181,6 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({
             width: 48,
             height: 48,
             borderRadius: 24,
-            backgroundColor:
-              activeTab === 2 ? "rgba(0, 149, 255, 0.08)" : "transparent",
           }}
         >
           <FontAwesomeIcon
