@@ -1,7 +1,6 @@
-// app/Enfants/Historique/chat.tsx
-import { LinearGradient } from "expo-linear-gradient";
+// app/Enfants/Historique/chat.tsx - Refactored
 import React, { useRef, useState, useEffect } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
@@ -18,25 +17,31 @@ import {
   Text,
   Alert,
   Platform,
-  TextInput,
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
   Animated,
-  Dimensions,
 } from "react-native";
 
 import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
 import Statement from "./statement";
 import { COLORS } from "../../../constants/theme";
-import { useTheme } from "../../../theme/ThemeProvider";
+import Header from "../../../components/ui/Header";
 import {
   CHILDREN_DATA,
   enhanceActivity,
 } from "../../../data/Enfants/CHILDREN_DATA";
+
+// Import components
+import {
+  ActivityTitleBar,
+  MessageBubble,
+  ReadOnlyInput,
+  InfoBanner,
+} from "./components";
 
 // Assistant mapping with colors and icons
 const ASSISTANT_THEME: Record<
@@ -61,7 +66,7 @@ const ASSISTANT_THEME: Record<
   },
 };
 
-const ChatScreen = () => {
+const ChatScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -147,6 +152,11 @@ const ChatScreen = () => {
     }
   };
 
+  // Toggle statement view
+  const toggleStatement = () => {
+    setShowStatement(!showStatement);
+  };
+
   // Loading display
   if (isLoading) {
     return (
@@ -189,7 +199,7 @@ const ChatScreen = () => {
           }}
         >
           <FontAwesomeIcon
-            icon="exclamation-circle"
+            icon={"exclamation-circle" as IconProp}
             size={64}
             color={COLORS.black}
           />
@@ -259,15 +269,29 @@ const ChatScreen = () => {
   // Get full conversation
   const conversation = activity.conversation || [];
 
-  // Prepare timestamp for bubble
-  const formatTime = (timestamp: string) => {
-    if (!timestamp || !timestamp.includes(":")) return "";
-    const parts = timestamp.split(":");
-    if (parts.length >= 2) {
-      return `${parts[0]}:${parts[1]}`;
-    }
-    return timestamp;
-  };
+  // Custom header with the assistant icon
+  const renderHeaderLeftAccessory = () => (
+    <LinearGradient
+      colors={assistantTheme.colors as [string, string]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{
+        width: 46,
+        height: 46,
+        borderRadius: 23,
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 12,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        elevation: 3,
+      }}
+    >
+      <FontAwesomeIcon icon={assistantTheme.icon} size={20} color="#FFF" />
+    </LinearGradient>
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
@@ -283,63 +307,44 @@ const ChatScreen = () => {
             backgroundColor: "#F8F8F8",
           }}
         >
-          {/* Header */}
+          {/* Header with Custom Left Accessory */}
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
-              padding: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: "rgba(0,0,0,0.05)",
               backgroundColor: "#FFFFFF",
               elevation: 2,
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 1 },
               shadowOpacity: 0.1,
               shadowRadius: 2,
+              borderBottomWidth: 1,
+              borderBottomColor: "rgba(0,0,0,0.05)",
             }}
           >
-            <TouchableOpacity
-              onPress={handleBack}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: "rgba(0,0,0,0.05)",
-                justifyContent: "center",
-                alignItems: "center",
-                marginRight: 12,
-              }}
-            >
-              <Ionicons name="arrow-back" size={22} color={COLORS.black} />
-            </TouchableOpacity>
+            <View style={{ width: 40, height: 40, marginLeft: 16 }}>
+              <TouchableOpacity
+                onPress={handleBack}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "rgba(0,0,0,0.05)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={"arrow-left" as IconProp}
+                  size={18}
+                  color={COLORS.black}
+                />
+              </TouchableOpacity>
+            </View>
 
-            <LinearGradient
-              colors={assistantTheme.colors as [string, string]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{
-                width: 46,
-                height: 46,
-                borderRadius: 23,
-                justifyContent: "center",
-                alignItems: "center",
-                marginRight: 12,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 3,
-                elevation: 3,
-              }}
-            >
-              <FontAwesomeIcon
-                icon={assistantTheme.icon}
-                size={20}
-                color="#FFF"
-              />
-            </LinearGradient>
+            {renderHeaderLeftAccessory()}
 
-            <View style={{ flex: 1 }}>
+            <View style={{ paddingVertical: 16 }}>
               <Text
                 style={{
                   fontSize: 18,
@@ -349,66 +354,20 @@ const ChatScreen = () => {
               >
                 Assistant {assistantName}
               </Text>
-              <Text
-                style={{
-                  fontSize: 13,
-                  color: COLORS.gray3,
-                }}
-              >
+              <Text style={{ fontSize: 13, color: COLORS.gray3 }}>
                 {formattedDate}
               </Text>
             </View>
           </View>
 
           {/* Activity Title */}
-          <View
-            style={{
-              paddingVertical: 14,
-              paddingHorizontal: 16,
-              backgroundColor: "rgba(0,0,0,0.02)",
-              borderBottomWidth: 1,
-              borderBottomColor: "rgba(0,0,0,0.05)",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "500",
-                  color: COLORS.gray3,
-                  flex: 1,
-                }}
-              >
-                {activity.activite}
-              </Text>
-              <TouchableOpacity
-                onPress={() => setShowStatement(!showStatement)}
-                style={{
-                  padding: 8,
-                  backgroundColor: "rgba(0,0,0,0.05)",
-                  borderRadius: 20,
-                  width: 36,
-                  height: 36,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={showStatement ? "chevron-up" : "chevron-down"}
-                  size={16}
-                  color={COLORS.gray3}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+          <ActivityTitleBar
+            activity={activity}
+            showStatement={showStatement}
+            toggleStatement={toggleStatement}
+          />
 
-          {/* Corrected Statement Section */}
+          {/* Statement Section */}
           {showStatement && <Statement activity={activity} />}
 
           {/* Chat Messages */}
@@ -418,149 +377,21 @@ const ChatScreen = () => {
             contentContainerStyle={{ paddingBottom: 16 }}
             showsVerticalScrollIndicator={false}
           >
-            {conversation.map((msg, index) => {
-              const isAssistant = msg.sender === "assistant";
-              const prevMsgSameSender =
-                index > 0 && conversation[index - 1].sender === msg.sender;
-              const nextMsgSameSender =
-                index < conversation.length - 1 &&
-                conversation[index + 1].sender === msg.sender;
-
-              // Calculate spacing and bubble styles based on message sequence
-              const topMargin = prevMsgSameSender ? 6 : 16;
-              const bottomMargin = nextMsgSameSender ? 6 : 16;
-
-              // Customize border radius based on position in sequence
-              let borderRadiusStyle = {};
-              if (isAssistant) {
-                borderRadiusStyle = {
-                  borderTopLeftRadius: prevMsgSameSender ? 18 : 4,
-                  borderBottomLeftRadius: nextMsgSameSender ? 18 : 4,
-                  borderTopRightRadius: 18,
-                  borderBottomRightRadius: 18,
-                };
-              } else {
-                borderRadiusStyle = {
-                  borderTopLeftRadius: 18,
-                  borderBottomLeftRadius: 18,
-                  borderTopRightRadius: prevMsgSameSender ? 18 : 4,
-                  borderBottomRightRadius: nextMsgSameSender ? 18 : 4,
-                };
-              }
-
-              return (
-                <View
-                  key={index}
-                  style={{
-                    marginTop: topMargin,
-                    marginBottom: bottomMargin,
-                    alignItems: isAssistant ? "flex-start" : "flex-end",
-                  }}
-                >
-                  <View
-                    style={{
-                      backgroundColor: isAssistant
-                        ? "rgba(0, 149, 255, 0.08)"
-                        : "#F0F0F0",
-                      padding: 16,
-                      maxWidth: "85%",
-                      minWidth: 80,
-                      ...borderRadiusStyle,
-                      shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 1 },
-                      shadowOpacity: 0.05,
-                      shadowRadius: 2,
-                      elevation: 1,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: isAssistant ? "#0066CC" : COLORS.black,
-                        fontSize: 15,
-                        lineHeight: 22,
-                        fontWeight: isAssistant ? "normal" : "500",
-                      }}
-                    >
-                      {msg.message}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        color: "rgba(0, 0, 0, 0.4)",
-                        alignSelf: "flex-end",
-                        marginTop: 6,
-                      }}
-                    >
-                      {formatTime(msg.timestamp)}
-                    </Text>
-                  </View>
-                </View>
-              );
-            })}
+            {conversation.map((msg, index) => (
+              <MessageBubble
+                key={index}
+                message={msg}
+                index={index}
+                conversation={conversation}
+              />
+            ))}
           </ScrollView>
 
-          {/* Message Input (Just for UI, not functional) */}
-          <View
-            style={{
-              flexDirection: "row",
-              padding: 12,
-              backgroundColor: COLORS.white,
-              borderTopWidth: 1,
-              borderTopColor: "rgba(0,0,0,0.05)",
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: "rgba(0,0,0,0.03)",
-                borderRadius: 25,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <TextInput
-                placeholder="Ce chat est en lecture seule..."
-                placeholderTextColor={COLORS.gray3}
-                style={{
-                  flex: 1,
-                  color: COLORS.black,
-                  fontSize: 15,
-                }}
-                editable={false}
-              />
-              <Ionicons name="lock-closed" size={18} color={COLORS.gray3} />
-            </View>
-          </View>
+          {/* Read-only Input */}
+          <ReadOnlyInput />
 
           {/* Info Banner */}
-          <View
-            style={{
-              backgroundColor: "rgba(0, 149, 255, 0.05)",
-              padding: 14,
-              alignItems: "center",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <Ionicons
-              name="information-circle"
-              size={18}
-              color={COLORS.primary}
-              style={{ marginRight: 8 }}
-            />
-            <Text
-              style={{
-                color: COLORS.primary,
-                fontSize: 14,
-                fontWeight: "500",
-              }}
-            >
-              Ceci est un historique de conversation en lecture seule
-            </Text>
-          </View>
+          <InfoBanner />
         </Animated.View>
       </KeyboardAvoidingView>
     </SafeAreaView>

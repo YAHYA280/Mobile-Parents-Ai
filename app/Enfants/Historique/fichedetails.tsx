@@ -16,7 +16,6 @@ import {
 } from "react-native";
 
 import { COLORS } from "../../../constants/theme";
-import { useTheme } from "../../../theme/ThemeProvider";
 
 // Define an interface for the pedagogical resource
 interface PedagogicalResource {

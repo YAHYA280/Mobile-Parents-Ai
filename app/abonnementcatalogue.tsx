@@ -349,16 +349,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  // Header container styles for sticky header
+
   headerContainer: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     backgroundColor: "#FFFFFF",
-    zIndex: 10, // Ensure header stays above other content
-    elevation: 5, // Android shadow
-    shadowColor: "#000", // iOS shadow
+    zIndex: 10,
+    elevation: 5,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
