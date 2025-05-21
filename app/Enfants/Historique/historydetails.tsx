@@ -3,27 +3,21 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
-  Text,
   Alert,
-  Modal,
-  TextInput,
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
-  ActivityIndicator,
   Animated,
   Share,
   StyleSheet,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { LinearGradient } from "expo-linear-gradient";
 import {
   faChalkboardTeacher,
   faSearch,
   faHome,
   faRobot,
 } from "@fortawesome/free-solid-svg-icons";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
