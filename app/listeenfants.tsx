@@ -1,20 +1,26 @@
 import { Image } from "expo-image";
 import React, { useState } from "react";
-import { useRouter } from "expo-router";
+import { useRouter, useNavigation } from "expo-router";
 import Button from "@/components/Button";
 import Header from "@/components/ui/Header";
-import { useNavigation } from "expo-router";
-import { useTheme } from "@/theme/ThemeProvider";
 import { icons, COLORS, images } from "@/constants";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import {
   View,
   Text,
   Modal,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
+  useWindowDimensions,
+  Platform,
 } from "react-native";
+import { MotiView } from "moti";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface Child {
   id: string;
@@ -61,17 +67,22 @@ const mockChildren: Child[] = [
 ];
 
 type Nav = {
+  goBack(): unknown;
   navigate: (value: string, params?: object) => void;
 };
 
 const ListeEnfantsScreen = () => {
-  const { colors, dark } = useTheme();
   const router = useRouter();
   const navigation = useNavigation<Nav>();
-  const navigationBack = useNavigation();
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+
   const [children, setChildren] = useState<Child[]>(mockChildren);
   const [childToDelete, setChildToDelete] = useState<Child | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const CARD_HORIZONTAL_PADDING = 16;
+  const CARD_WIDTH = width - CARD_HORIZONTAL_PADDING * 2;
 
   const handleChildDetails = (childId: string) => {
     router.push({
@@ -81,7 +92,7 @@ const ListeEnfantsScreen = () => {
   };
 
   const handleGoBack = () => {
-    navigationBack.goBack();
+    navigation.goBack();
   };
 
   const handleDeleteChild = (child: Child) => {
@@ -89,32 +100,30 @@ const ListeEnfantsScreen = () => {
     setShowDeleteModal(true);
   };
 
-  function handleEditChild(childId: string) {
+  const handleEditChild = (childId: string) => {
     router.push({
       pathname: "/editchild/[id]",
       params: { id: childId },
     });
-  }
+  };
 
   const confirmDeleteChild = () => {
     if (childToDelete) {
-      setChildren((prevChildren) =>
-        prevChildren.filter((child) => child.id !== childToDelete.id)
+      setChildren((prev) =>
+        prev.filter((child) => child.id !== childToDelete.id)
       );
       setShowDeleteModal(false);
       setChildToDelete(null);
     }
   };
 
-  // Calculate color for progress bar
   const getProgressColor = (progress: number) => {
-    if (progress >= 75) return COLORS.greeen;
+    if (progress >= 75) return COLORS.success ?? COLORS.primary;
     if (progress >= 50) return COLORS.primary;
     if (progress >= 25) return COLORS.secondary;
     return COLORS.error;
   };
 
-  // Delete confirmation modal
   const renderDeleteModal = () => (
     <Modal
       transparent
@@ -124,20 +133,12 @@ const ListeEnfantsScreen = () => {
     >
       <View style={styles.modalOverlay}>
         <View
-          style={[
-            styles.modalContainer,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
+          style={[styles.modalContainer, { backgroundColor: COLORS.white }]}
         >
           <Text style={[styles.modalTitle, { color: COLORS.error }]}>
             Confirmer la suppression
           </Text>
-          <Text
-            style={[
-              styles.modalMessage,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.modalMessage, { color: COLORS.black }]}>
             Êtes-vous sûr de vouloir supprimer le profil de{" "}
             {childToDelete?.name} ?
           </Text>
@@ -146,22 +147,16 @@ const ListeEnfantsScreen = () => {
               title="Annuler"
               style={[
                 styles.modalButton,
-                {
-                  backgroundColor: dark ? COLORS.dark3 : COLORS.grayscale200,
-                  borderWidth: 0,
-                },
+                { backgroundColor: COLORS.grayscale200, borderWidth: 0 },
               ]}
-              textColor={dark ? COLORS.white : COLORS.black}
+              textColor={COLORS.black}
               onPress={() => setShowDeleteModal(false)}
             />
             <Button
               title="Supprimer"
               style={[
                 styles.modalButton,
-                {
-                  backgroundColor: COLORS.error,
-                  borderColor: COLORS.black2,
-                },
+                { backgroundColor: COLORS.error, borderColor: COLORS.black2 },
               ]}
               textColor={COLORS.white}
               onPress={confirmDeleteChild}
@@ -172,60 +167,66 @@ const ListeEnfantsScreen = () => {
     </Modal>
   );
 
-  // Type for renderItem
-  type RenderItemProps = {
-    item: Child;
-    index: number;
-  };
-
-  const renderChildCard = ({ item }: RenderItemProps) => {
-    return (
+  const renderChildCard = ({ item, index }: { item: Child; index: number }) => (
+    <MotiView
+      from={{ opacity: 0, translateY: 20 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "timing", duration: 600, delay: index * 120 }}
+      style={[styles.childCardWrapper, { width: CARD_WIDTH }]}
+    >
       <View
-        style={[
-          styles.childCard,
-          { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-        ]}
+        style={[styles.childCard, Platform.OS === "ios" && styles.iosShadow]}
       >
-        {/* Delete Button */}
-        <TouchableOpacity
+        {/* Delete */}
+        <Pressable
           style={styles.deleteButton}
           onPress={() => handleDeleteChild(item)}
         >
-          <Image source={icons.cancelSquare} style={styles.deleteIcon} />
-        </TouchableOpacity>
+          <LinearGradient
+            colors={[COLORS.error, "#FF6B6B"]}
+            style={styles.roundButtonGradient}
+          >
+            <Ionicons name="trash-outline" size={18} color={COLORS.white} />
+          </LinearGradient>
+        </Pressable>
 
-        {/* Edit Button */}
-        <TouchableOpacity
+        {/* Edit */}
+        <Pressable
           style={styles.editButton}
           onPress={() => handleEditChild(item.id)}
         >
-          <Image source={icons.editPencil} style={styles.editIcon} />
-        </TouchableOpacity>
+          <LinearGradient
+            colors={[COLORS.secondary, COLORS.secondary]}
+            style={styles.roundButtonGradient}
+          >
+            <Ionicons name="pencil-outline" size={18} color={COLORS.white} />
+          </LinearGradient>
+        </Pressable>
 
+        {/* Header */}
         <View style={styles.cardHeader}>
           <View style={styles.avatarContainer}>
             <Image source={item.avatar} style={styles.avatar} />
-            {item.isActive && <View style={styles.statusDot} />}
+            {item.isActive && (
+              <View style={styles.statusDotWrapper}>
+                <View style={styles.statusDot} />
+              </View>
+            )}
           </View>
-
           <View style={styles.infoContainer}>
-            <View style={styles.nameContainer}>
-              <Text
-                style={[
-                  styles.childName,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
-                {item.name}
-              </Text>
-            </View>
-
+            <Text
+              style={[styles.childName, { color: COLORS.black }]}
+              numberOfLines={1}
+            >
+              {item.name}
+            </Text>
             <Text style={styles.childDetails}>
               {item.age} ans • {item.grade}
             </Text>
           </View>
         </View>
 
+        {/* Progress */}
         <View style={styles.progressSection}>
           <View style={styles.progressRow}>
             <Text style={styles.progressLabel}>Progrès global</Text>
@@ -238,23 +239,29 @@ const ListeEnfantsScreen = () => {
               {item.progress}%
             </Text>
           </View>
-
           <View style={styles.progressBarContainer}>
-            <View
+            <MotiView
+              from={{ width: "5%" }}
+              animate={{ width: `${Math.max(5, item.progress)}%` }}
+              transition={{ type: "timing", duration: 800, delay: 200 }}
               style={[
                 styles.progressBar,
-                {
-                  width: `${item.progress}%`,
-                  backgroundColor: getProgressColor(item.progress),
-                },
+                { backgroundColor: getProgressColor(item.progress) },
               ]}
             />
           </View>
-
           <View style={styles.timeSpentContainer}>
-            <Image source={icons.time} style={styles.timeIcon} />
+            <Ionicons
+              name="time-outline"
+              size={16}
+              color={COLORS.primary}
+              style={styles.timeIcon}
+            />
             <Text style={styles.timeSpentText}>
-              Temps passé: {item.timeSpent}
+              Temps passé :{" "}
+              <Text style={{ fontFamily: "medium", color: COLORS.primary }}>
+                {item.timeSpent}
+              </Text>
             </Text>
           </View>
         </View>
@@ -266,13 +273,13 @@ const ListeEnfantsScreen = () => {
           onPress={() => handleChildDetails(item.id)}
         />
       </View>
-    );
-  };
+    </MotiView>
+  );
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      edges={["right", "bottom", "left"]}
+      style={[styles.container, { paddingTop: insets.top }]}
+      edges={["right", "left", "bottom"]}
     >
       <Header
         title="Mes Enfants"
@@ -288,12 +295,7 @@ const ListeEnfantsScreen = () => {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text
-              style={[
-                styles.emptyText,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.emptyText, { color: COLORS.black }]}>
               Aucun enfant ajouté pour le moment
             </Text>
             <Button
@@ -305,7 +307,6 @@ const ListeEnfantsScreen = () => {
           </View>
         }
       />
-
       {renderDeleteModal()}
     </SafeAreaView>
   );
@@ -317,48 +318,44 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   listContainer: {
-    padding: 16,
-    paddingBottom: 80,
+    paddingHorizontal: 16,
+    paddingBottom: 100,
+  },
+  childCardWrapper: {
+    marginVertical: 12,
+    alignSelf: "center",
   },
   childCard: {
     backgroundColor: COLORS.white,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-    elevation: 3,
+    borderRadius: 20,
+    padding: 18,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    position: "relative",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  iosShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+  },
+  roundButtonGradient: {
+    padding: 8,
+    borderRadius: 14,
   },
   deleteButton: {
     position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: COLORS.error,
-    borderRadius: 15,
-    padding: 5,
+    top: 12,
+    right: 12,
     zIndex: 2,
-  },
-  deleteIcon: {
-    width: 16,
-    height: 16,
-    tintColor: COLORS.white,
   },
   editButton: {
     position: "absolute",
-    top: 45,
-    right: 10,
-    backgroundColor: COLORS.secondary,
-    borderRadius: 15,
-    padding: 5,
+    top: 52,
+    right: 12,
     zIndex: 2,
-  },
-  editIcon: {
-    width: 16,
-    height: 16,
-    tintColor: COLORS.white,
   },
   cardHeader: {
     flexDirection: "row",
@@ -366,48 +363,46 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   avatarContainer: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    overflow: "visible",
-    marginRight: 16,
-    position: "relative",
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    overflow: "hidden",
+    marginRight: 14,
   },
   avatar: {
     width: "100%",
     height: "100%",
-    borderRadius: 35,
+    borderRadius: 36,
   },
-  infoContainer: {
-    flex: 1,
-  },
-  nameContainer: {
-    flexDirection: "row",
+  statusDotWrapper: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: COLORS.white,
+    justifyContent: "center",
     alignItems: "center",
   },
   statusDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: COLORS.greeen,
-    position: "absolute",
-    bottom: 5,
-    right: 0,
-    borderWidth: 2,
-    borderColor: COLORS.white,
-    zIndex: 15,
-    elevation: 3,
+    backgroundColor: COLORS.success ?? COLORS.primary,
+  },
+  infoContainer: {
+    flex: 1,
   },
   childName: {
     fontSize: 18,
     fontFamily: "bold",
-    color: COLORS.black,
-    marginBottom: 4,
   },
   childDetails: {
     fontSize: 14,
     color: COLORS.gray,
     fontFamily: "regular",
+    marginTop: 2,
   },
   progressSection: {
     marginBottom: 16,
@@ -416,7 +411,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   progressLabel: {
     fontSize: 14,
@@ -425,14 +420,13 @@ const styles = StyleSheet.create({
   },
   progressValue: {
     fontSize: 14,
-    color: COLORS.primary,
     fontFamily: "bold",
   },
   progressBarContainer: {
     height: 8,
     backgroundColor: COLORS.grayscale200,
     borderRadius: 4,
-    marginBottom: 12,
+    overflow: "hidden",
   },
   progressBar: {
     height: "100%",
@@ -441,12 +435,10 @@ const styles = StyleSheet.create({
   timeSpentContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 8,
   },
   timeIcon: {
-    width: 16,
-    height: 16,
-    tintColor: COLORS.gray,
-    marginRight: 8,
+    marginRight: 6,
   },
   timeSpentText: {
     fontSize: 14,
@@ -455,12 +447,12 @@ const styles = StyleSheet.create({
   },
   detailsButton: {
     borderRadius: 30,
+    marginTop: 8,
   },
   emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
-    marginTop: 50,
   },
   emptyText: {
     fontSize: 16,
@@ -474,27 +466,26 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "center",
     alignItems: "center",
   },
   modalContainer: {
-    width: "80%",
+    width: "85%",
     backgroundColor: COLORS.white,
     borderRadius: 20,
-    padding: 20,
+    padding: 22,
     alignItems: "center",
-    elevation: 5,
   },
   modalTitle: {
     fontSize: 18,
     fontFamily: "bold",
-    marginBottom: 15,
+    marginBottom: 12,
   },
   modalMessage: {
-    fontSize: 16,
+    fontSize: 15,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 18,
   },
   modalButtons: {
     flexDirection: "row",

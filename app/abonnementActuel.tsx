@@ -16,12 +16,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { LinearGradient } from "expo-linear-gradient";
 
-// Import Custom Components
 import Header from "@/components/ui/Header";
 import Alert from "@/components/ui/Alert";
 import NoSubscriptionView from "@/components/subscription/NoSubscriptionView";
 
-// Import Types and Utilities
 import {
   COLOORS,
   SPACING,
