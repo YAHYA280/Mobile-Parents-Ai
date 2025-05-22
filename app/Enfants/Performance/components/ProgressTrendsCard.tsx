@@ -25,9 +25,9 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
   const [pointsOpacity, setPointsOpacity] = useState(0);
 
   const windowWidth = Dimensions.get("window").width;
-  const chartWidth = windowWidth - 80;
-  const chartHeight = 180;
-  const paddingHorizontal = 30;
+  const chartWidth = windowWidth - 100;
+  const chartHeight = 190;
+  const paddingHorizontal = 50;
   const paddingVertical = 20;
 
   const innerWidth = chartWidth - paddingHorizontal * 2;

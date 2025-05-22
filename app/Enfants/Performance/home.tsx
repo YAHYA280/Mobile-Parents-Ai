@@ -10,14 +10,6 @@ import {
   StatusBar,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faArrowLeft,
-  faFilter,
-  faChartLine,
-  faSearch,
-  faShareAlt,
-} from "@fortawesome/free-solid-svg-icons";
 
 import type { Child } from "../../../data/Enfants/CHILDREN_DATA";
 import { CHILDREN_DATA } from "../../../data/Enfants/CHILDREN_DATA";

@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBrain, faCheck } from "@fortawesome/free-solid-svg-icons";
 import Svg, { Polygon, Circle, Line, Text as SvgText } from "react-native-svg";
 
-import { COLORS } from "../../../../constants/theme";
 import { Child } from "../../../../data/Enfants/CHILDREN_DATA";
 
 interface SkillBreakdownCardProps {
@@ -18,7 +17,6 @@ interface SkillData {
   color: string;
 }
 
-// Create animated SVG component
 const AnimatedPolygon = Animated.createAnimatedComponent(Polygon);
 
 const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
@@ -33,9 +31,8 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
   const chartSize = windowWidth - 100; // Allow for padding
   const centerX = chartSize / 2;
   const centerY = chartSize / 2;
-  const radius = centerX - 20; // Smaller to fit in container
+  const radius = centerX - 40; // Smaller to fit in container
 
-  // Generate or get skill data based on child data
   useEffect(() => {
     // In a real app, this would be calculated from the child's activities,
     // but we'll use mock data for the example
@@ -111,7 +108,6 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
       );
     }
 
-    // Add radial lines
     if (skills.length > 0) {
       for (let i = 0; i < skills.length; i++) {
         const angle = (Math.PI * 2 * i) / skills.length - Math.PI / 2;
@@ -132,7 +128,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
 
         // Add labels
         const skill = skills[i];
-        const labelRadius = radius + 15; // Position slightly outside the chart
+        const labelRadius = radius + 2;
         const labelX = centerX + labelRadius * Math.cos(angle);
         const labelY = centerY + labelRadius * Math.sin(angle);
 
