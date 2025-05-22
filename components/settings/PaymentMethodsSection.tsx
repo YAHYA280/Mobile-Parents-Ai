@@ -147,7 +147,7 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
       <RBSheet
         ref={paymentBottomSheetRef}
         closeOnPressMask
-        height={380}
+        height={420}
         customStyles={{
           wrapper: {
             backgroundColor: "rgba(0,0,0,0.5)",
@@ -162,6 +162,7 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
             borderTopRightRadius: 24,
             backgroundColor: dark ? COLORS.dark1 : COLORS.white,
             padding: 16,
+            paddingBottom: 32, // Added extra bottom padding
           },
         }}
       >
@@ -340,6 +341,7 @@ const styles = StyleSheet.create({
   },
   paymentSheet: {
     flex: 1,
+    paddingBottom: 16, // Added bottom padding to the sheet content
   },
   paymentSheetHeader: {
     alignItems: "center",
@@ -363,7 +365,7 @@ const styles = StyleSheet.create({
     fontFamily: "regular",
   },
   paymentDetailsList: {
-    marginBottom: 24,
+    marginBottom: 32, // Increased from 24 to 32 for more space above the button
   },
   paymentDetailItem: {
     marginBottom: 16,
@@ -392,7 +394,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 16,
     borderRadius: 12,
-    marginTop: 8,
+    marginTop: 0, // Removed marginTop since we increased marginBottom above
+    marginBottom: 16, // Added bottom margin to separate from bottom edge
   },
   removeIcon: {
     marginRight: 8,
