@@ -19,6 +19,7 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
 
 // --------------------------------------------------
@@ -125,6 +126,8 @@ const ChildPreferencesScreen = () => {
   const [restrictedWords, setRestrictedWords] = useState<string[]>([]);
   const [newRestrictedWord, setNewRestrictedWord] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const scrollViewRef = React.useRef<ScrollView>(null);
+  const inputRef = React.useRef<TextInput>(null);
 
   // Fonction pour basculer l'état d'un jour
   const toggleDay = (dayId: DayId) => {
@@ -193,6 +196,13 @@ const ChildPreferencesScreen = () => {
     setRestrictedWords((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleInputFocus = () => {
+    // Scroll vers le bas après un délai pour laisser le clavier apparaître
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
+
   // Fonction pour sauvegarder les préférences
   const savePreferences = () => {
     setIsSubmitting(true);
@@ -219,522 +229,549 @@ const ChildPreferencesScreen = () => {
         onBackPress={() => navigation.goBack()}
       />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        {/* Section Temps d'utilisation */}
-        <MotiView
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: "timing", duration: 600 }}
-          style={[
-            styles.section,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-            Platform.OS === "ios" && styles.iosShadow,
-          ]}
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 0 }}
         >
-          <View style={styles.sectionHeader}>
-            <Ionicons name="time" size={24} color={COLORS.primary} />
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              Temps d&apos;utilisation
-            </Text>
-          </View>
-
-          <Text
+          {/* Section Temps d'utilisation */}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 600 }}
             style={[
-              styles.label,
-              { color: dark ? COLORS.white : COLORS.black },
+              styles.section,
+              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              Platform.OS === "ios" && styles.iosShadow,
             ]}
           >
-            Temps maximum d&apos;utilisation par jour
-          </Text>
-
-          <View style={styles.timeInputContainer}>
-            <View style={styles.timeInputGroup}>
-              <View style={styles.timeInputWrapper}>
-                <Ionicons name="hourglass" size={16} color={COLORS.primary} />
-                <TextInput
-                  style={[
-                    styles.timeInput,
-                    {
-                      backgroundColor: dark
-                        ? COLORS.dark3
-                        : COLORS.greyscale100,
-                      color: dark ? COLORS.white : COLORS.black,
-                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-                    },
-                  ]}
-                  value={maxHours}
-                  onChangeText={handleMaxHoursChange}
-                  keyboardType="numeric"
-                  maxLength={2}
-                />
-              </View>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="time" size={24} color={COLORS.primary} />
               <Text
                 style={[
-                  styles.timeLabel,
+                  styles.sectionTitle,
                   { color: dark ? COLORS.white : COLORS.black },
                 ]}
               >
-                heures
+                Temps d&apos;utilisation
               </Text>
             </View>
 
-            <View style={styles.timeInputGroup}>
-              <View style={styles.timeInputWrapper}>
-                <Ionicons name="timer" size={16} color={COLORS.primary} />
-                <TextInput
-                  style={[
-                    styles.timeInput,
-                    {
-                      backgroundColor: dark
-                        ? COLORS.dark3
-                        : COLORS.greyscale100,
-                      color: dark ? COLORS.white : COLORS.black,
-                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-                    },
-                  ]}
-                  value={maxMinutes}
-                  onChangeText={handleMaxMinutesChange}
-                  keyboardType="numeric"
-                  maxLength={2}
-                />
-              </View>
-              <Text
-                style={[
-                  styles.timeLabel,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
-                minutes
-              </Text>
-            </View>
-          </View>
-        </MotiView>
-
-        {/* Section Plages horaires */}
-        <MotiView
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: "timing", duration: 600, delay: 200 }}
-          style={[
-            styles.section,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-            Platform.OS === "ios" && styles.iosShadow,
-          ]}
-        >
-          <View style={styles.sectionHeader}>
-            <Ionicons name="alarm" size={24} color={COLORS.primary} />
             <Text
               style={[
-                styles.sectionTitle,
+                styles.label,
                 { color: dark ? COLORS.white : COLORS.black },
               ]}
             >
-              Plages horaires autorisées
+              Temps maximum d&apos;utilisation par jour
             </Text>
-          </View>
 
-          <View style={styles.timeRangeContainer}>
-            <View style={styles.timeRangeGroup}>
-              <View style={styles.timeRangeHeader}>
-                <Ionicons name="play" size={16} color={COLORS.primary} />
-                <Text
-                  style={[
-                    styles.timeRangeLabel,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
-                  De
-                </Text>
-              </View>
-              <View style={styles.timeInputContainer}>
-                <TextInput
-                  style={[
-                    styles.timeInput,
-                    {
-                      backgroundColor: dark
-                        ? COLORS.dark3
-                        : COLORS.greyscale100,
-                      color: dark ? COLORS.white : COLORS.black,
-                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-                    },
-                  ]}
-                  value={startHour}
-                  onChangeText={handleStartHourChange}
-                  keyboardType="numeric"
-                  maxLength={2}
-                />
-                <Text
-                  style={[
-                    styles.timeSeparator,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
-                  :
-                </Text>
-                <TextInput
-                  style={[
-                    styles.timeInput,
-                    {
-                      backgroundColor: dark
-                        ? COLORS.dark3
-                        : COLORS.greyscale100,
-                      color: dark ? COLORS.white : COLORS.black,
-                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-                    },
-                  ]}
-                  value={startMinute}
-                  onChangeText={handleStartMinuteChange}
-                  keyboardType="numeric"
-                  maxLength={2}
-                />
-              </View>
-            </View>
-
-            <View style={styles.timeRangeGroup}>
-              <View style={styles.timeRangeHeader}>
-                <Ionicons name="stop" size={16} color={COLORS.primary} />
-                <Text
-                  style={[
-                    styles.timeRangeLabel,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
-                  À
-                </Text>
-              </View>
-              <View style={styles.timeInputContainer}>
-                <TextInput
-                  style={[
-                    styles.timeInput,
-                    {
-                      backgroundColor: dark
-                        ? COLORS.dark3
-                        : COLORS.greyscale100,
-                      color: dark ? COLORS.white : COLORS.black,
-                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-                    },
-                  ]}
-                  value={endHour}
-                  onChangeText={handleEndHourChange}
-                  keyboardType="numeric"
-                  maxLength={2}
-                />
-                <Text
-                  style={[
-                    styles.timeSeparator,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
-                  :
-                </Text>
-                <TextInput
-                  style={[
-                    styles.timeInput,
-                    {
-                      backgroundColor: dark
-                        ? COLORS.dark3
-                        : COLORS.greyscale100,
-                      color: dark ? COLORS.white : COLORS.black,
-                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-                    },
-                  ]}
-                  value={endMinute}
-                  onChangeText={handleEndMinuteChange}
-                  keyboardType="numeric"
-                  maxLength={2}
-                />
-              </View>
-            </View>
-          </View>
-        </MotiView>
-
-        {/* Section Jours d'accès */}
-        <MotiView
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: "timing", duration: 600, delay: 400 }}
-          style={[
-            styles.section,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-            Platform.OS === "ios" && styles.iosShadow,
-          ]}
-        >
-          <View style={styles.sectionHeader}>
-            <Ionicons name="calendar" size={24} color={COLORS.primary} />
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              Jours d&apos;accès autorisés
-            </Text>
-          </View>
-
-          <View style={styles.daysContainer}>
-            {daysOfWeek.map((day, index) => (
-              <MotiView
-                key={day.id}
-                from={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", delay: 100 * index, damping: 15 }}
-              >
-                <TouchableOpacity
-                  style={[
-                    styles.dayButton,
-                    allowedDays[day.id]
-                      ? { backgroundColor: COLORS.primary }
-                      : {
-                          backgroundColor: dark
-                            ? COLORS.dark3
-                            : COLORS.greyscale300,
-                        },
-                  ]}
-                  onPress={() => toggleDay(day.id)}
-                  activeOpacity={0.8}
-                >
-                  {allowedDays[day.id] ? (
-                    <LinearGradient
-                      colors={[COLORS.primary, COLORS.primary]}
-                      style={styles.dayButtonGradient}
-                    >
-                      <Ionicons
-                        name="checkmark"
-                        size={16}
-                        color={COLORS.white}
-                      />
-                      <Text style={styles.dayLabel}>{day.label}</Text>
-                    </LinearGradient>
-                  ) : (
-                    <View style={styles.dayButtonContent}>
-                      <Ionicons
-                        name="close"
-                        size={16}
-                        color={dark ? COLORS.white : COLORS.black}
-                      />
-                      <Text
-                        style={[
-                          styles.dayLabel,
-                          { color: dark ? COLORS.white : COLORS.black },
-                        ]}
-                      >
-                        {day.label}
-                      </Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              </MotiView>
-            ))}
-          </View>
-        </MotiView>
-
-        {/* Section Restrictions de contenu */}
-        <MotiView
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: "timing", duration: 600, delay: 600 }}
-          style={[
-            styles.section,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-            Platform.OS === "ios" && styles.iosShadow,
-          ]}
-        >
-          <View style={styles.sectionHeader}>
-            <Ionicons
-              name="shield-checkmark"
-              size={24}
-              color={COLORS.primary}
-            />
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              Restrictions de contenu
-            </Text>
-          </View>
-
-          <Text
-            style={[
-              styles.restrictionDescription,
-              { color: dark ? COLORS.greyscale300 : COLORS.gray },
-            ]}
-          >
-            Activez les restrictions pour empêcher l&apos;accès à certaines
-            sections de l&apos;application.
-          </Text>
-
-          {contentSections.map((section, index) => (
-            <MotiView
-              key={section.id}
-              from={{ opacity: 0, translateX: -20 }}
-              animate={{ opacity: 1, translateX: 0 }}
-              transition={{ type: "timing", duration: 500, delay: 100 * index }}
-            >
-              <View style={styles.restrictionItem}>
-                <View style={styles.restrictionLeft}>
-                  <View style={styles.restrictionIconContainer}>
-                    <Ionicons
-                      name={section.icon as any}
-                      size={20}
-                      color={COLORS.primary}
-                    />
-                  </View>
-                  <View style={styles.restrictionTextContainer}>
-                    <Text
-                      style={[
-                        styles.restrictionLabel,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
-                      {section.label}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.restrictionSubtext,
-                        { color: dark ? COLORS.greyscale300 : COLORS.gray },
-                      ]}
-                    >
-                      {section.description}
-                    </Text>
-                  </View>
+            <View style={styles.timeInputContainer}>
+              <View style={styles.timeInputGroup}>
+                <View style={styles.timeInputWrapper}>
+                  <Ionicons name="hourglass" size={16} color={COLORS.primary} />
+                  <TextInput
+                    style={[
+                      styles.timeInput,
+                      {
+                        backgroundColor: dark
+                          ? COLORS.dark3
+                          : COLORS.greyscale100,
+                        color: dark ? COLORS.white : COLORS.black,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    value={maxHours}
+                    onChangeText={handleMaxHoursChange}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
                 </View>
-                <Switch
-                  value={contentRestrictions[section.id]}
-                  onValueChange={() => toggleContentRestriction(section.id)}
-                  trackColor={{
-                    false: dark ? COLORS.dark3 : COLORS.greyscale300,
-                    true: COLORS.primary,
-                  }}
-                  thumbColor={COLORS.white}
-                  ios_backgroundColor={
-                    dark ? COLORS.dark3 : COLORS.greyscale300
-                  }
-                />
+                <Text
+                  style={[
+                    styles.timeLabel,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  heures
+                </Text>
               </View>
-            </MotiView>
-          ))}
-        </MotiView>
 
-        {/* Section Mots interdits */}
-        <MotiView
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: "timing", duration: 600, delay: 800 }}
-          style={[
-            styles.section,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-            Platform.OS === "ios" && styles.iosShadow,
-          ]}
-        >
-          <View style={styles.sectionHeader}>
-            <Ionicons name="eye-off" size={24} color={COLORS.primary} />
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              Mots interdits
-            </Text>
-          </View>
-          <Text
+              <View style={styles.timeInputGroup}>
+                <View style={styles.timeInputWrapper}>
+                  <Ionicons name="timer" size={16} color={COLORS.primary} />
+                  <TextInput
+                    style={[
+                      styles.timeInput,
+                      {
+                        backgroundColor: dark
+                          ? COLORS.dark3
+                          : COLORS.greyscale100,
+                        color: dark ? COLORS.white : COLORS.black,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    value={maxMinutes}
+                    onChangeText={handleMaxMinutesChange}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                </View>
+                <Text
+                  style={[
+                    styles.timeLabel,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  minutes
+                </Text>
+              </View>
+            </View>
+          </MotiView>
+
+          {/* Section Plages horaires */}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 600, delay: 200 }}
             style={[
-              styles.restrictionDescription,
-              { color: dark ? COLORS.greyscale300 : COLORS.gray },
+              styles.section,
+              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              Platform.OS === "ios" && styles.iosShadow,
             ]}
           >
-            Saisissez les mots que vous souhaitez bloquer. Tapez le mot puis
-            appuyez sur &quot;Ajouter&quot;.
-          </Text>
-
-          {/* Input pour un nouveau mot interdit */}
-          <View style={styles.addRestrictedWordContainer}>
-            <View style={styles.restrictedWordInputContainer}>
-              <Ionicons name="ban" size={16} color={COLORS.primary} />
-              <TextInput
+            <View style={styles.sectionHeader}>
+              <Ionicons name="alarm" size={24} color={COLORS.primary} />
+              <Text
                 style={[
-                  styles.restrictedWordInput,
-                  {
-                    backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
-                    color: dark ? COLORS.white : COLORS.black,
-                    borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-                  },
+                  styles.sectionTitle,
+                  { color: dark ? COLORS.white : COLORS.black },
                 ]}
-                placeholder="Ajouter un mot interdit..."
-                placeholderTextColor={dark ? COLORS.greyscale300 : COLORS.gray}
-                value={newRestrictedWord}
-                onChangeText={setNewRestrictedWord}
-                onSubmitEditing={handleAddRestrictedWord}
-                returnKeyType="done"
-              />
+              >
+                Plages horaires autorisées
+              </Text>
             </View>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={handleAddRestrictedWord}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={[COLORS.primary, COLORS.primary]}
-                style={styles.addButtonGradient}
-              >
-                <Ionicons name="add" size={16} color={COLORS.white} />
-                <Text style={styles.addButtonText}>Ajouter</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
 
-          {/* Liste des mots interdits (tags) */}
-          <View style={styles.tagsContainer}>
-            {restrictedWords.map((word, index) => (
-              <MotiView
-                key={`${word}-${index}`}
-                from={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", delay: 50 * index, damping: 15 }}
-              >
-                <TouchableOpacity
-                  style={[
-                    styles.tag,
-                    {
-                      backgroundColor: dark
-                        ? COLORS.dark3
-                        : COLORS.greyscale300,
-                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale400,
-                    },
-                  ]}
-                  onPress={() => handleRemoveRestrictedWord(index)}
-                  activeOpacity={0.7}
-                >
+            <View style={styles.timeRangeContainer}>
+              <View style={styles.timeRangeGroup}>
+                <View style={styles.timeRangeHeader}>
+                  <Ionicons name="play" size={16} color={COLORS.primary} />
                   <Text
                     style={[
-                      styles.tagText,
+                      styles.timeRangeLabel,
                       { color: dark ? COLORS.white : COLORS.black },
                     ]}
                   >
-                    {word}
+                    De
                   </Text>
-                  <Ionicons
-                    name="close-circle"
-                    size={16}
-                    color={COLORS.error}
+                </View>
+                <View style={styles.timeInputContainer}>
+                  <TextInput
+                    style={[
+                      styles.timeInput,
+                      {
+                        backgroundColor: dark
+                          ? COLORS.dark3
+                          : COLORS.greyscale100,
+                        color: dark ? COLORS.white : COLORS.black,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    value={startHour}
+                    onChangeText={handleStartHourChange}
+                    keyboardType="numeric"
+                    maxLength={2}
                   />
-                </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.timeSeparator,
+                      { color: dark ? COLORS.white : COLORS.black },
+                    ]}
+                  >
+                    :
+                  </Text>
+                  <TextInput
+                    style={[
+                      styles.timeInput,
+                      {
+                        backgroundColor: dark
+                          ? COLORS.dark3
+                          : COLORS.greyscale100,
+                        color: dark ? COLORS.white : COLORS.black,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    value={startMinute}
+                    onChangeText={handleStartMinuteChange}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.timeRangeGroup}>
+                <View style={styles.timeRangeHeader}>
+                  <Ionicons name="stop" size={16} color={COLORS.primary} />
+                  <Text
+                    style={[
+                      styles.timeRangeLabel,
+                      { color: dark ? COLORS.white : COLORS.black },
+                    ]}
+                  >
+                    À
+                  </Text>
+                </View>
+                <View style={styles.timeInputContainer}>
+                  <TextInput
+                    style={[
+                      styles.timeInput,
+                      {
+                        backgroundColor: dark
+                          ? COLORS.dark3
+                          : COLORS.greyscale100,
+                        color: dark ? COLORS.white : COLORS.black,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    value={endHour}
+                    onChangeText={handleEndHourChange}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                  <Text
+                    style={[
+                      styles.timeSeparator,
+                      { color: dark ? COLORS.white : COLORS.black },
+                    ]}
+                  >
+                    :
+                  </Text>
+                  <TextInput
+                    style={[
+                      styles.timeInput,
+                      {
+                        backgroundColor: dark
+                          ? COLORS.dark3
+                          : COLORS.greyscale100,
+                        color: dark ? COLORS.white : COLORS.black,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    value={endMinute}
+                    onChangeText={handleEndMinuteChange}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                </View>
+              </View>
+            </View>
+          </MotiView>
+
+          {/* Section Jours d'accès */}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 600, delay: 400 }}
+            style={[
+              styles.section,
+              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              Platform.OS === "ios" && styles.iosShadow,
+            ]}
+          >
+            <View style={styles.sectionHeader}>
+              <Ionicons name="calendar" size={24} color={COLORS.primary} />
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Jours d&apos;accès autorisés
+              </Text>
+            </View>
+
+            <View style={styles.daysContainer}>
+              {daysOfWeek.map((day, index) => (
+                <MotiView
+                  key={day.id}
+                  from={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{
+                    type: "spring",
+                    delay: 100 * index,
+                    damping: 15,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={[
+                      styles.dayButton,
+                      allowedDays[day.id]
+                        ? { backgroundColor: COLORS.primary }
+                        : {
+                            backgroundColor: dark
+                              ? COLORS.dark3
+                              : COLORS.greyscale300,
+                          },
+                    ]}
+                    onPress={() => toggleDay(day.id)}
+                    activeOpacity={0.8}
+                  >
+                    {allowedDays[day.id] ? (
+                      <LinearGradient
+                        colors={["#FF9500", "#FFB84D"]}
+                        style={styles.dayButtonGradient}
+                      >
+                        <Ionicons
+                          name="checkmark"
+                          size={16}
+                          color={COLORS.white}
+                        />
+                        <Text style={styles.dayLabel}>{day.label}</Text>
+                      </LinearGradient>
+                    ) : (
+                      <View style={styles.dayButtonContent}>
+                        <Ionicons
+                          name="close"
+                          size={16}
+                          color={dark ? COLORS.white : COLORS.black}
+                        />
+                        <Text
+                          style={[
+                            styles.dayLabel,
+                            { color: dark ? COLORS.white : COLORS.black },
+                          ]}
+                        >
+                          {day.label}
+                        </Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                </MotiView>
+              ))}
+            </View>
+          </MotiView>
+
+          {/* Section Restrictions de contenu */}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 600, delay: 600 }}
+            style={[
+              styles.section,
+              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              Platform.OS === "ios" && styles.iosShadow,
+            ]}
+          >
+            <View style={styles.sectionHeader}>
+              <Ionicons
+                name="shield-checkmark"
+                size={24}
+                color={COLORS.primary}
+              />
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Restrictions de contenu
+              </Text>
+            </View>
+
+            <Text
+              style={[
+                styles.restrictionDescription,
+                { color: dark ? COLORS.greyscale300 : COLORS.gray },
+              ]}
+            >
+              Activez les restrictions pour empêcher l&apos;accès à certaines
+              sections de l&apos;application.
+            </Text>
+
+            {contentSections.map((section, index) => (
+              <MotiView
+                key={section.id}
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{
+                  type: "timing",
+                  duration: 500,
+                  delay: 100 * index,
+                }}
+              >
+                <View style={styles.restrictionItem}>
+                  <View style={styles.restrictionLeft}>
+                    <View style={styles.restrictionIconContainer}>
+                      <Ionicons
+                        name={section.icon as any}
+                        size={20}
+                        color={COLORS.primary}
+                      />
+                    </View>
+                    <View style={styles.restrictionTextContainer}>
+                      <Text
+                        style={[
+                          styles.restrictionLabel,
+                          { color: dark ? COLORS.white : COLORS.black },
+                        ]}
+                      >
+                        {section.label}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.restrictionSubtext,
+                          { color: dark ? COLORS.greyscale300 : COLORS.gray },
+                        ]}
+                      >
+                        {section.description}
+                      </Text>
+                    </View>
+                  </View>
+                  <Switch
+                    value={contentRestrictions[section.id]}
+                    onValueChange={() => toggleContentRestriction(section.id)}
+                    trackColor={{
+                      false: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      true: COLORS.primary,
+                    }}
+                    thumbColor={COLORS.white}
+                    ios_backgroundColor={
+                      dark ? COLORS.dark3 : COLORS.greyscale300
+                    }
+                  />
+                </View>
               </MotiView>
             ))}
-          </View>
-        </MotiView>
-      </ScrollView>
+          </MotiView>
 
+          {/* Section Mots interdits */}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 600, delay: 800 }}
+            style={[
+              styles.section,
+              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              Platform.OS === "ios" && styles.iosShadow,
+            ]}
+          >
+            <View style={styles.sectionHeader}>
+              <Ionicons name="eye-off" size={24} color={COLORS.primary} />
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Mots interdits
+              </Text>
+            </View>
+            <Text
+              style={[
+                styles.restrictionDescription,
+                { color: dark ? COLORS.greyscale300 : COLORS.gray },
+              ]}
+            >
+              Saisissez les mots que vous souhaitez bloquer. Tapez le mot puis
+              appuyez sur &quot;Ajouter&quot;.
+            </Text>
+
+            {/* Input pour un nouveau mot interdit */}
+            <View style={styles.addRestrictedWordContainer}>
+              <View style={styles.restrictedWordInputContainer}>
+                <Ionicons name="ban" size={16} color={COLORS.primary} />
+                <TextInput
+                  ref={inputRef}
+                  style={[
+                    styles.restrictedWordInput,
+                    {
+                      backgroundColor: dark
+                        ? COLORS.dark3
+                        : COLORS.greyscale100,
+                      color: dark ? COLORS.white : COLORS.black,
+                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                    },
+                  ]}
+                  placeholder="Ajouter un mot interdit..."
+                  placeholderTextColor={
+                    dark ? COLORS.greyscale300 : COLORS.gray
+                  }
+                  value={newRestrictedWord}
+                  onChangeText={setNewRestrictedWord}
+                  onSubmitEditing={handleAddRestrictedWord}
+                  onFocus={handleInputFocus}
+                  returnKeyType="done"
+                  blurOnSubmit={true}
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={handleAddRestrictedWord}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={["#FF9500", "#FFB84D"]}
+                  style={styles.addButtonGradient}
+                >
+                  <Ionicons name="add" size={16} color={COLORS.white} />
+                  <Text style={styles.addButtonText}>Ajouter</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+
+            {/* Liste des mots interdits (tags) */}
+            <View style={styles.tagsContainer}>
+              {restrictedWords.map((word, index) => (
+                <MotiView
+                  key={`${word}-${index}`}
+                  from={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{
+                    type: "spring",
+                    delay: 50 * index,
+                    damping: 15,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={[
+                      styles.tag,
+                      {
+                        backgroundColor: dark
+                          ? COLORS.dark3
+                          : COLORS.greyscale300,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale400,
+                      },
+                    ]}
+                    onPress={() => handleRemoveRestrictedWord(index)}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.tagText,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      {word}
+                    </Text>
+                    <Ionicons
+                      name="close-circle"
+                      size={16}
+                      color={COLORS.error}
+                    />
+                  </TouchableOpacity>
+                </MotiView>
+              ))}
+            </View>
+          </MotiView>
+        </ScrollView>
+      </KeyboardAvoidingView>
       {/* Enhanced Apply Button */}
       <MotiView
         from={{ opacity: 0, translateY: 20 }}
@@ -978,7 +1015,7 @@ const styles = StyleSheet.create({
   addButton: {
     borderRadius: 12,
     overflow: "hidden",
-    shadowColor: COLORS.primary,
+    shadowColor: "#FF9500",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
