@@ -1,4 +1,4 @@
-// Fixed SkillBreakdownCard.tsx
+// Fixed SkillBreakdownCard.tsx - ALWAYS shows data
 import React, { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet, Dimensions, Animated } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -17,53 +17,46 @@ interface SkillData {
   color: string;
 }
 
-const AnimatedPolygon = Animated.createAnimatedComponent(Polygon);
-
 const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
   childData,
 }) => {
   const [skills, setSkills] = useState<SkillData[]>([]);
   const [animation] = useState(new Animated.Value(0));
-  // FIX: Add ref for points to avoid recreating them on each render
-  const pointsRef = useRef<string>("");
+  const animatedScale = useRef(new Animated.Value(0)).current;
 
   const windowWidth = Dimensions.get("window").width;
-  const chartSize = windowWidth - 100; // Allow for padding
+  const chartSize = Math.min(windowWidth - 100, 250); // Ensure reasonable size
   const centerX = chartSize / 2;
   const centerY = chartSize / 2;
-  const radius = centerX - 40; // Smaller to fit in container
+  const radius = centerX - 50; // More padding for labels
 
   useEffect(() => {
-    // In a real app, this would be calculated from the child's activities,
-    // but we'll use mock data for the example
+    // ALWAYS generate mock data - this ensures the chart is ALWAYS visible
     const mockSkills: SkillData[] = [
       { name: "Mathématiques", value: 85, color: "#4CAF50" },
-      { name: "Français", value: 70, color: "#2196F3" },
+      { name: "Français", value: 78, color: "#2196F3" },
       { name: "Logique", value: 90, color: "#9C27B0" },
-      { name: "Sciences", value: 65, color: "#FF9800" },
-      { name: "Créativité", value: 75, color: "#E91E63" },
+      { name: "Sciences", value: 72, color: "#FF9800" },
+      { name: "Créativité", value: 83, color: "#E91E63" },
     ];
 
     setSkills(mockSkills);
 
     // Start animation
-    Animated.timing(animation, {
+    Animated.timing(animatedScale, {
       toValue: 1,
       duration: 1000,
-      useNativeDriver: false,
+      useNativeDriver: true,
     }).start();
-  }, [childData, animation]);
+  }, []); // Remove childData dependency to ensure data is always shown
 
   // Calculate points for the radar chart
-  const getPolygonPoints = (
-    skills: SkillData[],
-    animationValue: number
-  ): string => {
+  const getPolygonPoints = (skills: SkillData[]): string => {
     if (skills.length === 0) return "";
 
     const points = skills.map((skill, index) => {
       const angle = (Math.PI * 2 * index) / skills.length - Math.PI / 2;
-      const value = (skill.value / 100) * animationValue; // Scale by animation value
+      const value = skill.value / 100; // Normalize to 0-1
       const x = centerX + radius * value * Math.cos(angle);
       const y = centerY + radius * value * Math.sin(angle);
       return `${x},${y}`;
@@ -72,24 +65,9 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
     return points.join(" ");
   };
 
-  // FIX: Pre-calculate start and end points for animation
-  useEffect(() => {
-    if (skills.length > 0) {
-      // Create and cache the end points when skills are loaded
-      pointsRef.current = getPolygonPoints(skills, 1);
-    }
-  }, [skills]);
-
-  // FIX: Use a simple Polygon with fixed points instead of animated points
-  const animatedScale = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
-  });
-
   // Generate grid lines for the radar background
   const generateGridLines = () => {
-    const levels = 4; // Number of concentric circles
+    const levels = 4;
     const result = [];
 
     // Add concentric circles
@@ -108,6 +86,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
       );
     }
 
+    // Add lines from center to each skill point
     if (skills.length > 0) {
       for (let i = 0; i < skills.length; i++) {
         const angle = (Math.PI * 2 * i) / skills.length - Math.PI / 2;
@@ -128,11 +107,11 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
 
         // Add labels
         const skill = skills[i];
-        const labelRadius = radius + 2;
+        const labelRadius = radius + 20;
         const labelX = centerX + labelRadius * Math.cos(angle);
         const labelY = centerY + labelRadius * Math.sin(angle);
 
-        // Adjust text anchor based on position - use proper TextAnchor type
+        // Adjust text anchor based on position
         let textAnchor: "start" | "middle" | "end" = "middle";
         if (labelX < centerX - 10) textAnchor = "end";
         else if (labelX > centerX + 10) textAnchor = "start";
@@ -143,8 +122,8 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
             x={labelX}
             y={labelY}
             textAnchor={textAnchor}
-            fontWeight="bold"
-            fontSize="12"
+            fontWeight="600"
+            fontSize="11"
             fill={skill.color}
           >
             {skill.name}
@@ -174,17 +153,23 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
           {/* Background grid */}
           {generateGridLines()}
 
-          {/* Data polygon - FIX: use standard polygon with transform */}
-          {skills.length > 0 && pointsRef.current && (
-            <AnimatedPolygon
-              points={pointsRef.current}
-              fill="rgba(156, 39, 176, 0.3)"
-              stroke="#9C27B0"
-              strokeWidth={2}
-              originX={centerX} // <- centre of the radar
-              originY={centerY}
-              scale={animatedScale} // <- single animated prop
-            />
+          {/* Data polygon */}
+          {skills.length > 0 && (
+            <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
+              <Svg
+                width={chartSize}
+                height={chartSize}
+                viewBox={`0 0 ${chartSize} ${chartSize}`}
+                style={{ position: "absolute" }}
+              >
+                <Polygon
+                  points={getPolygonPoints(skills)}
+                  fill="rgba(156, 39, 176, 0.3)"
+                  stroke="#9C27B0"
+                  strokeWidth={2}
+                />
+              </Svg>
+            </Animated.View>
           )}
         </Svg>
       </View>
@@ -256,6 +241,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 16,
+    height: 250,
   },
   skillLegend: {
     flexDirection: "row",
@@ -267,7 +253,7 @@ const styles = StyleSheet.create({
   skillItem: {
     flexDirection: "row",
     alignItems: "center",
-    width: "48%", // two columns
+    width: "48%",
     marginBottom: 10,
   },
   colorDot: {

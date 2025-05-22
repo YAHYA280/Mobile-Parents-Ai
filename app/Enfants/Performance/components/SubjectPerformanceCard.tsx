@@ -1,4 +1,4 @@
-// Fixed SubjectPerformanceCard.tsx with visible data and better layout
+// Fixed SubjectPerformanceCard.tsx - Progress bars now work properly
 import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Animated, Easing } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,16 +21,18 @@ interface SubjectData {
   total: number;
   possible: number;
   percentage: number;
+  animatedValue: Animated.Value; // Add animated value to each subject
 }
 
 const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
   activities,
 }) => {
-  // Animation references for each subject bar
-  const barAnimations = useRef<{ [key: string]: Animated.Value }>({}).current;
+  const [subjectPerformance, setSubjectPerformance] = React.useState<
+    SubjectData[]
+  >([]);
 
-  // Calculate performance for each subject
-  const calculateSubjectPerformance = (): SubjectData[] => {
+  // Initialize data and animations
+  useEffect(() => {
     // Always show mock data for demonstration
     const mockSubjects: SubjectData[] = [
       {
@@ -38,62 +40,57 @@ const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
         total: 425,
         possible: 500,
         percentage: 85,
+        animatedValue: new Animated.Value(0),
       },
       {
         name: "Français",
         total: 360,
         possible: 450,
         percentage: 80,
+        animatedValue: new Animated.Value(0),
       },
       {
         name: "Sciences",
         total: 280,
         possible: 350,
         percentage: 80,
+        animatedValue: new Animated.Value(0),
       },
       {
         name: "Histoire",
         total: 195,
         possible: 300,
         percentage: 65,
+        animatedValue: new Animated.Value(0),
       },
       {
         name: "Anglais",
         total: 140,
         possible: 200,
         percentage: 70,
+        animatedValue: new Animated.Value(0),
       },
     ];
 
-    return mockSubjects.sort((a, b) => b.percentage - a.percentage);
-  };
+    // Sort by percentage (highest first)
+    const sortedSubjects = mockSubjects.sort(
+      (a, b) => b.percentage - a.percentage
+    );
+    setSubjectPerformance(sortedSubjects);
 
-  const subjectPerformance = calculateSubjectPerformance();
-
-  // Initialize animations for each subject
-  useEffect(() => {
-    const animations: { [key: string]: Animated.Value } = {};
-
-    subjectPerformance.forEach((subject) => {
-      animations[subject.name] = new Animated.Value(0);
-    });
-
-    // Start animations for all subjects
-    const animationsToStart = subjectPerformance.map((subject, index) =>
-      Animated.timing(animations[subject.name], {
-        toValue: 1,
-        duration: 1000,
-        delay: index * 200, // Staggered animation
+    // Start animations for all subjects with staggered delays
+    const animations = sortedSubjects.map((subject, index) =>
+      Animated.timing(subject.animatedValue, {
+        toValue: subject.percentage,
+        duration: 1200,
+        delay: index * 150, // Staggered animation
         easing: Easing.out(Easing.cubic),
         useNativeDriver: false,
       })
     );
 
     // Run all animations in parallel
-    Animated.parallel(animationsToStart).start();
-
-    // Update ref to keep track of animations
-    Object.assign(barAnimations, animations);
+    Animated.parallel(animations).start();
   }, []);
 
   // Utility function to get progress color
@@ -128,19 +125,6 @@ const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
           {subjectPerformance.map((subject, index) => {
             const progressColors = getProgressColor(subject.percentage);
 
-            // Get animation value for this subject
-            const animationValue =
-              barAnimations[subject.name] || new Animated.Value(0);
-
-            // Create width style for the progress bar
-            const widthStyle = {
-              width: animationValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: ["0%", `${subject.percentage}%`],
-                extrapolate: "clamp",
-              }),
-            };
-
             return (
               <View
                 key={subject.name}
@@ -163,17 +147,29 @@ const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
                 </View>
 
                 <View style={styles.progressBarContainer}>
-                  <Animated.View style={widthStyle}>
-                    <LinearGradient
-                      colors={progressColors}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.progressBar}
-                    />
-                  </Animated.View>
+                  <View style={styles.progressBarBackground}>
+                    <Animated.View
+                      style={[
+                        styles.progressBarForeground,
+                        {
+                          width: subject.animatedValue.interpolate({
+                            inputRange: [0, 100],
+                            outputRange: ["0%", "100%"],
+                            extrapolate: "clamp",
+                          }),
+                        },
+                      ]}
+                    >
+                      <LinearGradient
+                        colors={progressColors}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.progressBar}
+                      />
+                    </Animated.View>
+                  </View>
                 </View>
 
-                {/* FIX: Changed to column layout with each item on separate line */}
                 <View style={styles.scoreDetails}>
                   <Text style={styles.scoreText}>
                     {subject.total}/{subject.possible} points
@@ -297,17 +293,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   progressBarContainer: {
+    marginBottom: 12,
+  },
+  progressBarBackground: {
     height: 12,
     backgroundColor: "rgba(0, 0, 0, 0.06)",
     borderRadius: 6,
     overflow: "hidden",
-    marginBottom: 12,
+  },
+  progressBarForeground: {
+    height: "100%",
   },
   progressBar: {
     height: "100%",
     borderRadius: 6,
+    flex: 1,
   },
-  // FIX: Changed scoreDetails to column layout
   scoreDetails: {
     flexDirection: "column",
     alignItems: "flex-start",
