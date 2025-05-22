@@ -27,7 +27,7 @@ import {
 import { getCatalogues } from "./services/mocksApi/abonnementApiMock";
 import type { CataloguePlan } from "./services/mocksApi/abonnementApiMock";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const PlansComparison: React.FC = () => {
   const router = useRouter();
@@ -103,102 +103,119 @@ const PlansComparison: React.FC = () => {
     <SafeAreaView style={styles.safeArea} edges={["right", "bottom", "left"]}>
       <Header title="Comparaison des plans" onBackPress={() => router.back()} />
 
-      <View style={styles.headerContainer}>
-        <Ionicons
-          name="analytics-outline"
-          size={24}
-          color={COLOORS.primary.main}
-        />
-        <Text style={styles.headerTitle}>
-          Trouvez le plan parfait pour vous
-        </Text>
-        <Text style={styles.headerSubtitle}>
-          Comparez les caractéristiques et les prix de tous nos plans pour faire
-          le meilleur choix
-        </Text>
-      </View>
-
+      {/* Main content wrapped in vertical ScrollView */}
       <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.plansContainer}
+        style={styles.mainScrollView}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
       >
-        {/* First column - feature names */}
-        <View style={styles.featuresColumn}>
-          <View style={styles.planHeaderCell}>
-            <Text style={styles.featuresCellTitle}>Caractéristiques</Text>
-          </View>
-
-          {/* Price Row */}
-          <View style={styles.featureCell}>
-            <Text style={styles.featureName}>Prix mensuel</Text>
-          </View>
-
-          {/* Features Rows */}
-          {allFeatures.map((feature, index) => (
-            <View
-              key={index}
-              style={[
-                styles.featureCell,
-                index % 2 === 0 ? styles.evenRow : {},
-              ]}
-            >
-              <Text style={styles.featureName}>{feature}</Text>
-            </View>
-          ))}
+        <View style={styles.headerContainer}>
+          <Ionicons
+            name="analytics-outline"
+            size={24}
+            color={COLOORS.primary.main}
+          />
+          <Text style={styles.headerTitle}>
+            Trouvez le plan parfait pour vous
+          </Text>
+          <Text style={styles.headerSubtitle}>
+            Comparez les caractéristiques et les prix de tous nos plans pour
+            faire le meilleur choix
+          </Text>
         </View>
 
-        {/* Plan columns */}
-        {catalogues.map((plan, planIndex) => {
-          const planColor = getPlanColor(plan.id);
-
-          return (
-            <View key={planIndex} style={styles.planColumn}>
-              {/* Plan Header */}
-              <View
-                style={[styles.planHeaderCell, { backgroundColor: planColor }]}
-              >
-                <Text style={styles.planName}>{plan.planName}</Text>
-                {plan.recommended && (
-                  <View style={styles.recommendedBadge}>
-                    <Text style={styles.recommendedText}>Recommandé</Text>
-                  </View>
-                )}
+        {/* Horizontal ScrollView for the comparison table */}
+        <View style={styles.tableContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.plansContainer}
+            bounces={false}
+          >
+            {/* First column - feature names */}
+            <View style={styles.featuresColumn}>
+              <View style={styles.planHeaderCell}>
+                <Text style={styles.featuresCellTitle}>Caractéristiques</Text>
               </View>
 
               {/* Price Row */}
               <View style={styles.featureCell}>
-                <Text style={styles.priceText}>${plan.monthlyPrice}</Text>
-                <Text style={styles.monthText}>/mois</Text>
+                <Text style={styles.featureName}>Prix mensuel</Text>
               </View>
 
               {/* Features Rows */}
-              {allFeatures.map((feature, featureIndex) => (
+              {allFeatures.map((feature, index) => (
                 <View
-                  key={featureIndex}
+                  key={index}
                   style={[
                     styles.featureCell,
-                    featureIndex % 2 === 0 ? styles.evenRow : {},
+                    index % 2 === 0 ? styles.evenRow : {},
                   ]}
                 >
-                  {planHasFeature(plan, feature) ? (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={20}
-                      color={COLOORS.primary.main}
-                    />
-                  ) : (
-                    <Ionicons
-                      name="close-circle"
-                      size={20}
-                      color={COLOORS.gray3}
-                    />
-                  )}
+                  <Text style={styles.featureName}>{feature}</Text>
                 </View>
               ))}
             </View>
-          );
-        })}
+
+            {/* Plan columns */}
+            {catalogues.map((plan, planIndex) => {
+              const planColor = getPlanColor(plan.id);
+
+              return (
+                <View key={planIndex} style={styles.planColumn}>
+                  {/* Plan Header */}
+                  <View
+                    style={[
+                      styles.planHeaderCell,
+                      { backgroundColor: planColor },
+                    ]}
+                  >
+                    <Text style={styles.planName}>{plan.planName}</Text>
+                    {plan.recommended && (
+                      <View style={styles.recommendedBadge}>
+                        <Text style={styles.recommendedText}>Recommandé</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  {/* Price Row */}
+                  <View style={styles.featureCell}>
+                    <Text style={styles.priceText}>${plan.monthlyPrice}</Text>
+                    <Text style={styles.monthText}>/mois</Text>
+                  </View>
+
+                  {/* Features Rows */}
+                  {allFeatures.map((feature, featureIndex) => (
+                    <View
+                      key={featureIndex}
+                      style={[
+                        styles.featureCell,
+                        featureIndex % 2 === 0 ? styles.evenRow : {},
+                      ]}
+                    >
+                      {planHasFeature(plan, feature) ? (
+                        <Ionicons
+                          name="checkmark-circle"
+                          size={20}
+                          color={COLOORS.primary.main}
+                        />
+                      ) : (
+                        <Ionicons
+                          name="close-circle"
+                          size={20}
+                          color={COLOORS.gray3}
+                        />
+                      )}
+                    </View>
+                  ))}
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* Additional bottom space for better scrolling */}
+        <View style={styles.bottomSpacing} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -223,6 +240,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
+  mainScrollView: {
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -243,6 +263,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: SPACING.lg,
     marginBottom: SPACING.md,
+    paddingTop: SPACING.md, // Reduced top padding
   },
   headerTitle: {
     ...TYPOGRAPHY.h2,
@@ -250,23 +271,30 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
     marginBottom: SPACING.xs,
     textAlign: "center",
+    paddingHorizontal: SPACING.md,
   },
   headerSubtitle: {
     ...TYPOGRAPHY.body2,
     color: COLOORS.gray3,
     textAlign: "center",
-    paddingHorizontal: SPACING.xl,
+    paddingHorizontal: SPACING.lg,
+    lineHeight: 20,
+  },
+  tableContainer: {
+    flex: 1,
+    minHeight: height * 0.4, // Ensure minimum height for the table
   },
   plansContainer: {
     paddingHorizontal: SPACING.md,
-    paddingBottom: SPACING.xl,
+    paddingBottom: SPACING.md,
+    minWidth: width, // Ensure minimum width
   },
   featuresColumn: {
-    width: 150,
+    width: Math.max(150, width * 0.35), // Responsive width
     marginRight: 2,
   },
   planColumn: {
-    width: 120,
+    width: Math.max(120, width * 0.28), // Responsive width
     marginRight: 2,
   },
   planHeaderCell: {
@@ -280,11 +308,13 @@ const styles = StyleSheet.create({
   featuresCellTitle: {
     ...TYPOGRAPHY.subtitle1,
     color: COLOORS.black,
+    textAlign: "center",
   },
   planName: {
     ...TYPOGRAPHY.subtitle1,
     color: "#FFFFFF",
     textAlign: "center",
+    paddingHorizontal: SPACING.xs,
   },
   recommendedBadge: {
     backgroundColor: "rgba(255,255,255,0.2)",
@@ -296,6 +326,7 @@ const styles = StyleSheet.create({
   recommendedText: {
     ...TYPOGRAPHY.caption,
     color: "#FFFFFF",
+    fontSize: 10,
   },
   featureCell: {
     height: 50,
@@ -313,16 +344,22 @@ const styles = StyleSheet.create({
   featureName: {
     ...TYPOGRAPHY.body2,
     color: COLOORS.black,
+    textAlign: "center",
+    fontSize: 12,
+    paddingHorizontal: SPACING.xs,
   },
   priceText: {
     ...TYPOGRAPHY.h3,
     color: COLOORS.primary.main,
+    fontSize: 16,
   },
   monthText: {
     ...TYPOGRAPHY.caption,
     color: COLOORS.gray3,
     marginLeft: 2,
+    fontSize: 10,
+  },
+  bottomSpacing: {
+    height: SPACING.xl,
   },
 });
-
-export default PlansComparison;

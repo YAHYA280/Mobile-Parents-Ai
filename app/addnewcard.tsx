@@ -9,10 +9,17 @@ import {
   Dimensions,
   TouchableOpacity,
   StatusBar,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Platform, ScrollView, KeyboardAvoidingView } from "react-native";
-import React, { useState, useEffect, useReducer, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useReducer,
+  useCallback,
+  useRef,
+} from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { MotiView } from "moti";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,19 +30,23 @@ import { COLORS, COLOORS, RADIUS } from "../constants/theme";
 import { reducer } from "../utils/reducers/formReducers";
 import { validateInput } from "../utils/actions/formActions";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
+const isSmallScreen = height < 700;
+const isTablet = width > 768;
 
 const initialState = {
   inputValues: {
     creditCardHolderName: "",
     creditCardNumber: "",
-    creditCardExpiryDate: "",
+    expiryMonth: "",
+    expiryYear: "",
     cvv: "",
   },
   inputValidities: {
     creditCardHolderName: false,
     creditCardNumber: false,
-    creditCardExpiryDate: false,
+    expiryMonth: false,
+    expiryYear: false,
     cvv: false,
   },
   formIsValid: false,
@@ -48,28 +59,51 @@ const AddNewCard = () => {
   const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // Keyboard listeners
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, []);
 
   // Format card number with spaces
   const formattedCardNumber = () => {
-    const number =
-      formState.inputValues.creditCardNumber || "•••• •••• •••• ••••";
-    if (formState.inputValues.creditCardNumber) {
+    const number = formState.inputValues.creditCardNumber || "";
+    if (number) {
       // Add a space after every 4 digits
       return number.replace(/(\d{4})/g, "$1 ").trim();
     }
-    return number;
+    return "•••• •••• •••• ••••";
   };
 
   // Format expiration date
   const formattedExpiryDate = () => {
-    if (formState.inputValues.creditCardExpiryDate) {
-      const date = formState.inputValues.creditCardExpiryDate;
-      if (date.length >= 2) {
-        const month = date.substring(0, 2);
-        const year = date.substring(2);
-        return `${month}/${year.length ? year : "YY"}`;
-      }
-      return date;
+    const month = formState.inputValues.expiryMonth;
+    const year = formState.inputValues.expiryYear;
+
+    if (month && year) {
+      return `${month.padStart(2, "0")}/${year}`;
+    } else if (month) {
+      return `${month.padStart(2, "0")}/YY`;
+    } else if (year) {
+      return `MM/${year}`;
     }
     return "MM/YY";
   };
@@ -78,21 +112,41 @@ const AddNewCard = () => {
   const formattedName = () => {
     return formState.inputValues.creditCardHolderName
       ? formState.inputValues.creditCardHolderName.toUpperCase()
-      : "******";
+      : "CARD HOLDER NAME";
   };
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
-      const result = validateInput(inputId, inputValue);
+      let processedValue = inputValue;
+
+      // Process specific inputs
+      if (inputId === "expiryMonth") {
+        // Ensure month is between 01-12
+        if (
+          inputValue &&
+          (parseInt(inputValue) < 1 || parseInt(inputValue) > 12)
+        ) {
+          return;
+        }
+        processedValue = inputValue.replace(/[^\d]/g, "");
+      } else if (inputId === "expiryYear") {
+        processedValue = inputValue.replace(/[^\d]/g, "");
+      } else if (inputId === "creditCardNumber") {
+        processedValue = inputValue.replace(/[^\d]/g, "");
+      } else if (inputId === "cvv") {
+        processedValue = inputValue.replace(/[^\d]/g, "");
+      }
+
+      const result = validateInput(inputId, processedValue);
       dispatchFormState({
         inputId,
         validationResult: result,
-        inputValue,
+        inputValue: processedValue,
       });
 
       // Flip card to show CVV when CVV field is focused
       if (inputId === "cvv") {
-        setIsCardFlipped(!!inputValue);
+        setIsCardFlipped(!!processedValue);
       }
     },
     [dispatchFormState]
@@ -106,6 +160,32 @@ const AddNewCard = () => {
     } else {
       setIsCardFlipped(false);
     }
+
+    // Scroll to input when focused
+    setTimeout(() => {
+      if (scrollViewRef.current) {
+        let scrollToY = 0;
+
+        switch (inputId) {
+          case "creditCardHolderName":
+            scrollToY = cardHeight + 50; // Position after card
+            break;
+          case "creditCardNumber":
+            scrollToY = cardHeight + 120; // Position after first input
+            break;
+          case "expiryMonth":
+          case "expiryYear":
+          case "cvv":
+            scrollToY = cardHeight + 200; // Position for bottom row inputs
+            break;
+        }
+
+        scrollViewRef.current.scrollTo({
+          y: scrollToY,
+          animated: true,
+        });
+      }
+    }, 100);
   };
 
   const handleInputBlur = () => {
@@ -113,7 +193,19 @@ const AddNewCard = () => {
   };
 
   const handleAddCard = () => {
-    if (formState.formIsValid) {
+    const requiredFields = [
+      "creditCardHolderName",
+      "creditCardNumber",
+      "expiryMonth",
+      "expiryYear",
+      "cvv",
+    ];
+    const isFormValid = requiredFields.every(
+      (field) =>
+        formState.inputValues[field] && formState.inputValidities[field]
+    );
+
+    if (isFormValid) {
       navigation.navigate("confirmAddNewCard");
     } else {
       setError("Veuillez remplir correctement tous les champs");
@@ -131,9 +223,13 @@ const AddNewCard = () => {
     setHeaderHeight(height);
   };
 
+  const cardWidth = isTablet ? Math.min(400, width - 64) : width - 32;
+  const cardHeight = isSmallScreen ? 160 : 200;
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+
       {/* Fixed Header */}
       <View style={styles.headerContainer} onLayout={onHeaderLayout}>
         <Header
@@ -141,15 +237,21 @@ const AddNewCard = () => {
           subtitle="Ajouter une carte de paiement en toute sécurité"
           onBackPress={() => navigation.goBack()}
         />
-      </View>{" "}
+      </View>
+
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.keyboardView}
+        keyboardVerticalOffset={0}
       >
         <ScrollView
+          ref={scrollViewRef}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingTop: headerHeight }} // Add minimal padding after header
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingTop: headerHeight + 10 }, // Reduced from 20 to 10
+          ]}
         >
           <View style={styles.container}>
             <MotiView
@@ -158,99 +260,137 @@ const AddNewCard = () => {
               transition={{ type: "spring", damping: 18, stiffness: 120 }}
             >
               {/* Credit Card Preview */}
-              <MotiView
-                animate={{ rotateY: isCardFlipped ? "180deg" : "0deg" }}
-                transition={{ type: "timing", duration: 300 }}
-                style={styles.cardPreviewWrapper}
-              >
-                {!isCardFlipped ? (
-                  <LinearGradient
-                    colors={[COLOORS.primary.main, "#ff7043"]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.cardPreview}
-                  >
-                    {/* Card front elements */}
-                    <View style={styles.cardChip} />
-                    <View style={styles.cardWifi}>
-                      <Ionicons
-                        name="wifi-outline"
-                        size={24}
-                        color="#FFFFFF"
-                        style={{ transform: [{ rotate: "90deg" }] }}
-                      />
-                    </View>
-
-                    <MotiView
-                      style={styles.cardNumberWrapper}
-                      animate={{
-                        scale: focusedField === "creditCardNumber" ? 1.05 : 1,
-                      }}
-                      transition={{ type: "spring", damping: 10 }}
+              <View style={styles.cardContainer}>
+                <MotiView
+                  animate={{ rotateY: isCardFlipped ? "180deg" : "0deg" }}
+                  transition={{ type: "timing", duration: 300 }}
+                  style={[
+                    styles.cardPreviewWrapper,
+                    { width: cardWidth, height: cardHeight },
+                  ]}
+                >
+                  {!isCardFlipped ? (
+                    <LinearGradient
+                      colors={[COLOORS.primary.main, "#ff7043"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.cardPreview}
                     >
-                      <Text style={styles.cardNumber}>
-                        {formattedCardNumber()}
-                      </Text>
-                    </MotiView>
+                      {/* Card front elements */}
+                      <View style={styles.cardChip} />
+                      <View style={styles.cardWifi}>
+                        <Ionicons
+                          name="wifi-outline"
+                          size={isSmallScreen ? 20 : 24}
+                          color="#FFFFFF"
+                          style={{ transform: [{ rotate: "90deg" }] }}
+                        />
+                      </View>
 
-                    <View style={styles.cardInfoWrapper}>
                       <MotiView
+                        style={[
+                          styles.cardNumberWrapper,
+                          { marginTop: isSmallScreen ? 60 : 80 },
+                        ]}
                         animate={{
-                          scale:
-                            focusedField === "creditCardHolderName" ? 1.05 : 1,
+                          scale: focusedField === "creditCardNumber" ? 1.05 : 1,
                         }}
                         transition={{ type: "spring", damping: 10 }}
                       >
-                        <Text style={styles.cardInfoLabel}>
-                          NOM DU TITULAIRE
-                        </Text>
-                        <Text style={styles.cardInfoValue}>
-                          {formattedName()}
+                        <Text
+                          style={[
+                            styles.cardNumber,
+                            { fontSize: isSmallScreen ? 18 : 22 },
+                          ]}
+                        >
+                          {formattedCardNumber()}
                         </Text>
                       </MotiView>
-                      <MotiView
-                        animate={{
-                          scale:
-                            focusedField === "creditCardExpiryDate" ? 1.05 : 1,
-                        }}
-                        transition={{ type: "spring", damping: 10 }}
+
+                      <View style={styles.cardInfoWrapper}>
+                        <MotiView
+                          animate={{
+                            scale:
+                              focusedField === "creditCardHolderName"
+                                ? 1.05
+                                : 1,
+                          }}
+                          transition={{ type: "spring", damping: 10 }}
+                        >
+                          <Text style={styles.cardInfoLabel}>
+                            NOM DU TITULAIRE
+                          </Text>
+                          <Text
+                            style={[
+                              styles.cardInfoValue,
+                              { fontSize: isSmallScreen ? 14 : 16 },
+                            ]}
+                          >
+                            {formattedName()}
+                          </Text>
+                        </MotiView>
+                        <MotiView
+                          animate={{
+                            scale:
+                              focusedField === "expiryMonth" ||
+                              focusedField === "expiryYear"
+                                ? 1.05
+                                : 1,
+                          }}
+                          transition={{ type: "spring", damping: 10 }}
+                        >
+                          <Text style={styles.cardInfoLabel}>EXPIRE LE</Text>
+                          <Text
+                            style={[
+                              styles.cardInfoValue,
+                              { fontSize: isSmallScreen ? 14 : 16 },
+                            ]}
+                          >
+                            {formattedExpiryDate()}
+                          </Text>
+                        </MotiView>
+                      </View>
+                    </LinearGradient>
+                  ) : (
+                    <LinearGradient
+                      colors={[COLOORS.primary.main, "#ff7043"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={[
+                        styles.cardPreview,
+                        { transform: [{ rotateY: "180deg" }] },
+                      ]}
+                    >
+                      {/* Card back elements */}
+                      <View
+                        style={[
+                          styles.cardStrip,
+                          { top: isSmallScreen ? 25 : 30 },
+                        ]}
+                      />
+                      <View
+                        style={[
+                          styles.cardCvvContainer,
+                          { top: isSmallScreen ? 75 : 90 },
+                        ]}
                       >
-                        <Text style={styles.cardInfoLabel}>EXPIRE LE</Text>
-                        <Text style={styles.cardInfoValue}>
-                          {formattedExpiryDate()}
-                        </Text>
-                      </MotiView>
-                    </View>
-                  </LinearGradient>
-                ) : (
-                  <LinearGradient
-                    colors={[COLOORS.primary.main, "#ff7043"]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={[
-                      styles.cardPreview,
-                      { transform: [{ rotateY: "180deg" }] },
-                    ]}
-                  >
-                    {/* Card back elements */}
-                    <View style={styles.cardStrip} />
-                    <View style={styles.cardCvvContainer}>
-                      <Text style={styles.cardCvvLabel}>CVV</Text>
-                      <MotiView
-                        style={styles.cardCvvValue}
-                        animate={{
-                          scale: focusedField === "cvv" ? 1.05 : 1,
-                        }}
-                        transition={{ type: "spring", damping: 10 }}
-                      >
-                        <Text style={styles.cardCvvText}>
-                          {formState.inputValues.cvv || "***"}
-                        </Text>
-                      </MotiView>
-                    </View>
-                  </LinearGradient>
-                )}
-              </MotiView>
+                        <Text style={styles.cardCvvLabel}>CVV</Text>
+                        <MotiView
+                          style={styles.cardCvvValue}
+                          animate={{
+                            scale: focusedField === "cvv" ? 1.05 : 1,
+                          }}
+                          transition={{ type: "spring", damping: 10 }}
+                        >
+                          <Text style={styles.cardCvvText}>
+                            {formState.inputValues.cvv || "***"}
+                          </Text>
+                        </MotiView>
+                      </View>
+                    </LinearGradient>
+                  )}
+                </MotiView>
+              </View>
 
               {/* Form */}
               <View style={styles.formContainer}>
@@ -267,6 +407,7 @@ const AddNewCard = () => {
                     style={styles.inputField}
                     onFocus={() => handleInputFocus("creditCardHolderName")}
                     onBlur={handleInputBlur}
+                    value={formState.inputValues.creditCardHolderName}
                   />
                 </View>
 
@@ -283,26 +424,46 @@ const AddNewCard = () => {
                     onFocus={() => handleInputFocus("creditCardNumber")}
                     onBlur={handleInputBlur}
                     maxLength={16}
+                    value={formState.inputValues.creditCardNumber}
                   />
                 </View>
 
                 <View style={styles.inputRow}>
-                  <View style={styles.inputHalf}>
-                    <Text style={styles.inputLabel}>Date d'expiration</Text>
+                  <View style={styles.inputThird}>
+                    <Text style={styles.inputLabel}>Mois</Text>
                     <Input
-                      id="creditCardExpiryDate"
+                      id="expiryMonth"
                       onInputChanged={inputChangedHandler}
-                      errorText={formState.inputValidities.creditCardExpiryDate}
-                      placeholder="MM/YYYY"
+                      errorText={formState.inputValidities.expiryMonth}
+                      placeholder="MM"
                       placeholderTextColor="#999999"
                       keyboardType="number-pad"
                       style={styles.inputField}
-                      onFocus={() => handleInputFocus("creditCardExpiryDate")}
+                      onFocus={() => handleInputFocus("expiryMonth")}
                       onBlur={handleInputBlur}
-                      maxLength={6}
+                      maxLength={2}
+                      value={formState.inputValues.expiryMonth}
                     />
                   </View>
-                  <View style={styles.inputHalf}>
+
+                  <View style={styles.inputThird}>
+                    <Text style={styles.inputLabel}>Année</Text>
+                    <Input
+                      id="expiryYear"
+                      onInputChanged={inputChangedHandler}
+                      errorText={formState.inputValidities.expiryYear}
+                      placeholder="YYYY"
+                      placeholderTextColor="#999999"
+                      keyboardType="number-pad"
+                      style={styles.inputField}
+                      onFocus={() => handleInputFocus("expiryYear")}
+                      onBlur={handleInputBlur}
+                      maxLength={4}
+                      value={formState.inputValues.expiryYear}
+                    />
+                  </View>
+
+                  <View style={styles.inputThird}>
                     <Text style={styles.inputLabel}>CVV</Text>
                     <Input
                       id="cvv"
@@ -316,6 +477,7 @@ const AddNewCard = () => {
                       onFocus={() => handleInputFocus("cvv")}
                       onBlur={handleInputBlur}
                       maxLength={3}
+                      value={formState.inputValues.cvv}
                     />
                   </View>
                 </View>
@@ -324,7 +486,6 @@ const AddNewCard = () => {
 
             {/* Bottom Button */}
             <View style={styles.buttonContainer}>
-              {/* Button with solid color instead of gradient */}
               <TouchableOpacity
                 style={styles.submitButton}
                 onPress={handleAddCard}
@@ -354,6 +515,10 @@ const AddNewCard = () => {
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
   headerContainer: {
     position: "absolute",
     top: 0,
@@ -373,16 +538,21 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 80, // Increased for better keyboard handling
+  },
   container: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
     backgroundColor: "#FFFFFF",
   },
+  cardContainer: {
+    alignItems: "center",
+    marginBottom: 16, // Reduced from 24 to 16
+  },
   cardPreviewWrapper: {
-    width: width - 32,
-    height: 200,
     borderRadius: 16,
-    marginBottom: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -402,8 +572,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 20,
     left: 20,
-    width: 40,
-    height: 30,
+    width: isSmallScreen ? 35 : 40,
+    height: isSmallScreen ? 25 : 30,
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     borderRadius: 6,
   },
@@ -413,11 +583,9 @@ const styles = StyleSheet.create({
     right: 20,
   },
   cardNumberWrapper: {
-    marginTop: 80,
     alignItems: "center",
   },
   cardNumber: {
-    fontSize: 22,
     fontWeight: "500",
     color: "#FFFFFF",
     letterSpacing: 2,
@@ -428,27 +596,24 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   cardInfoLabel: {
-    fontSize: 10,
+    fontSize: isSmallScreen ? 9 : 10,
     color: "rgba(255, 255, 255, 0.7)",
     marginBottom: 4,
   },
   cardInfoValue: {
-    fontSize: 16,
     fontWeight: "500",
     color: "#FFFFFF",
   },
   cardStrip: {
     width: "100%",
-    height: 40,
+    height: isSmallScreen ? 35 : 40,
     backgroundColor: "rgba(0,0,0,0.8)",
     position: "absolute",
-    top: 30,
     left: 0,
   },
   cardCvvContainer: {
     position: "absolute",
     right: 20,
-    top: 90,
     alignItems: "flex-end",
   },
   cardCvvLabel: {
@@ -471,8 +636,8 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
-    padding: 24,
-    marginTop: 16,
+    padding: isTablet ? 32 : 24,
+    marginTop: 8, // Reduced from 16 to 8
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -480,7 +645,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   inputLabel: {
     fontSize: 16,
@@ -493,17 +658,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 54,
     paddingHorizontal: 16,
+    fontSize: 16,
   },
   inputRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 8, // Reduced gap from 12 to 8
   },
   inputHalf: {
-    width: "48%",
+    flex: 1,
+  },
+  inputThird: {
+    flex: 1,
   },
   buttonContainer: {
-    marginTop: 24,
-    marginBottom: 16,
+    marginTop: 32,
+    marginBottom: 24,
+    paddingHorizontal: isTablet ? 40 : 0,
   },
   submitButton: {
     height: 56,
@@ -532,6 +703,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666666",
     marginLeft: 8,
+    textAlign: "center",
   },
 });
 
