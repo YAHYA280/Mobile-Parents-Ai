@@ -261,7 +261,7 @@ const AbonnementCatalogue: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scrollViewContent,
-          { paddingTop: headerHeight }, // Dynamic padding based on header height
+          { paddingTop: headerHeight + 5 }, // Reduced from +10 to +5
         ]}
       >
         <MotiView
@@ -382,6 +382,7 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: 120, // Add top padding to account for fixed header
   },
   errorText: {
     ...TYPOGRAPHY.body1,
@@ -406,8 +407,8 @@ const styles = StyleSheet.create({
   headerSection: {
     alignItems: "center",
     paddingHorizontal: SPACING.lg,
-    marginTop: SPACING.md,
-    marginBottom: SPACING.lg,
+    marginTop: 0, // Reduced from SPACING.xs to 0
+    marginBottom: SPACING.sm, // Reduced from SPACING.md to SPACING.sm
   },
   headerIconContainer: {
     width: 60,
@@ -416,13 +417,13 @@ const styles = StyleSheet.create({
     backgroundColor: `${COLOORS.primary.main}15`,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm, // Reduced from SPACING.md to SPACING.sm
     ...SHADOWS.small,
   },
   headerTitle: {
     ...TYPOGRAPHY.h1,
     color: COLOORS.black,
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.xs, // Reduced from SPACING.sm to SPACING.xs
     textAlign: "center",
   },
   headerSubtitle: {

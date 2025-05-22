@@ -354,7 +354,7 @@ const AbonnementActuel: React.FC = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={
-          (styles.scrollContent, { paddingTop: headerHeight })
+          (styles.scrollContent, { paddingTop: headerHeight + 25 })
         }
       >
         {!abonnement ? (
@@ -727,6 +727,7 @@ const styles = StyleSheet.create({
   },
   subscriptionContainer: {
     paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.md,
   },
   subscriptionCard: {
     borderRadius: RADIUS.lg,
@@ -735,7 +736,7 @@ const styles = StyleSheet.create({
     ...SHADOWS.medium,
   },
   planHeader: {
-    padding: SPACING.lg,
+    padding: SPACING.xxl,
     position: "relative",
     overflow: "hidden",
   },

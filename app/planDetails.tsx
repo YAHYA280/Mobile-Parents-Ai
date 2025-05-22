@@ -393,7 +393,7 @@ const PlanDetails: React.FC = () => {
 
       <ScrollView
         contentContainerStyle={{
-          paddingTop: headerHeight,
+          paddingTop: headerHeight + 25,
           paddingBottom: SPACING.xl,
         }}
       >

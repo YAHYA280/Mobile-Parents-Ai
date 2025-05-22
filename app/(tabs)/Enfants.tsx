@@ -203,7 +203,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 20, // Increased from 16 to 20
+    paddingBottom: 24, // Added extra bottom padding
     backgroundColor: "#FFFFFF",
     ...SHADOWS.small,
   },
@@ -245,6 +246,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingHorizontal: 16,
+    paddingTop: 16, // Added top padding for spacing between header and content
     paddingBottom: 80,
   },
   childCardWrapper: {

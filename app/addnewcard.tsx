@@ -161,31 +161,33 @@ const AddNewCard = () => {
       setIsCardFlipped(false);
     }
 
-    // Scroll to input when focused
-    setTimeout(() => {
-      if (scrollViewRef.current) {
-        let scrollToY = 0;
+    // Scroll to input when focused (only on Android or when needed)
+    if (Platform.OS === "android") {
+      setTimeout(() => {
+        if (scrollViewRef.current) {
+          let scrollToY = 0;
 
-        switch (inputId) {
-          case "creditCardHolderName":
-            scrollToY = cardHeight + 50; // Position after card
-            break;
-          case "creditCardNumber":
-            scrollToY = cardHeight + 120; // Position after first input
-            break;
-          case "expiryMonth":
-          case "expiryYear":
-          case "cvv":
-            scrollToY = cardHeight + 200; // Position for bottom row inputs
-            break;
+          switch (inputId) {
+            case "creditCardHolderName":
+              scrollToY = cardHeight + 50;
+              break;
+            case "creditCardNumber":
+              scrollToY = cardHeight + 120;
+              break;
+            case "expiryMonth":
+            case "expiryYear":
+            case "cvv":
+              scrollToY = cardHeight + 200;
+              break;
+          }
+
+          scrollViewRef.current.scrollTo({
+            y: scrollToY,
+            animated: true,
+          });
         }
-
-        scrollViewRef.current.scrollTo({
-          y: scrollToY,
-          animated: true,
-        });
-      }
-    }, 100);
+      }, 100);
+    }
   };
 
   const handleInputBlur = () => {
@@ -540,7 +542,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 80, // Increased for better keyboard handling
+    paddingBottom: Platform.OS === "ios" ? 20 : 80, // Reduced iOS padding
   },
   container: {
     flex: 1,
