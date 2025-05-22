@@ -1,8 +1,16 @@
 import React from "react";
-import { Image } from "expo-image";
-import { icons, COLORS } from "@/constants";
+import { COLORS } from "@/constants";
 import { useTheme } from "@/theme/ThemeProvider";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { MotiView } from "moti";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 
 interface Objective {
   id: string;
@@ -27,259 +35,398 @@ const ObjectiveCard: React.FC<ObjectiveCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const { dark } = useTheme();
-
-  // Determine status color
-  const getStatusColor = (status: string) => {
+  // Determine status color and icon
+  const getStatusInfo = (status: string) => {
     switch (status) {
       case "Atteint":
-        return COLORS.greeen;
+        return {
+          color: "#4CAF50",
+          icon: "checkmark-circle",
+          bgColor: "#4CAF5015",
+        };
       case "En cours":
-        return COLORS.primary;
+        return {
+          color: COLORS.primary,
+          icon: "time",
+          bgColor: `${COLORS.primary}15`,
+        };
       case "Non atteint":
-        return COLORS.error;
+      case "Non commencé":
+        return {
+          color: "#FF9500",
+          icon: "pause-circle",
+          bgColor: "#FF950015",
+        };
       default:
-        return COLORS.gray;
+        return {
+          color: COLORS.gray,
+          icon: "help-circle",
+          bgColor: `${COLORS.gray}15`,
+        };
+    }
+  };
+
+  // Determine priority color and gradient
+  const getPriorityInfo = (priority: string) => {
+    switch (priority) {
+      case "Élevée":
+        return {
+          colors: ["#FF6B6B", "#FF8E53"],
+          textColor: COLORS.white,
+        };
+      case "Moyenne":
+        return {
+          colors: [COLORS.primary, COLORS.primary],
+          textColor: COLORS.white,
+        };
+      case "Basse":
+        return {
+          colors: ["#4CAF50", "#66BB6A"],
+          textColor: COLORS.white,
+        };
+      default:
+        return {
+          colors: [COLORS.gray, COLORS.gray],
+          textColor: COLORS.white,
+        };
     }
   };
 
   // Determine progress color based on percentage
   const getProgressColor = (value: number) => {
-    if (value >= 75) return COLORS.greeen;
+    if (value >= 75) return "#4CAF50";
     if (value >= 50) return COLORS.primary;
-    if (value >= 25) return COLORS.secondary;
-    return COLORS.error;
+    if (value >= 25) return "#FF9500";
+    return "#FF6B6B";
   };
 
+  const statusInfo = getStatusInfo(objective.status);
+  const priorityInfo = getPriorityInfo(objective.priority);
+
   return (
-    <View
+    <MotiView
+      from={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", damping: 15 }}
       style={[
         styles.container,
-        { backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100 },
+        {
+          backgroundColor: COLORS.white,
+          borderColor: COLORS.greyscale300,
+        },
+        Platform.OS === "ios" && styles.iosShadow,
       ]}
     >
-      {/* Title and Action Buttons */}
-      <View style={styles.headerRow}>
-        <Text
-          style={[styles.title, { color: dark ? COLORS.white : COLORS.black }]}
-        >
-          {objective.title}
-        </Text>
+      {/* Header with Status Badge */}
+      <View style={styles.headerSection}>
+        <View style={styles.statusBadge}>
+          <View
+            style={[
+              styles.statusContainer,
+              { backgroundColor: statusInfo.bgColor },
+            ]}
+          >
+            <Ionicons
+              name={statusInfo.icon as any}
+              size={14}
+              color={statusInfo.color}
+            />
+            <Text style={[styles.statusText, { color: statusInfo.color }]}>
+              {objective.status}
+            </Text>
+          </View>
+        </View>
 
         <View style={styles.actionButtons}>
-          <TouchableOpacity onPress={onEdit} style={styles.editButton}>
-            <Image source={icons.editPencil} style={styles.actionIcon} />
+          <TouchableOpacity
+            onPress={onEdit}
+            style={styles.editButton}
+            activeOpacity={0.7}
+          >
+            <LinearGradient
+              colors={["#FF9500", "#FFB84D"]}
+              style={styles.actionButtonGradient}
+            >
+              <Ionicons name="pencil" size={14} color={COLORS.white} />
+            </LinearGradient>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-            <Image source={icons.trash} style={styles.actionIcon} />
+          <TouchableOpacity
+            onPress={onDelete}
+            style={styles.deleteButton}
+            activeOpacity={0.7}
+          >
+            <LinearGradient
+              colors={["#FF6B6B", "#FF8E53"]}
+              style={styles.actionButtonGradient}
+            >
+              <Ionicons name="trash" size={14} color={COLORS.white} />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </View>
 
+      {/* Title */}
+      <Text style={[styles.title, { color: COLORS.black }]} numberOfLines={2}>
+        {objective.title}
+      </Text>
+
       {/* Description */}
       <Text
-        style={[
-          styles.description,
-          { color: dark ? COLORS.greyscale300 : COLORS.gray },
-        ]}
+        style={[styles.description, { color: COLORS.gray }]}
+        numberOfLines={3}
       >
         {objective.description}
       </Text>
 
-      {/* Subject and Priority */}
-      <View style={styles.detailsRow}>
-        <View style={styles.detailChip}>
-          <Text style={styles.detailChipText}>{objective.subject}</Text>
+      {/* Subject and Priority Chips */}
+      <View style={styles.chipsRow}>
+        <View style={styles.subjectChip}>
+          <Ionicons name="school" size={12} color={COLORS.primary} />
+          <Text style={[styles.subjectText, { color: COLORS.primary }]}>
+            {objective.subject}
+          </Text>
         </View>
 
-        <View
-          style={[
-            styles.detailChip,
-            {
-              backgroundColor:
-                objective.priority === "Élevée"
-                  ? COLORS.error
-                  : objective.priority === "Moyenne"
-                    ? COLORS.primary
-                    : COLORS.secondary,
-            },
-          ]}
-        >
-          <Text style={styles.detailChipText}>
-            Priorité: {objective.priority}
+        <TouchableOpacity style={styles.priorityChip} activeOpacity={0.8}>
+          <LinearGradient
+            colors={priorityInfo.colors as any}
+            style={styles.priorityGradient}
+          >
+            <Ionicons name="flag" size={12} color={priorityInfo.textColor} />
+            <Text
+              style={[styles.priorityText, { color: priorityInfo.textColor }]}
+            >
+              {objective.priority}
+            </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+
+      {/* Dates Section */}
+      <View style={styles.datesSection}>
+        <View style={styles.dateItem}>
+          <Ionicons name="play" size={12} color={COLORS.gray} />
+          <Text style={[styles.dateText, { color: COLORS.gray }]}>
+            {objective.startDate}
+          </Text>
+        </View>
+
+        <View style={styles.dateSeparator}>
+          <View style={styles.separatorLine} />
+          <Ionicons name="arrow-forward" size={12} color={COLORS.gray} />
+          <View style={styles.separatorLine} />
+        </View>
+
+        <View style={styles.dateItem}>
+          <Ionicons name="flag" size={12} color={COLORS.gray} />
+          <Text style={[styles.dateText, { color: COLORS.gray }]}>
+            {objective.endDate}
           </Text>
         </View>
       </View>
 
-      {/* Dates */}
-      <View style={styles.datesRow}>
-        <Text
-          style={[
-            styles.dateText,
-            { color: dark ? COLORS.greyscale300 : COLORS.gray },
-          ]}
-        >
-          Du {objective.startDate}
-        </Text>
-
-        <Text
-          style={[
-            styles.dateText,
-            { color: dark ? COLORS.greyscale300 : COLORS.gray },
-          ]}
-        >
-          Au {objective.endDate}
-        </Text>
-      </View>
-
-      {/* Progress Bar */}
+      {/* Progress Section */}
       <View style={styles.progressSection}>
-        <View style={styles.progressRow}>
-          <View style={styles.statusContainer}>
-            <View
-              style={[
-                styles.statusDot,
-                { backgroundColor: getStatusColor(objective.status) },
-              ]}
-            />
+        <View style={styles.progressHeader}>
+          <Text style={[styles.progressLabel, { color: COLORS.black }]}>
+            Progression
+          </Text>
+          <View style={styles.progressPercentage}>
             <Text
               style={[
-                styles.statusText,
-                { color: getStatusColor(objective.status) },
+                styles.progressText,
+                { color: getProgressColor(objective.progress) },
               ]}
             >
-              {objective.status}
+              {objective.progress}%
             </Text>
           </View>
-
-          <Text
-            style={[
-              styles.progressText,
-              { color: getProgressColor(objective.progress) },
-            ]}
-          >
-            {objective.progress}%
-          </Text>
         </View>
 
         <View style={styles.progressBarContainer}>
-          <View
+          <MotiView
+            from={{ width: "0%" }}
+            animate={{ width: `${Math.max(2, objective.progress)}%` }}
+            transition={{ type: "timing", duration: 1000, delay: 300 }}
             style={[
               styles.progressBar,
-              {
-                width: `${objective.progress}%`,
-                backgroundColor: getProgressColor(objective.progress),
-              },
+              { backgroundColor: getProgressColor(objective.progress) },
             ]}
           />
         </View>
       </View>
-    </View>
+    </MotiView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    backgroundColor: COLORS.greyscale100,
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 16,
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 8,
+  iosShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
   },
-  title: {
-    fontSize: 16,
-    fontFamily: "bold",
-    flex: 1,
-    marginRight: 8,
-  },
-  actionButtons: {
-    flexDirection: "row",
-  },
-  editButton: {
-    padding: 4,
-    marginRight: 8,
-  },
-  deleteButton: {
-    padding: 4,
-  },
-  actionIcon: {
-    width: 16,
-    height: 16,
-    tintColor: COLORS.primary,
-  },
-  description: {
-    fontSize: 14,
-    fontFamily: "regular",
-    marginBottom: 12,
-  },
-  detailsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 8,
-  },
-  detailChip: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginRight: 8,
-    marginBottom: 4,
-  },
-  detailChipText: {
-    color: COLORS.white,
-    fontSize: 12,
-    fontFamily: "medium",
-  },
-  datesRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  dateText: {
-    fontSize: 12,
-    fontFamily: "regular",
-  },
-  progressSection: {
-    marginTop: 4,
-  },
-  progressRow: {
+  headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 12,
+  },
+  statusBadge: {
+    flex: 1,
   },
   statusContainer: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    alignSelf: "flex-start",
   },
   statusText: {
     fontSize: 12,
+    fontFamily: "semibold",
+    marginLeft: 6,
+  },
+  actionButtons: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  editButton: {
+    borderRadius: 14,
+    overflow: "hidden",
+  },
+  deleteButton: {
+    borderRadius: 14,
+    overflow: "hidden",
+  },
+  actionButtonGradient: {
+    width: 28,
+    height: 28,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 16,
+    fontFamily: "bold",
+    marginBottom: 8,
+    lineHeight: 22,
+  },
+  description: {
+    fontSize: 14,
+    fontFamily: "regular",
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  chipsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    gap: 8,
+  },
+  subjectChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: `${COLORS.primary}15`,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: `${COLORS.primary}30`,
+  },
+  subjectText: {
+    fontSize: 12,
+    fontFamily: "semibold",
+    marginLeft: 4,
+  },
+  priorityChip: {
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  priorityGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  priorityText: {
+    fontSize: 12,
+    fontFamily: "semibold",
+    marginLeft: 4,
+  },
+  datesSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingVertical: 8,
+    backgroundColor: `${COLORS.primary}08`,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+  },
+  dateItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  dateText: {
+    fontSize: 11,
     fontFamily: "medium",
+    marginLeft: 6,
+  },
+  dateSeparator: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 8,
+  },
+  separatorLine: {
+    width: 8,
+    height: 1,
+    backgroundColor: COLORS.greyscale300,
+  },
+  progressSection: {
+    marginTop: 4,
+  },
+  progressHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  progressLabel: {
+    fontSize: 14,
+    fontFamily: "semibold",
+  },
+  progressPercentage: {
+    backgroundColor: `${COLORS.primary}15`,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
   progressText: {
     fontSize: 12,
     fontFamily: "bold",
   },
   progressBarContainer: {
-    height: 6,
+    height: 8,
     backgroundColor: COLORS.grayscale200,
-    borderRadius: 3,
+    borderRadius: 4,
+    overflow: "hidden",
   },
   progressBar: {
     height: "100%",
-    borderRadius: 3,
+    borderRadius: 4,
   },
 });
 

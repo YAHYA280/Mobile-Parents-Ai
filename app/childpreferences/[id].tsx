@@ -1,10 +1,12 @@
 import { COLORS } from "@/constants";
 import React, { useState } from "react";
 import Header from "@/components/ui/Header";
-import Button from "@/components/Button";
 import { useTheme } from "@/theme/ThemeProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { MotiView } from "moti";
 import {
   View,
   Text,
@@ -15,6 +17,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Platform,
+  ActivityIndicator,
 } from "react-native";
 
 // --------------------------------------------------
@@ -26,24 +30,49 @@ type ContentId = "learning" | "chatbot" | "challenge" | "recherche";
 // --------------------------------------------------
 // Jours de la semaine
 // --------------------------------------------------
-const daysOfWeek: { id: DayId; label: string }[] = [
-  { id: "mon", label: "Lun" },
-  { id: "tue", label: "Mar" },
-  { id: "wed", label: "Mer" },
-  { id: "thu", label: "Jeu" },
-  { id: "fri", label: "Ven" },
-  { id: "sat", label: "Sam" },
-  { id: "sun", label: "Dim" },
+const daysOfWeek: { id: DayId; label: string; icon: string }[] = [
+  { id: "mon", label: "Lun", icon: "calendar" },
+  { id: "tue", label: "Mar", icon: "calendar" },
+  { id: "wed", label: "Mer", icon: "calendar" },
+  { id: "thu", label: "Jeu", icon: "calendar" },
+  { id: "fri", label: "Ven", icon: "calendar" },
+  { id: "sat", label: "Sam", icon: "calendar" },
+  { id: "sun", label: "Dim", icon: "calendar" },
 ];
 
 // --------------------------------------------------
 // Sections de contenu (mis à jour)
 // --------------------------------------------------
-const contentSections: { id: ContentId; label: string }[] = [
-  { id: "learning", label: "J'apprends" },
-  { id: "chatbot", label: "Assistant d'accueil" },
-  { id: "challenge", label: "Challenge" },
-  { id: "recherche", label: "Recherche" },
+const contentSections: {
+  id: ContentId;
+  label: string;
+  icon: string;
+  description: string;
+}[] = [
+  {
+    id: "learning",
+    label: "J'apprends",
+    icon: "school",
+    description: "Accès aux cours et leçons",
+  },
+  {
+    id: "chatbot",
+    label: "Assistant d'accueil",
+    icon: "chatbubble-ellipses",
+    description: "Interaction avec l'assistant IA",
+  },
+  {
+    id: "challenge",
+    label: "Challenge",
+    icon: "trophy",
+    description: "Défis et compétitions",
+  },
+  {
+    id: "recherche",
+    label: "Recherche",
+    icon: "search",
+    description: "Fonctionnalité de recherche",
+  },
 ];
 
 // --------------------------------------------------
@@ -95,6 +124,7 @@ const ChildPreferencesScreen = () => {
   // --------------------------------------------------
   const [restrictedWords, setRestrictedWords] = useState<string[]>([]);
   const [newRestrictedWord, setNewRestrictedWord] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fonction pour basculer l'état d'un jour
   const toggleDay = (dayId: DayId) => {
@@ -165,17 +195,24 @@ const ChildPreferencesScreen = () => {
 
   // Fonction pour sauvegarder les préférences
   const savePreferences = () => {
+    setIsSubmitting(true);
+
     // Dans une vraie application, vous enverriez ces données à une API
     // et incluriez "restrictedWords" pour gérer les mots interdits.
-    Alert.alert("Succès", "Les préférences ont été enregistrées avec succès.", [
-      { text: "OK", onPress: () => navigation.goBack() },
-    ]);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      Alert.alert(
+        "Succès",
+        "Les préférences ont été enregistrées avec succès.",
+        [{ text: "OK", onPress: () => navigation.goBack() }]
+      );
+    }, 1000);
   };
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
-      edges={["right", "bottom", "left"]}
+      edges={["top", "right", "bottom", "left"]}
     >
       <Header
         title="Préférences et restrictions"
@@ -187,20 +224,27 @@ const ChildPreferencesScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Section Temps d'utilisation */}
-        <View
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 600 }}
           style={[
             styles.section,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Temps d&apos;utilisation
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="time" size={24} color={COLORS.primary} />
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Temps d&apos;utilisation
+            </Text>
+          </View>
 
           <Text
             style={[
@@ -213,19 +257,25 @@ const ChildPreferencesScreen = () => {
 
           <View style={styles.timeInputContainer}>
             <View style={styles.timeInputGroup}>
-              <TextInput
-                style={[
-                  styles.timeInput,
-                  {
-                    backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
-                    color: dark ? COLORS.white : COLORS.black,
-                  },
-                ]}
-                value={maxHours}
-                onChangeText={handleMaxHoursChange}
-                keyboardType="numeric"
-                maxLength={2}
-              />
+              <View style={styles.timeInputWrapper}>
+                <Ionicons name="hourglass" size={16} color={COLORS.primary} />
+                <TextInput
+                  style={[
+                    styles.timeInput,
+                    {
+                      backgroundColor: dark
+                        ? COLORS.dark3
+                        : COLORS.greyscale100,
+                      color: dark ? COLORS.white : COLORS.black,
+                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                    },
+                  ]}
+                  value={maxHours}
+                  onChangeText={handleMaxHoursChange}
+                  keyboardType="numeric"
+                  maxLength={2}
+                />
+              </View>
               <Text
                 style={[
                   styles.timeLabel,
@@ -237,19 +287,25 @@ const ChildPreferencesScreen = () => {
             </View>
 
             <View style={styles.timeInputGroup}>
-              <TextInput
-                style={[
-                  styles.timeInput,
-                  {
-                    backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
-                    color: dark ? COLORS.white : COLORS.black,
-                  },
-                ]}
-                value={maxMinutes}
-                onChangeText={handleMaxMinutesChange}
-                keyboardType="numeric"
-                maxLength={2}
-              />
+              <View style={styles.timeInputWrapper}>
+                <Ionicons name="timer" size={16} color={COLORS.primary} />
+                <TextInput
+                  style={[
+                    styles.timeInput,
+                    {
+                      backgroundColor: dark
+                        ? COLORS.dark3
+                        : COLORS.greyscale100,
+                      color: dark ? COLORS.white : COLORS.black,
+                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                    },
+                  ]}
+                  value={maxMinutes}
+                  onChangeText={handleMaxMinutesChange}
+                  keyboardType="numeric"
+                  maxLength={2}
+                />
+              </View>
               <Text
                 style={[
                   styles.timeLabel,
@@ -260,34 +316,44 @@ const ChildPreferencesScreen = () => {
               </Text>
             </View>
           </View>
-        </View>
+        </MotiView>
 
         {/* Section Plages horaires */}
-        <View
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 600, delay: 200 }}
           style={[
             styles.section,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Plages horaires autorisées
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="alarm" size={24} color={COLORS.primary} />
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Plages horaires autorisées
+            </Text>
+          </View>
 
           <View style={styles.timeRangeContainer}>
             <View style={styles.timeRangeGroup}>
-              <Text
-                style={[
-                  styles.timeRangeLabel,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
-                De
-              </Text>
+              <View style={styles.timeRangeHeader}>
+                <Ionicons name="play" size={16} color={COLORS.primary} />
+                <Text
+                  style={[
+                    styles.timeRangeLabel,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  De
+                </Text>
+              </View>
               <View style={styles.timeInputContainer}>
                 <TextInput
                   style={[
@@ -297,6 +363,7 @@ const ChildPreferencesScreen = () => {
                         ? COLORS.dark3
                         : COLORS.greyscale100,
                       color: dark ? COLORS.white : COLORS.black,
+                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
                     },
                   ]}
                   value={startHour}
@@ -320,6 +387,7 @@ const ChildPreferencesScreen = () => {
                         ? COLORS.dark3
                         : COLORS.greyscale100,
                       color: dark ? COLORS.white : COLORS.black,
+                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
                     },
                   ]}
                   value={startMinute}
@@ -331,14 +399,17 @@ const ChildPreferencesScreen = () => {
             </View>
 
             <View style={styles.timeRangeGroup}>
-              <Text
-                style={[
-                  styles.timeRangeLabel,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
-                À
-              </Text>
+              <View style={styles.timeRangeHeader}>
+                <Ionicons name="stop" size={16} color={COLORS.primary} />
+                <Text
+                  style={[
+                    styles.timeRangeLabel,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  À
+                </Text>
+              </View>
               <View style={styles.timeInputContainer}>
                 <TextInput
                   style={[
@@ -348,6 +419,7 @@ const ChildPreferencesScreen = () => {
                         ? COLORS.dark3
                         : COLORS.greyscale100,
                       color: dark ? COLORS.white : COLORS.black,
+                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
                     },
                   ]}
                   value={endHour}
@@ -371,6 +443,7 @@ const ChildPreferencesScreen = () => {
                         ? COLORS.dark3
                         : COLORS.greyscale100,
                       color: dark ? COLORS.white : COLORS.black,
+                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
                     },
                   ]}
                   value={endMinute}
@@ -381,61 +454,114 @@ const ChildPreferencesScreen = () => {
               </View>
             </View>
           </View>
-        </View>
+        </MotiView>
 
         {/* Section Jours d'accès */}
-        <View
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 600, delay: 400 }}
           style={[
             styles.section,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Jours d&apos;accès autorisés
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="calendar" size={24} color={COLORS.primary} />
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Jours d&apos;accès autorisés
+            </Text>
+          </View>
 
           <View style={styles.daysContainer}>
-            {daysOfWeek.map((day) => (
-              <TouchableOpacity
+            {daysOfWeek.map((day, index) => (
+              <MotiView
                 key={day.id}
-                style={[
-                  styles.dayButton,
-                  allowedDays[day.id]
-                    ? { backgroundColor: COLORS.primary }
-                    : {
-                        backgroundColor: dark
-                          ? COLORS.dark3
-                          : COLORS.greyscale300,
-                      },
-                ]}
-                onPress={() => toggleDay(day.id)}
+                from={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ type: "spring", delay: 100 * index, damping: 15 }}
               >
-                <Text style={styles.dayLabel}>{day.label}</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.dayButton,
+                    allowedDays[day.id]
+                      ? { backgroundColor: COLORS.primary }
+                      : {
+                          backgroundColor: dark
+                            ? COLORS.dark3
+                            : COLORS.greyscale300,
+                        },
+                  ]}
+                  onPress={() => toggleDay(day.id)}
+                  activeOpacity={0.8}
+                >
+                  {allowedDays[day.id] ? (
+                    <LinearGradient
+                      colors={[COLORS.primary, COLORS.primary]}
+                      style={styles.dayButtonGradient}
+                    >
+                      <Ionicons
+                        name="checkmark"
+                        size={16}
+                        color={COLORS.white}
+                      />
+                      <Text style={styles.dayLabel}>{day.label}</Text>
+                    </LinearGradient>
+                  ) : (
+                    <View style={styles.dayButtonContent}>
+                      <Ionicons
+                        name="close"
+                        size={16}
+                        color={dark ? COLORS.white : COLORS.black}
+                      />
+                      <Text
+                        style={[
+                          styles.dayLabel,
+                          { color: dark ? COLORS.white : COLORS.black },
+                        ]}
+                      >
+                        {day.label}
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </MotiView>
             ))}
           </View>
-        </View>
+        </MotiView>
 
         {/* Section Restrictions de contenu */}
-        <View
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 600, delay: 600 }}
           style={[
             styles.section,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Restrictions de contenu
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons
+              name="shield-checkmark"
+              size={24}
+              color={COLORS.primary}
+            />
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Restrictions de contenu
+            </Text>
+          </View>
 
           <Text
             style={[
@@ -447,45 +573,80 @@ const ChildPreferencesScreen = () => {
             sections de l&apos;application.
           </Text>
 
-          {contentSections.map((section) => (
-            <View key={section.id} style={styles.restrictionItem}>
-              <Text
-                style={[
-                  styles.restrictionLabel,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
-                {section.label}
-              </Text>
-              <Switch
-                value={contentRestrictions[section.id]}
-                onValueChange={() => toggleContentRestriction(section.id)}
-                trackColor={{
-                  false: COLORS.greyscale300,
-                  true: COLORS.primary,
-                }}
-                thumbColor={COLORS.white}
-                ios_backgroundColor={COLORS.greyscale300}
-              />
-            </View>
+          {contentSections.map((section, index) => (
+            <MotiView
+              key={section.id}
+              from={{ opacity: 0, translateX: -20 }}
+              animate={{ opacity: 1, translateX: 0 }}
+              transition={{ type: "timing", duration: 500, delay: 100 * index }}
+            >
+              <View style={styles.restrictionItem}>
+                <View style={styles.restrictionLeft}>
+                  <View style={styles.restrictionIconContainer}>
+                    <Ionicons
+                      name={section.icon as any}
+                      size={20}
+                      color={COLORS.primary}
+                    />
+                  </View>
+                  <View style={styles.restrictionTextContainer}>
+                    <Text
+                      style={[
+                        styles.restrictionLabel,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      {section.label}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.restrictionSubtext,
+                        { color: dark ? COLORS.greyscale300 : COLORS.gray },
+                      ]}
+                    >
+                      {section.description}
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={contentRestrictions[section.id]}
+                  onValueChange={() => toggleContentRestriction(section.id)}
+                  trackColor={{
+                    false: dark ? COLORS.dark3 : COLORS.greyscale300,
+                    true: COLORS.primary,
+                  }}
+                  thumbColor={COLORS.white}
+                  ios_backgroundColor={
+                    dark ? COLORS.dark3 : COLORS.greyscale300
+                  }
+                />
+              </View>
+            </MotiView>
           ))}
-        </View>
+        </MotiView>
 
         {/* Section Mots interdits */}
-        <View
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 600, delay: 800 }}
           style={[
             styles.section,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Mots interdits
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="eye-off" size={24} color={COLORS.primary} />
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Mots interdits
+            </Text>
+          </View>
           <Text
             style={[
               styles.restrictionDescription,
@@ -498,68 +659,121 @@ const ChildPreferencesScreen = () => {
 
           {/* Input pour un nouveau mot interdit */}
           <View style={styles.addRestrictedWordContainer}>
-            <TextInput
-              style={[
-                styles.restrictedWordInput,
-                {
-                  backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
-                  color: dark ? COLORS.white : COLORS.black,
-                },
-              ]}
-              placeholder="Ajouter un mot interdit..."
-              placeholderTextColor={dark ? COLORS.greyscale300 : COLORS.gray}
-              value={newRestrictedWord}
-              onChangeText={setNewRestrictedWord}
-              onSubmitEditing={handleAddRestrictedWord}
-              returnKeyType="done"
-            />
+            <View style={styles.restrictedWordInputContainer}>
+              <Ionicons name="ban" size={16} color={COLORS.primary} />
+              <TextInput
+                style={[
+                  styles.restrictedWordInput,
+                  {
+                    backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
+                    color: dark ? COLORS.white : COLORS.black,
+                    borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                  },
+                ]}
+                placeholder="Ajouter un mot interdit..."
+                placeholderTextColor={dark ? COLORS.greyscale300 : COLORS.gray}
+                value={newRestrictedWord}
+                onChangeText={setNewRestrictedWord}
+                onSubmitEditing={handleAddRestrictedWord}
+                returnKeyType="done"
+              />
+            </View>
             <TouchableOpacity
               style={styles.addButton}
               onPress={handleAddRestrictedWord}
+              activeOpacity={0.8}
             >
-              <Text style={styles.addButtonText}>Ajouter</Text>
+              <LinearGradient
+                colors={[COLORS.primary, COLORS.primary]}
+                style={styles.addButtonGradient}
+              >
+                <Ionicons name="add" size={16} color={COLORS.white} />
+                <Text style={styles.addButtonText}>Ajouter</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
 
           {/* Liste des mots interdits (tags) */}
           <View style={styles.tagsContainer}>
             {restrictedWords.map((word, index) => (
-              <TouchableOpacity
+              <MotiView
                 key={`${word}-${index}`}
-                style={[
-                  styles.tag,
-                  {
-                    backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-                  },
-                ]}
-                onPress={() => handleRemoveRestrictedWord(index)}
+                from={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ type: "spring", delay: 50 * index, damping: 15 }}
               >
-                <Text
+                <TouchableOpacity
                   style={[
-                    styles.tagText,
-                    { color: dark ? COLORS.white : COLORS.black },
+                    styles.tag,
+                    {
+                      backgroundColor: dark
+                        ? COLORS.dark3
+                        : COLORS.greyscale300,
+                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale400,
+                    },
                   ]}
+                  onPress={() => handleRemoveRestrictedWord(index)}
+                  activeOpacity={0.7}
                 >
-                  {word}
-                </Text>
-                <Text style={[styles.tagRemoveSymbol, { color: COLORS.error }]}>
-                  ×
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.tagText,
+                      { color: dark ? COLORS.white : COLORS.black },
+                    ]}
+                  >
+                    {word}
+                  </Text>
+                  <Ionicons
+                    name="close-circle"
+                    size={16}
+                    color={COLORS.error}
+                  />
+                </TouchableOpacity>
+              </MotiView>
             ))}
           </View>
-        </View>
+        </MotiView>
       </ScrollView>
 
-      {/* Bouton d'action */}
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Appliquer les restrictions"
-          filled
-          style={styles.applyButton}
+      {/* Enhanced Apply Button */}
+      <MotiView
+        from={{ opacity: 0, translateY: 20 }}
+        animate={{ opacity: 1, translateY: 0 }}
+        transition={{ type: "timing", duration: 500, delay: 1000 }}
+        style={styles.buttonContainer}
+      >
+        <TouchableOpacity
+          style={[styles.applyButton, { opacity: isSubmitting ? 0.8 : 1 }]}
           onPress={savePreferences}
-        />
-      </View>
+          disabled={isSubmitting}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={["#4CAF50", "#66BB6A"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.applyButtonGradient}
+          >
+            {isSubmitting ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={COLORS.white} />
+                <Text style={styles.applyButtonText}>Application...</Text>
+              </View>
+            ) : (
+              <View style={styles.applyButtonContent}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={20}
+                  color={COLORS.white}
+                />
+                <Text style={styles.applyButtonText}>
+                  Appliquer les restrictions
+                </Text>
+              </View>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+      </MotiView>
     </SafeAreaView>
   );
 };
@@ -578,33 +792,52 @@ const styles = StyleSheet.create({
   },
   section: {
     backgroundColor: COLORS.white,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     marginBottom: 16,
-    elevation: 2,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  iosShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: "bold",
-    marginBottom: 16,
+    marginLeft: 12,
   },
   label: {
     fontSize: 14,
     fontFamily: "medium",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   timeInputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 16,
   },
   timeInputGroup: {
+    alignItems: "center",
+  },
+  timeInputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: 16,
+    backgroundColor: `${COLORS.primary}10`,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginBottom: 8,
   },
   timeInput: {
     width: 50,
@@ -614,9 +847,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     fontFamily: "medium",
+    marginLeft: 8,
+    borderWidth: 1,
   },
   timeLabel: {
-    marginLeft: 8,
     fontSize: 14,
     fontFamily: "regular",
   },
@@ -628,10 +862,15 @@ const styles = StyleSheet.create({
   timeRangeGroup: {
     alignItems: "center",
   },
+  timeRangeHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
   timeRangeLabel: {
     fontSize: 14,
     fontFamily: "medium",
-    marginBottom: 8,
+    marginLeft: 6,
   },
   timeSeparator: {
     fontSize: 18,
@@ -642,93 +881,177 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
+    gap: 8,
   },
   dayButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 70,
+    height: 50,
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dayButtonGradient: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 8,
+  },
+  dayButtonContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   dayLabel: {
     color: COLORS.white,
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: "bold",
+    marginTop: 2,
   },
   restrictionDescription: {
     fontSize: 14,
     fontFamily: "regular",
     marginBottom: 16,
+    lineHeight: 20,
   },
   restrictionItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.grayscale200,
+  },
+  restrictionLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  restrictionIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: `${COLORS.primary}15`,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  restrictionTextContainer: {
+    flex: 1,
   },
   restrictionLabel: {
     fontSize: 16,
     fontFamily: "medium",
+  },
+  restrictionSubtext: {
+    fontSize: 12,
+    fontFamily: "regular",
+    marginTop: 2,
+  },
+  addRestrictedWordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    gap: 8,
+  },
+  restrictedWordInputContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: `${COLORS.primary}10`,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  restrictedWordInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 14,
+    fontFamily: "regular",
+    marginLeft: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  addButton: {
+    borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  addButtonGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  addButtonText: {
+    color: COLORS.white,
+    fontFamily: "bold",
+    fontSize: 14,
+    marginLeft: 6,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  tag: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  tagText: {
+    fontFamily: "medium",
+    fontSize: 14,
+    marginRight: 8,
   },
   buttonContainer: {
     padding: 16,
     paddingBottom: 24,
   },
   applyButton: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  // Section Mots Interdits
-  addRestrictedWordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  restrictedWordInput: {
-    flex: 1,
-    height: 40,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    fontSize: 14,
-    fontFamily: "regular",
-    marginRight: 8,
-  },
-  addButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  addButtonText: {
-    color: COLORS.white,
-    fontFamily: "bold",
-    fontSize: 14,
-  },
-  tagsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  tag: {
-    flexDirection: "row",
-    alignItems: "center",
     borderRadius: 16,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginRight: 8,
-    marginBottom: 8,
+    overflow: "hidden",
+    shadowColor: "#4CAF50",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  tagText: {
-    fontFamily: "medium",
-    fontSize: 14,
-    marginRight: 4,
+  applyButtonGradient: {
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  tagRemoveSymbol: {
-    fontFamily: "bold",
+  applyButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  applyButtonText: {
+    color: COLORS.white,
     fontSize: 16,
-    marginLeft: 2,
+    fontFamily: "semibold",
+    marginLeft: 8,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

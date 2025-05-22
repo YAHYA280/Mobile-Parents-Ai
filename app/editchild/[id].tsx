@@ -3,16 +3,21 @@ import type { ViewStyle, TextStyle, ImageStyle } from "react-native";
 import { Image } from "expo-image";
 import Input from "@/components/Input";
 import Header from "@/components/ui/Header";
-import Button from "@/components/Button";
 import { useTheme } from "@/theme/ThemeProvider";
 import { icons, COLORS, images } from "@/constants";
 import RNPickerSelect from "react-native-picker-select";
 import { reducer } from "@/utils/reducers/formReducers";
 import { validateInput } from "@/utils/actions/formActions";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { launchImagePicker } from "@/utils/ImagePickerHelper";
 import { useNavigation, useLocalSearchParams } from "expo-router";
 import React, { useState, useEffect, useReducer, useCallback } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { MotiView } from "moti";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -23,6 +28,8 @@ import {
   ScrollView,
   TouchableOpacity,
   KeyboardAvoidingView,
+  useWindowDimensions,
+  ActivityIndicator,
 } from "react-native";
 
 // --------------------------------------------------
@@ -86,6 +93,8 @@ const EditChildScreen = () => {
   const { colors, dark } = useTheme();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
 
   // Form and state hooks:
   const [formState, dispatchFormState] = useReducer(reducer, initialFormState);
@@ -94,6 +103,7 @@ const EditChildScreen = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [showDiscardModal, setShowDiscardModal] = useState(false);
+  const pickerRef = React.useRef<any>(null);
 
   // 2) Get childId from params:
   const childId = (params.id as string) || "1";
@@ -166,6 +176,12 @@ const EditChildScreen = () => {
     setSelectedGrade(value || "");
   };
 
+  const openPicker = () => {
+    if (pickerRef.current) {
+      pickerRef.current.togglePicker();
+    }
+  };
+
   const pickImage = async () => {
     try {
       const tempUri = await launchImagePicker();
@@ -213,7 +229,7 @@ const EditChildScreen = () => {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
-        edges={["right", "bottom", "left"]}
+        edges={["top", "right", "left", "bottom"]}
       >
         <Header title="Enfant introuvable" onBackPress={handleBack} />
         <View style={{ padding: 16 }}>
@@ -236,12 +252,19 @@ const EditChildScreen = () => {
       onRequestClose={() => setShowDiscardModal(false)}
     >
       <View style={styles.modalOverlay}>
-        <View
+        <MotiView
+          from={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", damping: 15 }}
           style={[
             styles.modalContainer,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
           ]}
         >
+          <View style={styles.modalIconContainer}>
+            <Ionicons name="warning" size={48} color="#FF9500" />
+          </View>
+
           <Text
             style={[
               styles.modalTitle,
@@ -260,34 +283,59 @@ const EditChildScreen = () => {
             quitter sans enregistrer ?
           </Text>
           <View style={styles.modalButtons}>
-            <Button
-              title="Continuer l'édition"
+            {/* Enhanced Cancel Button */}
+            <TouchableOpacity
               style={[
-                styles.modalButton,
-                {
-                  backgroundColor: dark ? COLORS.dark3 : COLORS.grayscale200,
-                  borderWidth: 0,
-                },
+                styles.modalCancelButton,
+                { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
               ]}
-              textColor={dark ? COLORS.white : COLORS.black}
               onPress={() => setShowDiscardModal(false)}
-            />
-            <Button
-              title="Abandonner"
-              style={[
-                styles.modalButton,
-                {
-                  backgroundColor: COLORS.primary,
-                  borderColor: COLORS.primary,
-                },
-              ]}
+              activeOpacity={0.8}
+            >
+              <View style={styles.modalCancelContent}>
+                <Ionicons
+                  name="close-outline"
+                  size={18}
+                  color={dark ? COLORS.white : COLORS.black}
+                />
+                <Text
+                  style={[
+                    styles.modalCancelText,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  Continuer
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Enhanced Discard Button */}
+            <TouchableOpacity
+              style={styles.modalDiscardButton}
               onPress={() => {
                 setShowDiscardModal(false);
                 navigation.goBack();
               }}
-            />
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={["#FF6B6B", "#FF8E53"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.modalDiscardGradient}
+              >
+                <View style={styles.modalDiscardContent}>
+                  <Ionicons
+                    name="trash-outline"
+                    size={18}
+                    color={COLORS.white}
+                  />
+                  <Text style={styles.modalDiscardText}>Abandonner</Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
-        </View>
+        </MotiView>
       </View>
     </Modal>
   );
@@ -295,20 +343,16 @@ const EditChildScreen = () => {
   // --------------------------------------------------
   // Render
   // --------------------------------------------------
-  const dynamicStyles = {
-    cancelButton: {
-      flex: 1,
-      marginRight: 8,
-      backgroundColor: dark ? COLORS.dark2 : COLORS.tansparentPrimary,
-      borderColor: dark ? COLORS.dark2 : COLORS.tansparentPrimary,
-    },
-  };
-
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
+      edges={["top", "right", "left", "bottom"]}
     >
-      <Header title="Modifier les informations" onBackPress={handleBack} />
+      <Header
+        title="Modifier les informations"
+        onBackPress={handleBack}
+        showBackButton={true}
+      />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -318,129 +362,284 @@ const EditChildScreen = () => {
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.contentContainer}>
-            <View style={styles.avatarSection}>
-              <View style={styles.avatarContainer}>
-                <Image source={image} style={styles.avatar} />
-                <TouchableOpacity
-                  onPress={pickImage}
-                  style={styles.pickImageButton}
-                >
-                  <Image
-                    source={icons.editPencil}
-                    style={styles.pickImageIcon}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 600 }}
+            style={[styles.formCard, Platform.OS === "ios" && styles.iosShadow]}
+          >
+            <View style={styles.contentContainer}>
+              <MotiView
+                from={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ type: "spring", delay: 200, damping: 15 }}
+                style={styles.avatarSection}
+              >
+                <View style={styles.avatarContainer}>
+                  <Image source={image} style={styles.avatar} />
+                  <TouchableOpacity
+                    onPress={pickImage}
+                    style={styles.pickImageButton}
+                  >
+                    <LinearGradient
+                      colors={["#FF9500", "#FFB84D"]}
+                      style={styles.pickImageGradient}
+                    >
+                      <Ionicons name="pencil" size={18} color={COLORS.white} />
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              </MotiView>
+
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 300 }}
+              >
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons
+                      name="person-outline"
+                      size={18}
+                      color={COLORS.primary}
+                    />
+                    <Text
+                      style={[
+                        styles.fieldLabel,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Nom complet
+                    </Text>
+                  </View>
+                  <Input
+                    id="fullName"
+                    onInputChanged={inputChangedHandler}
+                    errorText={formState.inputValidities.fullName}
+                    placeholder="Nom et prénom de l'enfant"
+                    placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
+                    value={formState.inputValues.fullName}
                   />
-                </TouchableOpacity>
-              </View>
-            </View>
+                </View>
+              </MotiView>
 
-            <Text
-              style={[
-                styles.fieldLabel,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              Nom complet
-            </Text>
-            <Input
-              id="fullName"
-              onInputChanged={inputChangedHandler}
-              errorText={formState.inputValidities.fullName}
-              placeholder="Nom et prénom de l'enfant"
-              placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
-              value={formState.inputValues.fullName}
-            />
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 400 }}
+              >
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons
+                      name="calendar-outline"
+                      size={18}
+                      color={COLORS.primary}
+                    />
+                    <Text
+                      style={[
+                        styles.fieldLabel,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Âge
+                    </Text>
+                  </View>
+                  <Input
+                    id="age"
+                    onInputChanged={inputChangedHandler}
+                    errorText={formState.inputValidities.age}
+                    placeholder="Âge de l'enfant"
+                    placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
+                    keyboardType="numeric"
+                    value={formState.inputValues.age}
+                  />
+                </View>
+              </MotiView>
 
-            <Text
-              style={[
-                styles.fieldLabel,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              Âge
-            </Text>
-            <Input
-              id="age"
-              onInputChanged={inputChangedHandler}
-              errorText={formState.inputValidities.age}
-              placeholder="Âge de l'enfant"
-              placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
-              keyboardType="numeric"
-              value={formState.inputValues.age}
-            />
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 500 }}
+              >
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons
+                      name="school-outline"
+                      size={18}
+                      color={COLORS.primary}
+                    />
+                    <Text
+                      style={[
+                        styles.fieldLabel,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Niveau scolaire
+                    </Text>
+                  </View>
 
-            <Text
-              style={[
-                styles.fieldLabel,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              Niveau scolaire
-            </Text>
-            <View
-              style={[
-                styles.pickerContainer,
-                {
-                  backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale500,
-                  borderColor: dark ? COLORS.dark2 : COLORS.greyscale500,
-                },
-              ]}
-            >
-              <RNPickerSelect
-                placeholder={{ label: "Sélectionner le niveau", value: null }}
-                items={gradeOptions}
-                onValueChange={handleGradeChange}
-                value={selectedGrade}
-                style={{
-                  inputIOS: {
-                    fontSize: 16,
-                    paddingVertical: 12,
-                    paddingHorizontal: 10,
-                    color: dark ? COLORS.white : COLORS.black,
-                    paddingRight: 30,
-                  },
-                  inputAndroid: {
-                    fontSize: 16,
-                    paddingHorizontal: 10,
-                    paddingVertical: 8,
-                    color: dark ? COLORS.white : COLORS.black,
-                    paddingRight: 30,
-                  },
-                  iconContainer: {
-                    top: 10,
-                    right: 12,
-                  },
-                }}
-                useNativeAndroidPickerStyle={false}
-                Icon={() => (
-                  <Image
-                    source={icons.down}
+                  {/* Enhanced Picker Container */}
+                  <View
                     style={[
-                      styles.dropdownIcon,
-                      { tintColor: dark ? COLORS.white : COLORS.black },
+                      styles.pickerContainer,
+                      {
+                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
                     ]}
-                  />
-                )}
-              />
+                  >
+                    {/* Touchable Overlay */}
+                    <TouchableOpacity
+                      style={styles.pickerTouchableOverlay}
+                      onPress={openPicker}
+                      activeOpacity={0.7}
+                    />
+
+                    {/* Native Picker */}
+                    <RNPickerSelect
+                      ref={pickerRef}
+                      placeholder={{
+                        label: "Sélectionner le niveau",
+                        value: null,
+                        color: dark ? COLORS.grayTie : COLORS.gray,
+                      }}
+                      items={gradeOptions}
+                      onValueChange={handleGradeChange}
+                      value={selectedGrade}
+                      style={{
+                        inputIOS: {
+                          fontSize: 16,
+                          paddingVertical: 12,
+                          paddingHorizontal: 16,
+                          color: dark ? COLORS.white : COLORS.black,
+                          paddingRight: 50,
+                          width: "100%",
+                          height: "100%",
+                        },
+                        inputAndroid: {
+                          fontSize: 16,
+                          paddingHorizontal: 16,
+                          paddingVertical: 12,
+                          color: dark ? COLORS.white : COLORS.black,
+                          paddingRight: 50,
+                          width: "100%",
+                          height: "100%",
+                        },
+                        placeholder: {
+                          color: dark ? COLORS.grayTie : COLORS.gray,
+                          fontSize: 16,
+                        },
+                        iconContainer: {
+                          top: 18,
+                          right: 16,
+                        },
+                        viewContainer: {
+                          width: "100%",
+                          height: "100%",
+                        },
+                      }}
+                      useNativeAndroidPickerStyle={false}
+                      Icon={() => {
+                        return (
+                          <View style={styles.pickerIconContainer}>
+                            <Ionicons
+                              name="chevron-down"
+                              size={20}
+                              color={dark ? COLORS.white : COLORS.black}
+                            />
+                          </View>
+                        );
+                      }}
+                    />
+                  </View>
+                </View>
+              </MotiView>
+
+              {hasChanges && (
+                <MotiView
+                  from={{ opacity: 0, translateY: 10 }}
+                  animate={{ opacity: 1, translateY: 0 }}
+                  transition={{ type: "timing", duration: 500, delay: 600 }}
+                >
+                  <View style={styles.changesContainer}>
+                    <Ionicons
+                      name="alert-circle-outline"
+                      size={16}
+                      color="#FF9500"
+                    />
+                    <Text style={styles.changesText}>
+                      Vous avez des modifications non sauvegardées
+                    </Text>
+                  </View>
+                </MotiView>
+              )}
             </View>
-          </View>
+          </MotiView>
         </ScrollView>
 
-        <View style={styles.buttonContainer}>
-          <Button
-            title="Annuler"
-            style={dynamicStyles.cancelButton}
-            textColor={dark ? COLORS.white : COLORS.primary}
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 500, delay: 700 }}
+          style={styles.buttonContainer}
+        >
+          {/* Enhanced Cancel Button */}
+          <TouchableOpacity
+            style={[
+              styles.cancelButton,
+              { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
+            ]}
             onPress={handleBack}
-          />
-          <Button
-            title="Enregistrer"
-            filled
-            isLoading={isSubmitting}
-            style={styles.saveButton}
+            activeOpacity={0.8}
+          >
+            <View style={styles.cancelButtonContent}>
+              <Ionicons
+                name="close-outline"
+                size={20}
+                color={dark ? COLORS.white : COLORS.black}
+              />
+              <Text
+                style={[
+                  styles.cancelButtonText,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Annuler
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Enhanced Save Button */}
+          <TouchableOpacity
+            style={[styles.saveButton, { opacity: isSubmitting ? 0.8 : 1 }]}
             onPress={handleSave}
-          />
-        </View>
+            disabled={isSubmitting}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#4CAF50", "#66BB6A"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.saveButtonGradient}
+            >
+              {isSubmitting ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color={COLORS.white} />
+                  <Text style={styles.saveButtonText}>Mise à jour...</Text>
+                </View>
+              ) : (
+                <View style={styles.saveButtonContent}>
+                  <Ionicons
+                    name="checkmark-outline"
+                    size={20}
+                    color={COLORS.white}
+                  />
+                  <Text style={styles.saveButtonText}>Enregistrer</Text>
+                </View>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+        </MotiView>
       </KeyboardAvoidingView>
 
       {renderDiscardModal()}
@@ -455,23 +654,44 @@ interface Styles {
   container: ViewStyle;
   keyboardContainer: ViewStyle;
   scrollView: ViewStyle;
+  formCard: ViewStyle;
+  iosShadow: ViewStyle;
   contentContainer: ViewStyle;
   avatarSection: ViewStyle;
   avatarContainer: ViewStyle;
   avatar: ImageStyle;
   pickImageButton: ViewStyle;
-  pickImageIcon: ImageStyle;
+  pickImageGradient: ViewStyle;
+  inputGroup: ViewStyle;
+  labelContainer: ViewStyle;
   fieldLabel: TextStyle;
   pickerContainer: ViewStyle;
-  dropdownIcon: ImageStyle;
+  pickerTouchableOverlay: ViewStyle;
+  pickerIconContainer: ViewStyle;
+  changesContainer: ViewStyle;
+  changesText: TextStyle;
   buttonContainer: ViewStyle;
+  cancelButton: ViewStyle;
+  cancelButtonContent: ViewStyle;
+  cancelButtonText: TextStyle;
   saveButton: ViewStyle;
+  saveButtonGradient: ViewStyle;
+  saveButtonContent: ViewStyle;
+  saveButtonText: TextStyle;
+  loadingContainer: ViewStyle;
   modalOverlay: ViewStyle;
   modalContainer: ViewStyle;
+  modalIconContainer: ViewStyle;
   modalTitle: TextStyle;
   modalMessage: TextStyle;
   modalButtons: ViewStyle;
-  modalButton: ViewStyle;
+  modalCancelButton: ViewStyle;
+  modalCancelContent: ViewStyle;
+  modalCancelText: TextStyle;
+  modalDiscardButton: ViewStyle;
+  modalDiscardGradient: ViewStyle;
+  modalDiscardContent: ViewStyle;
+  modalDiscardText: TextStyle;
 }
 
 const styles = StyleSheet.create<Styles>({
@@ -486,12 +706,28 @@ const styles = StyleSheet.create<Styles>({
     flex: 1,
     paddingHorizontal: 16,
   },
+  formCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    marginVertical: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  iosShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+  },
   contentContainer: {
-    paddingVertical: 20,
+    padding: 20,
   },
   avatarSection: {
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 32,
   },
   avatarContainer: {
     position: "relative",
@@ -508,80 +744,209 @@ const styles = StyleSheet.create<Styles>({
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: COLORS.secondary,
+    borderRadius: 18,
+    overflow: "hidden",
+  },
+  pickImageGradient: {
     width: 36,
     height: 36,
     borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 3,
+    borderColor: COLORS.white,
   },
-  pickImageIcon: {
-    width: 20,
-    height: 20,
-    tintColor: COLORS.white,
+  inputGroup: {
+    marginBottom: 20,
+  },
+  labelContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
   },
   fieldLabel: {
     fontSize: 16,
     fontFamily: "medium",
-    marginBottom: 8,
-    marginTop: 16,
+    marginLeft: 8,
   },
   pickerContainer: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderRadius: 12,
-    marginVertical: 8,
-    height: 52,
-    justifyContent: "center",
+    height: 56,
+    position: "relative",
   },
-  dropdownIcon: {
-    width: 16,
-    height: 16,
+  pickerTouchableOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10,
+  },
+  pickerIconContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  changesContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF3CD",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  changesText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#856404",
+    fontStyle: "italic",
+    flex: 1,
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.grayscale200,
+    paddingBottom: 24,
+    gap: 12,
+  },
+  cancelButton: {
+    flex: 1,
+    height: 56,
+    borderWidth: 2,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cancelButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontFamily: "semibold",
+    marginLeft: 8,
   },
   saveButton: {
     flex: 1,
+    height: 56,
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: "#4CAF50",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  saveButtonGradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  saveButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontFamily: "semibold",
+    color: COLORS.white,
     marginLeft: 8,
-    backgroundColor: COLORS.greeen,
-    borderColor: COLORS.greeen,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
+    padding: 16,
   },
   modalContainer: {
-    width: "80%",
+    width: "85%",
     backgroundColor: COLORS.white,
     borderRadius: 20,
-    padding: 20,
+    padding: 24,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
     elevation: 5,
   },
+  modalIconContainer: {
+    marginBottom: 16,
+  },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: "bold",
-    marginBottom: 15,
+    marginBottom: 12,
+    textAlign: "center",
   },
   modalMessage: {
     fontSize: 16,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 24,
+    lineHeight: 22,
   },
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+    gap: 12,
   },
-  modalButton: {
+  modalCancelButton: {
     flex: 1,
-    marginHorizontal: 5,
+    height: 48,
+    borderWidth: 2,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+  },
+  modalCancelContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalCancelText: {
+    fontSize: 14,
+    fontFamily: "semibold",
+    marginLeft: 6,
+  },
+  modalDiscardButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  modalDiscardGradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalDiscardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalDiscardText: {
+    fontSize: 14,
+    fontFamily: "semibold",
+    color: COLORS.white,
+    marginLeft: 6,
   },
 });
 

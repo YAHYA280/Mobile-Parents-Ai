@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter, useNavigation } from "expo-router";
 import Button from "@/components/Button";
 import Header from "@/components/ui/Header";
-import { icons, COLORS, images } from "@/constants";
+import { COLORS, images } from "@/constants";
 import {
   SafeAreaView,
   useSafeAreaInsets,

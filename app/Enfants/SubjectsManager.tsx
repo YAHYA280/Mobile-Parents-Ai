@@ -1,12 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faBook,
-  faPlus,
-  faInfo,
-  faTimes,
-  faCheck,
-} from "@fortawesome/free-solid-svg-icons";
 import {
   View,
   Text,
@@ -15,16 +7,23 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  Platform,
+  ActivityIndicator,
 } from "react-native";
 
 import { COLORS } from "../../constants/theme";
 import { useTheme } from "../../theme/ThemeProvider";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { MotiView } from "moti";
+import { ColorSpace } from "react-native-reanimated";
 
 // Structure pour une matière
 export type ISubject = {
   id: string;
   name: string;
   isSelected: boolean;
+  icon: string;
 };
 
 // Structure pour l'abonnement
@@ -44,15 +43,15 @@ export type IChildInfo = {
 
 // Simuler l'API avec des matières disponibles
 const AVAILABLE_SUBJECTS: ISubject[] = [
-  { id: "1", name: "Mathématiques", isSelected: false },
-  { id: "2", name: "Français", isSelected: false },
-  { id: "3", name: "Histoire-Géographie", isSelected: false },
-  { id: "4", name: "Sciences", isSelected: false },
-  { id: "5", name: "Anglais", isSelected: false },
-  { id: "6", name: "Arts plastiques", isSelected: false },
-  { id: "7", name: "Musique", isSelected: false },
-  { id: "8", name: "Éducation physique", isSelected: false },
-  { id: "9", name: "Informatique", isSelected: false },
+  { id: "1", name: "Mathématiques", isSelected: false, icon: "calculator" },
+  { id: "2", name: "Français", isSelected: false, icon: "book" },
+  { id: "3", name: "Histoire-Géographie", isSelected: false, icon: "globe" },
+  { id: "4", name: "Sciences", isSelected: false, icon: "flask" },
+  { id: "5", name: "Anglais", isSelected: false, icon: "language" },
+  { id: "6", name: "Arts plastiques", isSelected: false, icon: "brush" },
+  { id: "7", name: "Musique", isSelected: false, icon: "musical-notes" },
+  { id: "8", name: "Éducation physique", isSelected: false, icon: "fitness" },
+  { id: "9", name: "Informatique", isSelected: false, icon: "laptop" },
 ];
 
 // Simuler un abonnement actif
@@ -85,6 +84,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
   const [subscription] = useState<ISubscription>(MOCK_SUBSCRIPTION);
   const [allChildren] = useState<IChildInfo[]>(MOCK_CHILDREN);
   const [subjects, setSubjects] = useState<ISubject[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Trouver l'enfant actuel
   const currentChild = allChildren.find((child) => child.id === childId);
@@ -169,75 +169,96 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
   );
 
   const saveChanges = useCallback(() => {
-    // Ici, vous appelleriez votre API pour sauvegarder les matières
-    console.log(
-      `Matières sauvegardées pour l'enfant #${childId}:`,
-      subjects.filter((s) => s.isSelected).map((s) => s.name)
-    );
+    setIsLoading(true);
 
-    Alert.alert(
-      "Matières mises à jour",
-      "Les matières ont été assignées avec succès.",
-      [{ text: "OK", onPress: () => setModalVisible(false) }]
-    );
+    // Ici, vous appelleriez votre API pour sauvegarder les matières
+    setTimeout(() => {
+      setIsLoading(false);
+      console.log(
+        `Matières sauvegardées pour l'enfant #${childId}:`,
+        subjects.filter((s) => s.isSelected).map((s) => s.name)
+      );
+
+      Alert.alert(
+        "Matières mises à jour",
+        "Les matières ont été assignées avec succès.",
+        [{ text: "OK", onPress: () => setModalVisible(false) }]
+      );
+    }, 1000);
   }, [childId, subjects]);
 
   // Afficher un message si aucun enfant correspondant n'est trouvé
   if (!currentChild) {
     return (
-      <View
+      <MotiView
+        from={{ opacity: 0, translateY: 20 }}
+        animate={{ opacity: 1, translateY: 0 }}
+        transition={{ type: "timing", duration: 600 }}
         style={[
           styles.container,
-          { backgroundColor: dark ? COLORS.black : COLORS.white },
+          { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+          Platform.OS === "ios" && styles.iosShadow,
         ]}
       >
-        <Text
-          style={[
-            styles.errorText,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
-          Enfant non trouvé. Veuillez vérifier l&apos;identifiant.
-        </Text>
-      </View>
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle" size={48} color={COLORS.error} />
+          <Text
+            style={[
+              styles.errorText,
+              { color: dark ? COLORS.white : COLORS.black },
+            ]}
+          >
+            Enfant non trouvé. Veuillez vérifier l&apos;identifiant.
+          </Text>
+        </View>
+      </MotiView>
     );
   }
 
   return (
-    <View
+    <MotiView
+      from={{ opacity: 0, translateY: 20 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "timing", duration: 600 }}
       style={[
         styles.container,
-        { backgroundColor: dark ? COLORS.black : COLORS.white },
+        { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+        Platform.OS === "ios" && styles.iosShadow,
       ]}
     >
       <View style={styles.headerRow}>
-        <Text
-          style={[
-            styles.sectionTitle,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
-          Matières
-        </Text>
+        <View style={styles.headerLeft}>
+          <Ionicons name="library" size={24} color={COLORS.primary} />
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: dark ? COLORS.white : COLORS.black },
+            ]}
+          >
+            Matières
+          </Text>
+        </View>
         <TouchableOpacity
           style={styles.manageButton}
           onPress={() => setModalVisible(true)}
+          activeOpacity={0.8}
         >
-          <FontAwesomeIcon icon={faPlus} size={14} color={COLORS.white} />
-          <Text style={styles.manageButtonText}>Gérer</Text>
+          <LinearGradient
+            colors={[COLORS.primary, COLORS.primary]}
+            style={styles.manageButtonGradient}
+          >
+            <Ionicons name="settings" size={14} color={COLORS.white} />
+            <Text style={styles.manageButtonText}>Gérer</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
 
       <View style={styles.infoContainer}>
-        <FontAwesomeIcon
-          icon={faInfo}
-          size={14}
-          color={dark ? COLORS.secondaryWhite : COLORS.gray}
-        />
+        <Ionicons name="information-circle" size={16} color={COLORS.primary} />
         <Text
           style={[
             styles.infoText,
-            { color: dark ? COLORS.secondaryWhite : COLORS.gray },
+            { color: dark ? COLORS.greyscale300 : COLORS.gray },
           ]}
         >
           Votre abonnement {subscription.title} permet d&apos;assigner un total
@@ -248,6 +269,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
 
       {!isCurrentChildWithinLimit && currentChild.subjectsAllocated === 0 ? (
         <View style={styles.warningContainer}>
+          <Ionicons name="warning" size={20} color="#FF6B6B" />
           <Text style={styles.warningText}>
             Cet enfant n&apos;est pas inclus dans votre limite d&apos;abonnement
             actuel ({subscription.nbr_children_access} enfants).
@@ -255,44 +277,93 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
         </View>
       ) : (
         <>
-          <View style={styles.counterContainer}>
-            <Text
-              style={[
-                styles.counter,
-                { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-              ]}
-            >
-              {selectedCount} matières utilisées sur {subscription.nbr_subjects}{" "}
-              disponibles
-            </Text>
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+              <Text
+                style={[
+                  styles.statText,
+                  { color: dark ? COLORS.greyscale300 : COLORS.gray },
+                ]}
+              >
+                {selectedCount} / {subscription.nbr_subjects} matières
+              </Text>
+            </View>
+            <View style={styles.progressBarContainer}>
+              <MotiView
+                from={{ width: "0%" }}
+                animate={{
+                  width: `${(selectedCount / subscription.nbr_subjects) * 100}%`,
+                }}
+                transition={{ type: "timing", duration: 800, delay: 300 }}
+                style={[
+                  styles.progressBar,
+                  {
+                    backgroundColor:
+                      selectedCount > 0 ? "#4CAF50" : COLORS.greyscale300,
+                  },
+                ]}
+              />
+            </View>
           </View>
 
           {selectedCount > 0 ? (
             <View style={styles.subjectsContainer}>
               {subjects
                 .filter((s) => s.isSelected)
-                .map((subject) => (
-                  <View key={subject.id} style={styles.subjectTag}>
-                    <FontAwesomeIcon
-                      icon={faBook}
-                      size={14}
-                      color="#24D26D"
-                      style={{ marginRight: 5 }}
-                    />
-                    <Text style={styles.subjectTagText}>{subject.name}</Text>
-                  </View>
+                .map((subject, index) => (
+                  <MotiView
+                    key={subject.id}
+                    from={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                      type: "spring",
+                      delay: 100 * index,
+                      damping: 15,
+                    }}
+                  >
+                    <View style={styles.subjectTag}>
+                      <LinearGradient
+                        colors={["#4CAF50", "#66BB6A"]}
+                        style={styles.subjectTagGradient}
+                      >
+                        <Ionicons
+                          name={subject.icon as any}
+                          size={14}
+                          color={COLORS.white}
+                        />
+                        <Text style={styles.subjectTagText}>
+                          {subject.name}
+                        </Text>
+                      </LinearGradient>
+                    </View>
+                  </MotiView>
                 ))}
             </View>
           ) : (
-            <Text
-              style={[
-                styles.emptyText,
-                { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-              ]}
-            >
-              Aucune matière assignée. Ajoutez des matières pour personnaliser
-              l&apos;apprentissage.
-            </Text>
+            <View style={styles.emptyContainer}>
+              <Ionicons
+                name="school"
+                size={48}
+                color={dark ? COLORS.dark3 : COLORS.greyscale300}
+              />
+              <Text
+                style={[
+                  styles.emptyText,
+                  { color: dark ? COLORS.greyscale300 : COLORS.gray },
+                ]}
+              >
+                Aucune matière assignée
+              </Text>
+              <Text
+                style={[
+                  styles.emptySubtext,
+                  { color: dark ? COLORS.greyscale400 : COLORS.gray },
+                ]}
+              >
+                Ajoutez des matières pour personnaliser l&apos;apprentissage
+              </Text>
+            </View>
           )}
         </>
       )}
@@ -304,25 +375,35 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View
+          <MotiView
+            from={{ opacity: 0, scale: 0.9, translateY: 50 }}
+            animate={{ opacity: 1, scale: 1, translateY: 0 }}
+            transition={{ type: "spring", damping: 15 }}
             style={[
               styles.modalContent,
               { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
             ]}
           >
             <View style={styles.modalHeader}>
-              <Text
-                style={[
-                  styles.modalTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
+              <View style={styles.modalHeaderLeft}>
+                <Ionicons name="settings" size={24} color={COLORS.primary} />
+                <Text
+                  style={[
+                    styles.modalTitle,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  Gérer les matières
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.closeButton}
+                activeOpacity={0.7}
               >
-                Gérer les matières
-              </Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <FontAwesomeIcon
-                  icon={faTimes}
-                  size={20}
+                <Ionicons
+                  name="close"
+                  size={24}
                   color={dark ? COLORS.white : COLORS.black}
                 />
               </TouchableOpacity>
@@ -331,6 +412,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
             {!isCurrentChildWithinLimit &&
             currentChild.subjectsAllocated === 0 ? (
               <View style={styles.modalWarning}>
+                <Ionicons name="warning" size={24} color="#FF6B6B" />
                 <Text style={styles.modalWarningText}>
                   Vous avez atteint la limite de{" "}
                   {subscription.nbr_children_access} enfants de votre
@@ -340,76 +422,113 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
               </View>
             ) : (
               <>
-                <Text
-                  style={[
-                    styles.modalSubtitle,
-                    { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-                  ]}
-                >
-                  Vous pouvez sélectionner jusqu&apos;à {remainingSubjects}{" "}
-                  matières (sur {subscription.nbr_subjects} de votre
-                  abonnement).
-                </Text>
+                <View style={styles.modalSubtitleContainer}>
+                  <Ionicons
+                    name="information-circle"
+                    size={16}
+                    color={COLORS.primary}
+                  />
+                  <Text
+                    style={[
+                      styles.modalSubtitle,
+                      { color: dark ? COLORS.greyscale300 : COLORS.gray },
+                    ]}
+                  >
+                    Vous pouvez sélectionner jusqu&apos;à {remainingSubjects}{" "}
+                    matières (sur {subscription.nbr_subjects} de votre
+                    abonnement).
+                  </Text>
+                </View>
 
                 <FlatList
                   data={subjects}
                   keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={[
-                        styles.subjectItem,
-                        {
-                          backgroundColor: item.isSelected
-                            ? "rgba(36, 210, 109, 0.1)"
-                            : dark
-                              ? COLORS.dark2
-                              : COLORS.greyScale100,
-                          borderColor: item.isSelected
-                            ? "#24D26D"
-                            : "transparent",
-                        },
-                      ]}
-                      onPress={() => toggleSubject(item.id)}
+                  renderItem={({ item, index }) => (
+                    <MotiView
+                      from={{ opacity: 0, translateX: -20 }}
+                      animate={{ opacity: 1, translateX: 0 }}
+                      transition={{
+                        type: "timing",
+                        duration: 300,
+                        delay: 50 * index,
+                      }}
                     >
-                      <View style={styles.subjectItemContent}>
-                        <FontAwesomeIcon
-                          icon={faBook}
-                          size={16}
-                          color={
-                            item.isSelected
-                              ? "#24D26D"
+                      <TouchableOpacity
+                        style={[
+                          styles.subjectItem,
+                          {
+                            backgroundColor: item.isSelected
+                              ? "#4CAF5015"
                               : dark
-                                ? COLORS.white
-                                : COLORS.gray
-                          }
-                        />
-                        <Text
-                          style={[
-                            styles.subjectItemText,
-                            { color: dark ? COLORS.white : COLORS.black },
-                          ]}
-                        >
-                          {item.name}
-                        </Text>
-                      </View>
+                                ? COLORS.dark2
+                                : COLORS.greyscale100,
+                            borderColor: item.isSelected
+                              ? "#4CAF50"
+                              : dark
+                                ? COLORS.dark3
+                                : COLORS.greyscale300,
+                          },
+                        ]}
+                        onPress={() => toggleSubject(item.id)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.subjectItemContent}>
+                          <View
+                            style={[
+                              styles.subjectItemIcon,
+                              {
+                                backgroundColor: item.isSelected
+                                  ? "#4CAF5020"
+                                  : dark
+                                    ? COLORS.dark3
+                                    : COLORS.greyscale300,
+                              },
+                            ]}
+                          >
+                            <Ionicons
+                              name={item.icon as any}
+                              size={16}
+                              color={
+                                item.isSelected
+                                  ? "#4CAF50"
+                                  : dark
+                                    ? COLORS.white
+                                    : COLORS.gray
+                              }
+                            />
+                          </View>
+                          <Text
+                            style={[
+                              styles.subjectItemText,
+                              { color: dark ? COLORS.white : COLORS.black },
+                            ]}
+                          >
+                            {item.name}
+                          </Text>
+                        </View>
 
-                      {item.isSelected && (
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          size={16}
-                          color="#24D26D"
-                        />
-                      )}
-                    </TouchableOpacity>
+                        {item.isSelected && (
+                          <View style={styles.checkmarkContainer}>
+                            <Ionicons
+                              name="checkmark-circle"
+                              size={20}
+                              color="#4CAF50"
+                            />
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    </MotiView>
                   )}
                   contentContainerStyle={styles.subjectsList}
+                  showsVerticalScrollIndicator={false}
                 />
 
                 <View style={styles.allocationInfo}>
+                  <Ionicons name="pie-chart" size={16} color={COLORS.primary} />
                   <Text
                     style={[
                       styles.allocationInfoText,
-                      { color: dark ? COLORS.secondaryWhite : COLORS.gray },
+                      { color: dark ? COLORS.greyscale300 : COLORS.gray },
                     ]}
                   >
                     Vous pouvez distribuer librement les{" "}
@@ -425,88 +544,152 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                 style={[
                   styles.cancelButton,
                   {
-                    borderColor: dark
-                      ? "rgba(255,255,255,0.2)"
-                      : "rgba(0,0,0,0.1)",
+                    borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
                   },
                 ]}
                 onPress={() => setModalVisible(false)}
+                activeOpacity={0.8}
               >
-                <Text
-                  style={[
-                    styles.cancelButtonText,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
-                  Annuler
-                </Text>
+                <View style={styles.cancelButtonContent}>
+                  <Ionicons
+                    name="close-outline"
+                    size={18}
+                    color={dark ? COLORS.white : COLORS.black}
+                  />
+                  <Text
+                    style={[
+                      styles.cancelButtonText,
+                      { color: dark ? COLORS.white : COLORS.black },
+                    ]}
+                  >
+                    Annuler
+                  </Text>
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
                   styles.saveButton,
-                  !isCurrentChildWithinLimit &&
-                  currentChild.subjectsAllocated === 0
+                  (!isCurrentChildWithinLimit &&
+                    currentChild.subjectsAllocated === 0) ||
+                  isLoading
                     ? styles.disabledButton
                     : {},
                 ]}
                 onPress={saveChanges}
                 disabled={
-                  !isCurrentChildWithinLimit &&
-                  currentChild.subjectsAllocated === 0
+                  (!isCurrentChildWithinLimit &&
+                    currentChild.subjectsAllocated === 0) ||
+                  isLoading
                 }
+                activeOpacity={0.8}
               >
-                <Text style={styles.saveButtonText}>Enregistrer</Text>
+                <LinearGradient
+                  colors={
+                    (!isCurrentChildWithinLimit &&
+                      currentChild.subjectsAllocated === 0) ||
+                    isLoading
+                      ? ["#CCCCCC", "#CCCCCC"]
+                      : ["#4CAF50", "#66BB6A"]
+                  }
+                  style={styles.saveButtonGradient}
+                >
+                  {isLoading ? (
+                    <View style={styles.loadingContainer}>
+                      <ActivityIndicator size="small" color={COLORS.white} />
+                      <Text style={styles.saveButtonText}>
+                        Enregistrement...
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={styles.saveButtonContent}>
+                      <Ionicons
+                        name="checkmark-outline"
+                        size={18}
+                        color={COLORS.white}
+                      />
+                      <Text style={styles.saveButtonText}>Enregistrer</Text>
+                    </View>
+                  )}
+                </LinearGradient>
               </TouchableOpacity>
             </View>
-          </View>
+          </MotiView>
         </View>
       </Modal>
-    </View>
+    </MotiView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     marginBottom: 16,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  iosShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+  },
+  errorContainer: {
+    alignItems: "center",
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    fontFamily: "medium",
+    textAlign: "center",
+    marginTop: 12,
   },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 16,
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: "bold",
+    marginLeft: 12,
   },
   manageButton: {
-    backgroundColor: COLORS.primary,
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#FF9500",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  manageButtonGradient: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingVertical: 8,
   },
   manageButtonText: {
     color: COLORS.white,
-    marginLeft: 5,
+    marginLeft: 6,
     fontSize: 14,
-    fontFamily: "medium",
+    fontFamily: "semibold",
   },
   infoContainer: {
     flexDirection: "row",
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
+    backgroundColor: `${COLORS.primary}10`,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
     alignItems: "flex-start",
   },
   infoText: {
@@ -514,90 +697,157 @@ const styles = StyleSheet.create({
     fontFamily: "regular",
     marginLeft: 8,
     flex: 1,
+    lineHeight: 18,
   },
   warningContainer: {
-    backgroundColor: "rgba(255, 90, 90, 0.1)",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
+    flexDirection: "row",
+    backgroundColor: "#FF6B6B15",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    alignItems: "center",
   },
   warningText: {
-    color: "#FF5A5A",
+    color: "#FF6B6B",
     fontSize: 14,
     fontFamily: "medium",
+    marginLeft: 8,
+    flex: 1,
   },
-  counterContainer: {
-    marginBottom: 15,
+  statsContainer: {
+    marginBottom: 16,
   },
-  counter: {
+  statItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  statText: {
     fontSize: 14,
-    fontFamily: "regular",
+    fontFamily: "medium",
+    marginLeft: 8,
+  },
+  progressBarContainer: {
+    height: 6,
+    backgroundColor: COLORS.greyscale300,
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  progressBar: {
+    height: "100%",
+    borderRadius: 3,
   },
   subjectsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
+    gap: 8,
   },
   subjectTag: {
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  subjectTagGradient: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(36, 210, 109, 0.1)",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginRight: 8,
-    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
   subjectTagText: {
-    color: "#24D26D",
-    fontSize: 14,
-    fontFamily: "medium",
+    color: COLORS.white,
+    fontSize: 12,
+    fontFamily: "semibold",
+    marginLeft: 6,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    padding: 24,
   },
   emptyText: {
-    fontSize: 14,
-    fontFamily: "regular",
-    fontStyle: "italic",
-  },
-  errorText: {
     fontSize: 16,
     fontFamily: "medium",
     textAlign: "center",
+    marginTop: 12,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    fontFamily: "regular",
+    textAlign: "center",
+    marginTop: 4,
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
+    padding: 16,
   },
   modalContent: {
-    width: "90%",
-    maxHeight: "80%",
-    borderRadius: 12,
-    padding: 20,
+    width: "100%",
+    maxHeight: "90%",
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 10,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 20,
+  },
+  modalHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 20,
     fontFamily: "bold",
+    marginLeft: 12,
   },
-  modalSubtitle: {
-    fontSize: 14,
-    marginBottom: 20,
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: `${COLORS.primary}15`,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  modalWarning: {
-    backgroundColor: "rgba(255, 90, 90, 0.1)",
-    borderRadius: 8,
+  modalSubtitleContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: `${COLORS.primary}10`,
+    borderRadius: 12,
     padding: 12,
     marginBottom: 20,
   },
+  modalSubtitle: {
+    fontSize: 14,
+    marginLeft: 8,
+    flex: 1,
+    lineHeight: 20,
+  },
+  modalWarning: {
+    flexDirection: "row",
+    backgroundColor: "#FF6B6B15",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    alignItems: "center",
+  },
   modalWarningText: {
-    color: "#FF5A5A",
+    color: "#FF6B6B",
     fontSize: 14,
     fontFamily: "medium",
+    marginLeft: 12,
+    flex: 1,
   },
   subjectsList: {
     paddingBottom: 20,
@@ -606,61 +856,111 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 12,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 12,
     marginBottom: 8,
-    borderWidth: 1,
+    borderWidth: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   subjectItemContent: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
+  },
+  subjectItemIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
   },
   subjectItemText: {
-    marginLeft: 10,
     fontSize: 16,
     fontFamily: "medium",
+    flex: 1,
+  },
+  checkmarkContainer: {
+    marginLeft: 12,
   },
   allocationInfo: {
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
+    flexDirection: "row",
+    backgroundColor: `${COLORS.primary}10`,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 20,
+    alignItems: "flex-start",
   },
   allocationInfoText: {
     fontSize: 12,
-    fontFamily: "italic",
+    fontFamily: "regular",
+    marginLeft: 8,
+    flex: 1,
+    lineHeight: 18,
   },
   modalFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 12,
   },
   cancelButton: {
     flex: 1,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderWidth: 2,
+    borderRadius: 16,
+    height: 56,
+    justifyContent: "center",
     alignItems: "center",
-    marginRight: 8,
+    backgroundColor: "transparent",
+  },
+  cancelButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   cancelButtonText: {
     fontSize: 16,
-    fontFamily: "medium",
+    fontFamily: "semibold",
+    marginLeft: 6,
   },
   saveButton: {
     flex: 1,
-    backgroundColor: COLORS.primary,
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: "center",
-    marginLeft: 8,
+    borderRadius: 16,
+    height: 56,
+    overflow: "hidden",
+    shadowColor: "#4CAF50",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  disabledButton: {
-    backgroundColor: "#CCCCCC",
+  saveButtonGradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  saveButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   saveButtonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontFamily: "medium",
+    fontFamily: "semibold",
+    marginLeft: 6,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  disabledButton: {
+    shadowOpacity: 0,
+    elevation: 0,
   },
 });
 

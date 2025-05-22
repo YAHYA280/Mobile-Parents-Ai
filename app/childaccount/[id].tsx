@@ -1,13 +1,18 @@
 import { Image } from "expo-image";
 import React, { useState } from "react";
 import Header from "@/components/ui/Header";
-import Button from "@/components/Button";
 import { useNavigation } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
 import ObjectiveCard from "@/components/ObjectiveCard";
-import { SIZES, icons, COLORS, images } from "@/constants";
+import { SIZES, COLORS, images } from "@/constants";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { MotiView } from "moti";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -17,6 +22,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  useWindowDimensions,
+  Platform,
+  ActivityIndicator,
 } from "react-native";
 
 import SubjectsManager from "../Enfants/SubjectsManager";
@@ -121,11 +129,11 @@ interface ProgressBarProps {
 }
 const ProgressBar = ({ progress, color }: ProgressBarProps) => (
   <View style={styles.progressBarContainer}>
-    <View
-      style={[
-        styles.progressBar,
-        { width: `${progress}%`, backgroundColor: color },
-      ]}
+    <MotiView
+      from={{ width: "5%" }}
+      animate={{ width: `${Math.max(5, progress)}%` }}
+      transition={{ type: "timing", duration: 800, delay: 200 }}
+      style={[styles.progressBar, { backgroundColor: color }]}
     />
   </View>
 );
@@ -137,11 +145,14 @@ const ChildAccount = () => {
   const navigation = useNavigation();
   const router = useRouter();
   const { colors, dark } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
 
   // 1. Call all Hooks at the top level, unconditionally:
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [message, setMessage] = useState("");
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
 
   // 2. Get the childId from the route params:
   const params = useLocalSearchParams();
@@ -156,6 +167,7 @@ const ChildAccount = () => {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
+        edges={["top", "right", "left", "bottom"]}
       >
         <Header
           title="Enfant introuvable"
@@ -172,9 +184,9 @@ const ChildAccount = () => {
 
   // Helper to determine progress color
   const getProgressColor = (value: number) => {
-    if (value >= 75) return COLORS.greeen;
+    if (value >= 75) return "#4CAF50";
     if (value >= 50) return COLORS.primary;
-    if (value >= 25) return COLORS.secondary;
+    if (value >= 25) return "#FF9500";
     return COLORS.error;
   };
 
@@ -182,10 +194,30 @@ const ChildAccount = () => {
   const handleDeleteAccount = () => {
     setShowDeleteConfirmModal(true);
   };
+
   const confirmDeleteAccount = () => {
     // In a real app, you'd actually delete the child account.
     setShowDeleteConfirmModal(false);
     navigation.goBack();
+  };
+
+  const handleSendMessage = () => {
+    if (!message.trim()) {
+      Alert.alert(
+        "Message vide",
+        "Veuillez entrer un message avant d'envoyer."
+      );
+      return;
+    }
+
+    setIsSendingMessage(true);
+
+    // Simulate sending message
+    setTimeout(() => {
+      setIsSendingMessage(false);
+      Alert.alert("Message envoyé", "Ton message a été envoyé à l'enfant !");
+      setMessage("");
+    }, 1000);
   };
 
   // --------------------------------------------------
@@ -199,12 +231,19 @@ const ChildAccount = () => {
       onRequestClose={() => setShowSettingsModal(false)}
     >
       <View style={styles.centeredView}>
-        <View
+        <MotiView
+          from={{ opacity: 0, scale: 0.9, translateY: 20 }}
+          animate={{ opacity: 1, scale: 1, translateY: 0 }}
+          transition={{ type: "spring", damping: 15 }}
           style={[
             styles.modalView,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
           ]}
         >
+          <View style={styles.modalIconContainer}>
+            <Ionicons name="settings" size={48} color={COLORS.primary} />
+          </View>
+
           <Text
             style={[
               styles.modalTitle,
@@ -224,8 +263,18 @@ const ChildAccount = () => {
                 params: { id: childId },
               });
             }}
+            activeOpacity={0.7}
           >
-            <Image source={icons.settings} style={styles.modalIcon} />
+            <LinearGradient
+              colors={[COLORS.primary, "#4A90E2"]}
+              style={styles.modalOptionIconContainer}
+            >
+              <Ionicons
+                name="shield-checkmark"
+                size={20}
+                color={COLORS.white}
+              />
+            </LinearGradient>
             <Text
               style={[
                 styles.modalOptionText,
@@ -246,8 +295,14 @@ const ChildAccount = () => {
                 params: { id: childId },
               });
             }}
+            activeOpacity={0.7}
           >
-            <Image source={icons.plus} style={styles.modalIcon} />
+            <LinearGradient
+              colors={["#4CAF50", "#66BB6A"]}
+              style={styles.modalOptionIconContainer}
+            >
+              <Ionicons name="add" size={20} color={COLORS.white} />
+            </LinearGradient>
             <Text
               style={[
                 styles.modalOptionText,
@@ -264,23 +319,38 @@ const ChildAccount = () => {
               setShowSettingsModal(false);
               handleDeleteAccount();
             }}
+            activeOpacity={0.7}
           >
-            <Image
-              source={icons.trash}
-              style={[styles.modalIcon, { tintColor: COLORS.error }]}
-            />
+            <LinearGradient
+              colors={[COLORS.error, "#FF6B6B"]}
+              style={styles.modalOptionIconContainer}
+            >
+              <Ionicons name="trash" size={20} color={COLORS.white} />
+            </LinearGradient>
             <Text style={[styles.modalOptionText, { color: COLORS.error }]}>
               Supprimer le compte
             </Text>
           </TouchableOpacity>
 
-          <Button
-            title="Fermer"
-            textColor={COLORS.white}
+          {/* Enhanced Close Button */}
+          <TouchableOpacity
+            style={styles.modalCloseButton}
             onPress={() => setShowSettingsModal(false)}
-            style={styles.closeButton}
-          />
-        </View>
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={[COLORS.primary, COLORS.primary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.modalCloseGradient}
+            >
+              <View style={styles.modalCloseContent}>
+                <Ionicons name="close-outline" size={20} color={COLORS.white} />
+                <Text style={styles.modalCloseText}>Fermer</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </MotiView>
       </View>
     </Modal>
   );
@@ -293,42 +363,74 @@ const ChildAccount = () => {
       onRequestClose={() => setShowDeleteConfirmModal(false)}
     >
       <View style={styles.centeredView}>
-        <View
+        <MotiView
+          from={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", damping: 15 }}
           style={[
             styles.confirmModalView,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
           ]}
         >
+          <View style={styles.modalIconContainer}>
+            <Ionicons name="warning" size={48} color={COLORS.error} />
+          </View>
+
           <Text style={[styles.confirmTitle, { color: COLORS.error }]}>
             Êtes-vous sûr de vouloir supprimer ce compte enfant ?
           </Text>
 
           <View style={styles.confirmButtonsContainer}>
-            <Button
-              title="Annuler"
+            {/* Enhanced Cancel Button */}
+            <TouchableOpacity
+              style={[
+                styles.confirmCancelButton,
+                { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
+              ]}
               onPress={() => setShowDeleteConfirmModal(false)}
-              style={[
-                styles.confirmButton,
-                {
-                  backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-                  borderWidth: 0,
-                },
-              ]}
-              textColor={dark ? COLORS.white : COLORS.black}
-            />
-            <Button
-              title="Confirmer"
+              activeOpacity={0.8}
+            >
+              <View style={styles.confirmCancelContent}>
+                <Ionicons
+                  name="close-outline"
+                  size={18}
+                  color={dark ? COLORS.white : COLORS.black}
+                />
+                <Text
+                  style={[
+                    styles.confirmCancelText,
+                    { color: dark ? COLORS.white : COLORS.black },
+                  ]}
+                >
+                  Annuler
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Enhanced Confirm Button */}
+            <TouchableOpacity
+              style={styles.confirmDeleteButton}
               onPress={confirmDeleteAccount}
-              style={[
-                styles.confirmButton,
-                {
-                  backgroundColor: COLORS.error,
-                  borderColor: COLORS.error,
-                },
-              ]}
-            />
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={[COLORS.error, "#FF6B6B"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.confirmDeleteGradient}
+              >
+                <View style={styles.confirmDeleteContent}>
+                  <Ionicons
+                    name="trash-outline"
+                    size={18}
+                    color={COLORS.white}
+                  />
+                  <Text style={styles.confirmDeleteText}>Confirmer</Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
-        </View>
+        </MotiView>
       </View>
     </Modal>
   );
@@ -339,7 +441,7 @@ const ChildAccount = () => {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
-      edges={["right", "bottom", "left"]}
+      edges={["top", "right", "left", "bottom"]}
     >
       {/* Header + Settings button */}
       <Header
@@ -353,45 +455,67 @@ const ChildAccount = () => {
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
-        {/* Child Info */}
-        <View style={styles.profileSection}>
-          <View style={styles.avatarContainer}>
-            <Image source={childData.avatar} style={styles.avatar} />
-            {childData.isActive && <View style={styles.statusDot} />}
-          </View>
-          <View style={styles.profileInfo}>
-            <Text
-              style={[
-                styles.childDetails,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              {childData.age} ans • {childData.grade}
-            </Text>
-            <View style={styles.timeSpentContainer}>
-              <Image source={icons.time} style={styles.timeIcon} />
-              <Text style={styles.timeSpentText}>
-                Temps passé : {childData.timeSpent}
+        {/* Child Info Card */}
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 600 }}
+          style={[styles.infoCard, Platform.OS === "ios" && styles.iosShadow]}
+        >
+          <View style={styles.profileSection}>
+            <View style={styles.avatarContainer}>
+              <Image source={childData.avatar} style={styles.avatar} />
+              {childData.isActive && (
+                <View style={styles.statusDotWrapper}>
+                  <View style={styles.statusDot} />
+                </View>
+              )}
+            </View>
+            <View style={styles.profileInfo}>
+              <Text
+                style={[
+                  styles.childDetails,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                {childData.age} ans • {childData.grade}
               </Text>
+              <View style={styles.timeSpentContainer}>
+                <Ionicons
+                  name="time-outline"
+                  size={16}
+                  color={COLORS.primary}
+                />
+                <Text style={styles.timeSpentText}>
+                  Temps passé : {childData.timeSpent}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
+        </MotiView>
 
         {/* Global progress */}
-        <View
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 600, delay: 200 }}
           style={[
             styles.section,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Progrès global
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="trending-up" size={24} color={COLORS.primary} />
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Progrès global
+            </Text>
+          </View>
 
           <View style={styles.progressRow}>
             <Text style={styles.progressLabel}>Taux de réussite global</Text>
@@ -418,61 +542,88 @@ const ChildAccount = () => {
                 "Cette fonctionnalité sera bientôt disponible"
               )
             }
+            activeOpacity={0.7}
           >
-            <Image source={icons.download} style={styles.exportIcon} />
-            <Text style={styles.exportText}>Exporter les statistiques</Text>
+            <LinearGradient
+              colors={[`${COLORS.primary}15`, `${COLORS.primary}10`]}
+              style={styles.exportGradient}
+            >
+              <Ionicons
+                name="download-outline"
+                size={16}
+                color={COLORS.primary}
+              />
+              <Text style={styles.exportText}>Exporter les statistiques</Text>
+            </LinearGradient>
           </TouchableOpacity>
-        </View>
+        </MotiView>
+
         <SubjectsManager childId={childIdNumber} />
 
         {/* Objectives */}
-        <View
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 600, delay: 400 }}
           style={[
             styles.section,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Objectifs d’apprentissage
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="flag" size={24} color={COLORS.primary} />
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Objectifs d'apprentissage
+            </Text>
+          </View>
 
-          {mockObjectives.map((objective) => (
-            <ObjectiveCard
+          {mockObjectives.map((objective, index) => (
+            <MotiView
               key={objective.id}
-              objective={objective}
-              onEdit={() =>
-                router.push({
-                  pathname: "/editobjective/[id]",
-                  params: { id: objective.id },
-                })
-              }
-              onDelete={() =>
-                Alert.alert(
-                  "Confirmation",
-                  "Êtes-vous sûr de vouloir supprimer cet objectif ?",
-                  [
-                    { text: "Annuler", style: "cancel" },
-                    {
-                      text: "Supprimer",
-                      style: "destructive",
-                      onPress: () => {
-                        // Delete objective logic
-                        Alert.alert("Succès", "Objectif supprimé avec succès");
+              from={{ opacity: 0, translateX: -20 }}
+              animate={{ opacity: 1, translateX: 0 }}
+              transition={{ type: "timing", duration: 500, delay: 100 * index }}
+            >
+              <ObjectiveCard
+                objective={objective}
+                onEdit={() =>
+                  router.push({
+                    pathname: "/editobjective/[id]",
+                    params: { id: objective.id },
+                  })
+                }
+                onDelete={() =>
+                  Alert.alert(
+                    "Confirmation",
+                    "Êtes-vous sûr de vouloir supprimer cet objectif ?",
+                    [
+                      { text: "Annuler", style: "cancel" },
+                      {
+                        text: "Supprimer",
+                        style: "destructive",
+                        onPress: () => {
+                          // Delete objective logic
+                          Alert.alert(
+                            "Succès",
+                            "Objectif supprimé avec succès"
+                          );
+                        },
                       },
-                    },
-                  ]
-                )
-              }
-            />
+                    ]
+                  )
+                }
+              />
+            </MotiView>
           ))}
 
-          <Button
-            title="Ajouter un objectif"
+          {/* Enhanced Add Objective Button */}
+          <TouchableOpacity
             style={styles.addObjectiveButton}
             onPress={() =>
               router.push({
@@ -480,25 +631,48 @@ const ChildAccount = () => {
                 params: { id: childId },
               })
             }
-            filled
-          />
-        </View>
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#4CAF50", "#66BB6A"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.addObjectiveGradient}
+            >
+              <View style={styles.addObjectiveContent}>
+                <Ionicons name="add" size={20} color={COLORS.white} />
+                <Text style={styles.addObjectiveText}>Ajouter un objectif</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </MotiView>
 
         {/* Encouraging Message Section */}
-        <View
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 600, delay: 600 }}
           style={[
             styles.section,
             { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
-            Envoyer un message de soutien
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons
+              name="chatbubble-ellipses"
+              size={24}
+              color={COLORS.primary}
+            />
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: dark ? COLORS.white : COLORS.black },
+              ]}
+            >
+              Envoyer un message de soutien
+            </Text>
+          </View>
 
           <TextInput
             style={[
@@ -506,6 +680,7 @@ const ChildAccount = () => {
               {
                 color: dark ? COLORS.white : COLORS.black,
                 borderColor: dark ? COLORS.greyscale300 : COLORS.grayscale200,
+                backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
               },
             ]}
             onChangeText={(text) => setMessage(text)}
@@ -517,19 +692,33 @@ const ChildAccount = () => {
             }
           />
 
-          <Button
-            title="Envoyer"
-            onPress={() => {
-              Alert.alert(
-                "Message envoyé",
-                "Ton message a été envoyé à l'enfant !"
-              );
-              setMessage("");
-            }}
-            style={styles.addObjectiveButton}
-            filled
-          />
-        </View>
+          {/* Enhanced Send Button */}
+          <TouchableOpacity
+            style={[styles.sendButton, { opacity: isSendingMessage ? 0.8 : 1 }]}
+            onPress={handleSendMessage}
+            disabled={isSendingMessage}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={[COLORS.primary, COLORS.primary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.sendButtonGradient}
+            >
+              {isSendingMessage ? (
+                <View style={styles.sendingContainer}>
+                  <ActivityIndicator size="small" color={COLORS.white} />
+                  <Text style={styles.sendButtonText}>Envoi...</Text>
+                </View>
+              ) : (
+                <View style={styles.sendButtonContent}>
+                  <Ionicons name="send" size={18} color={COLORS.white} />
+                  <Text style={styles.sendButtonText}>Envoyer</Text>
+                </View>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+        </MotiView>
       </ScrollView>
 
       {/* Render Modals */}
@@ -549,12 +738,28 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+  },
+  infoCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    padding: 18,
+    marginVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  iosShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
   },
   profileSection: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
   },
   avatarContainer: {
     position: "relative",
@@ -565,16 +770,22 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
   },
-  statusDot: {
-    width: 15,
-    height: 15,
-    borderRadius: 7.5,
-    backgroundColor: COLORS.greeen,
+  statusDotWrapper: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    borderWidth: 2,
-    borderColor: COLORS.white,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: COLORS.white,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  statusDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#4CAF50",
   },
   profileInfo: {
     flex: 1,
@@ -588,32 +799,32 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  timeIcon: {
-    width: 16,
-    height: 16,
-    tintColor: COLORS.gray,
-    marginRight: 8,
-  },
   timeSpentText: {
     fontSize: 14,
     color: COLORS.gray,
     fontFamily: "regular",
+    marginLeft: 8,
   },
   section: {
     backgroundColor: COLORS.white,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
+    borderRadius: 20,
+    padding: 18,
+    marginVertical: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: "bold",
-    marginBottom: 16,
+    marginLeft: 12,
   },
   progressRow: {
     flexDirection: "row",
@@ -635,35 +846,96 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.grayscale200,
     borderRadius: 4,
     marginBottom: 12,
+    overflow: "hidden",
   },
   progressBar: {
     height: "100%",
     borderRadius: 4,
   },
   exportButton: {
+    marginTop: 8,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  exportGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 8,
-    padding: 8,
-    backgroundColor: COLORS.greyscale100,
-    borderRadius: 8,
-  },
-  exportIcon: {
-    width: 16,
-    height: 16,
-    tintColor: COLORS.primary,
-    marginRight: 8,
+    padding: 12,
   },
   exportText: {
     fontSize: 14,
     color: COLORS.primary,
     fontFamily: "medium",
+    marginLeft: 8,
   },
   addObjectiveButton: {
     marginTop: 16,
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: "#4CAF50",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  addObjectiveGradient: {
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addObjectiveContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addObjectiveText: {
+    fontSize: 16,
+    fontFamily: "semibold",
+    color: COLORS.white,
+    marginLeft: 8,
+  },
+  messageInput: {
+    borderWidth: 1.5,
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 14,
+    fontFamily: "regular",
+    marginBottom: 16,
+    textAlignVertical: "top",
+    minHeight: 80,
+  },
+  sendButton: {
+    alignSelf: "flex-end",
+    minWidth: 120,
+    borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  sendButtonGradient: {
+    padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sendButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sendButtonText: {
+    fontSize: 14,
+    fontFamily: "semibold",
+    color: COLORS.white,
+    marginLeft: 8,
+  },
+  sendingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   centeredView: {
     flex: 1,
@@ -675,13 +947,16 @@ const styles = StyleSheet.create({
     width: SIZES.width * 0.9,
     backgroundColor: COLORS.white,
     borderRadius: 20,
-    padding: 20,
+    padding: 24,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  modalIconContainer: {
+    marginBottom: 16,
   },
   modalTitle: {
     fontSize: 20,
@@ -697,27 +972,51 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.grayscale200,
   },
-  modalIcon: {
-    width: 24,
-    height: 24,
+  modalOptionIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 16,
-    tintColor: COLORS.primary,
   },
   modalOptionText: {
     fontSize: 16,
     fontFamily: "medium",
+    flex: 1,
   },
-  closeButton: {
+  modalCloseButton: {
     marginTop: 20,
     width: "100%",
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  modalCloseGradient: {
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalCloseContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalCloseText: {
+    fontSize: 16,
+    fontFamily: "semibold",
+    color: COLORS.white,
+    marginLeft: 8,
   },
   confirmModalView: {
     width: SIZES.width * 0.9,
     backgroundColor: COLORS.white,
     borderRadius: 20,
-    padding: 20,
+    padding: 24,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -735,20 +1034,53 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+    gap: 12,
   },
-  confirmButton: {
+  confirmCancelButton: {
     flex: 1,
-    marginHorizontal: 5,
+    height: 48,
+    borderWidth: 2,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
   },
-  messageInput: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 8,
+  confirmCancelContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  confirmCancelText: {
     fontSize: 14,
-    fontFamily: "regular",
-    marginBottom: 16,
-    textAlignVertical: "top",
-    minHeight: 80,
+    fontFamily: "semibold",
+    marginLeft: 6,
+  },
+  confirmDeleteButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: COLORS.error,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  confirmDeleteGradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  confirmDeleteContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  confirmDeleteText: {
+    fontSize: 14,
+    fontFamily: "semibold",
+    color: COLORS.white,
+    marginLeft: 6,
   },
 });
 

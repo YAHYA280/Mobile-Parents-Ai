@@ -1,13 +1,14 @@
-import { Image } from "expo-image";
 import React, { useState } from "react";
 import Header from "@/components/ui/Header";
-import Button from "@/components/Button";
 import { icons, COLORS } from "@/constants";
 import { useTheme } from "@/theme/ThemeProvider";
 import RNPickerSelect from "react-native-picker-select";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { MotiView } from "moti";
 import {
   View,
   Text,
@@ -18,6 +19,7 @@ import {
   ScrollView,
   TouchableOpacity,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
 
 // Options pour les matières
@@ -58,6 +60,7 @@ const AddObjectiveScreen = () => {
   const [initialStatus, setInitialStatus] = useState<string | null>(
     "not_started"
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // États pour les dates
   const [startDate, setStartDate] = useState(new Date());
@@ -71,6 +74,11 @@ const AddObjectiveScreen = () => {
 
   // **Nouvel état : message optionnel pour l'enfant**
   const [kidMessage, setKidMessage] = useState("");
+
+  // Refs for pickers
+  const subjectPickerRef = React.useRef<any>(null);
+  const priorityPickerRef = React.useRef<any>(null);
+  const statusPickerRef = React.useRef<any>(null);
 
   // Format de date pour l'affichage
   const formatDate = (date: Date): string => {
@@ -124,17 +132,28 @@ const AddObjectiveScreen = () => {
   // Sauvegarde de l'objectif
   const saveObjective = () => {
     if (validateForm()) {
+      setIsSubmitting(true);
+
       // Dans une vraie application, vous enverriez tous ces champs (dont kidMessage) à votre API / backend
-      Alert.alert("Succès", "L'objectif a été créé avec succès", [
-        { text: "OK", onPress: () => navigation.goBack() },
-      ]);
+      setTimeout(() => {
+        setIsSubmitting(false);
+        Alert.alert("Succès", "L'objectif a été créé avec succès", [
+          { text: "OK", onPress: () => navigation.goBack() },
+        ]);
+      }, 1000);
+    }
+  };
+
+  const openPicker = (pickerRef: React.RefObject<any>) => {
+    if (pickerRef.current) {
+      pickerRef.current.togglePicker();
     }
   };
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
-      edges={["right", "bottom", "left"]}
+      edges={["top", "right", "bottom", "left"]}
     >
       <Header
         title="Ajouter un objectif"
@@ -149,381 +168,556 @@ const AddObjectiveScreen = () => {
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.formContainer}>
-            {/* Titre de l'objectif */}
-            <View style={styles.inputGroup}>
-              <Text
-                style={[
-                  styles.label,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 600 }}
+            style={[styles.formCard, Platform.OS === "ios" && styles.iosShadow]}
+          >
+            <View style={styles.formContainer}>
+              {/* Titre de l'objectif */}
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 200 }}
               >
-                Titre de l&apos;objectif
-              </Text>
-              <TextInput
-                style={[
-                  styles.textInput,
-                  {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
-                    color: dark ? COLORS.white : COLORS.black,
-                  },
-                ]}
-                value={title}
-                onChangeText={setTitle}
-                placeholder="Entrez le titre de l'objectif"
-                placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
-              />
-            </View>
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons name="flag" size={18} color={COLORS.primary} />
+                    <Text
+                      style={[
+                        styles.label,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Titre de l&apos;objectif
+                    </Text>
+                  </View>
+                  <TextInput
+                    style={[
+                      styles.textInput,
+                      {
+                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                        color: dark ? COLORS.white : COLORS.black,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    value={title}
+                    onChangeText={setTitle}
+                    placeholder="Entrez le titre de l'objectif"
+                    placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                  />
+                </View>
+              </MotiView>
 
-            {/* Description de l'objectif */}
-            <View style={styles.inputGroup}>
-              <Text
-                style={[
-                  styles.label,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
+              {/* Description de l'objectif */}
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 300 }}
               >
-                Description
-              </Text>
-              <TextInput
-                style={[
-                  styles.textInput,
-                  styles.textArea,
-                  {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
-                    color: dark ? COLORS.white : COLORS.black,
-                  },
-                ]}
-                value={description}
-                onChangeText={setDescription}
-                placeholder="Décrivez l'objectif"
-                placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-              />
-            </View>
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons
+                      name="document-text"
+                      size={18}
+                      color={COLORS.primary}
+                    />
+                    <Text
+                      style={[
+                        styles.label,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Description
+                    </Text>
+                  </View>
+                  <TextInput
+                    style={[
+                      styles.textInput,
+                      styles.textArea,
+                      {
+                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                        color: dark ? COLORS.white : COLORS.black,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    value={description}
+                    onChangeText={setDescription}
+                    placeholder="Décrivez l'objectif"
+                    placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                  />
+                </View>
+              </MotiView>
 
-            {/* Matière */}
-            <View style={styles.inputGroup}>
-              <Text
-                style={[
-                  styles.label,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
+              {/* Matière */}
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 400 }}
               >
-                Matière
-              </Text>
-              <View
-                style={[
-                  styles.pickerContainer,
-                  {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
-                  },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Sélectionner une matière",
-                    value: null,
-                  }}
-                  items={subjectOptions}
-                  onValueChange={setSubject}
-                  value={subject}
-                  style={{
-                    inputIOS: {
-                      fontSize: 16,
-                      paddingVertical: 12,
-                      paddingHorizontal: 10,
-                      color: dark ? COLORS.white : COLORS.black,
-                      paddingRight: 30,
-                    },
-                    inputAndroid: {
-                      fontSize: 16,
-                      paddingHorizontal: 10,
-                      paddingVertical: 8,
-                      color: dark ? COLORS.white : COLORS.black,
-                      paddingRight: 30,
-                    },
-                    iconContainer: {
-                      top: 10,
-                      right: 12,
-                    },
-                  }}
-                  useNativeAndroidPickerStyle={false}
-                  Icon={() => (
-                    <Image
-                      source={icons.down}
-                      style={{
-                        width: 18,
-                        height: 18,
-                        tintColor: dark ? COLORS.white : COLORS.black,
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons name="school" size={18} color={COLORS.primary} />
+                    <Text
+                      style={[
+                        styles.label,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Matière
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.pickerContainer,
+                      {
+                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                  >
+                    <TouchableOpacity
+                      style={styles.pickerTouchableOverlay}
+                      onPress={() => openPicker(subjectPickerRef)}
+                      activeOpacity={0.7}
+                    />
+
+                    <RNPickerSelect
+                      ref={subjectPickerRef}
+                      placeholder={{
+                        label: "Sélectionner une matière",
+                        value: null,
                       }}
+                      items={subjectOptions}
+                      onValueChange={setSubject}
+                      value={subject}
+                      style={{
+                        inputIOS: {
+                          fontSize: 16,
+                          paddingVertical: 12,
+                          paddingHorizontal: 16,
+                          color: dark ? COLORS.white : COLORS.black,
+                          paddingRight: 50,
+                        },
+                        inputAndroid: {
+                          fontSize: 16,
+                          paddingHorizontal: 16,
+                          paddingVertical: 12,
+                          color: dark ? COLORS.white : COLORS.black,
+                          paddingRight: 50,
+                        },
+                        iconContainer: {
+                          top: 18,
+                          right: 16,
+                        },
+                      }}
+                      useNativeAndroidPickerStyle={false}
+                      Icon={() => (
+                        <Ionicons
+                          name="chevron-down"
+                          size={20}
+                          color={dark ? COLORS.white : COLORS.black}
+                        />
+                      )}
+                    />
+                  </View>
+                </View>
+              </MotiView>
+
+              {/* Priorité */}
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 500 }}
+              >
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons
+                      name="alert-circle"
+                      size={18}
+                      color={COLORS.primary}
+                    />
+                    <Text
+                      style={[
+                        styles.label,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Priorité
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.pickerContainer,
+                      {
+                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                  >
+                    <TouchableOpacity
+                      style={styles.pickerTouchableOverlay}
+                      onPress={() => openPicker(priorityPickerRef)}
+                      activeOpacity={0.7}
+                    />
+
+                    <RNPickerSelect
+                      ref={priorityPickerRef}
+                      placeholder={{
+                        label: "Sélectionner une priorité",
+                        value: null,
+                      }}
+                      items={priorityOptions}
+                      onValueChange={setPriority}
+                      value={priority}
+                      style={{
+                        inputIOS: {
+                          fontSize: 16,
+                          paddingVertical: 12,
+                          paddingHorizontal: 16,
+                          color: dark ? COLORS.white : COLORS.black,
+                          paddingRight: 50,
+                        },
+                        inputAndroid: {
+                          fontSize: 16,
+                          paddingHorizontal: 16,
+                          paddingVertical: 12,
+                          color: dark ? COLORS.white : COLORS.black,
+                          paddingRight: 50,
+                        },
+                        iconContainer: {
+                          top: 18,
+                          right: 16,
+                        },
+                      }}
+                      useNativeAndroidPickerStyle={false}
+                      Icon={() => (
+                        <Ionicons
+                          name="chevron-down"
+                          size={20}
+                          color={dark ? COLORS.white : COLORS.black}
+                        />
+                      )}
+                    />
+                  </View>
+                </View>
+              </MotiView>
+
+              {/* Date de début */}
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 600 }}
+              >
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons name="play" size={18} color={COLORS.primary} />
+                    <Text
+                      style={[
+                        styles.label,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Date de début
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[
+                      styles.dateButton,
+                      {
+                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    onPress={() => setShowStartDatePicker(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+                      {formatDate(startDate)}
+                    </Text>
+                    <Ionicons
+                      name="calendar"
+                      size={20}
+                      color={dark ? COLORS.white : COLORS.black}
+                    />
+                  </TouchableOpacity>
+
+                  {showStartDatePicker && (
+                    <DateTimePicker
+                      value={startDate}
+                      mode="datetime"
+                      display="default"
+                      onChange={onStartDateChange}
+                      {...(Platform.OS === "android" ? { is24Hour: true } : {})}
                     />
                   )}
-                />
-              </View>
-            </View>
+                </View>
+              </MotiView>
 
-            {/* Priorité */}
-            <View style={styles.inputGroup}>
-              <Text
-                style={[
-                  styles.label,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
+              {/* Date de fin */}
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 700 }}
               >
-                Priorité
-              </Text>
-              <View
-                style={[
-                  styles.pickerContainer,
-                  {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
-                  },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Sélectionner une priorité",
-                    value: null,
-                  }}
-                  items={priorityOptions}
-                  onValueChange={setPriority}
-                  value={priority}
-                  style={{
-                    inputIOS: {
-                      fontSize: 16,
-                      paddingVertical: 12,
-                      paddingHorizontal: 10,
-                      color: dark ? COLORS.white : COLORS.black,
-                      paddingRight: 30,
-                    },
-                    inputAndroid: {
-                      fontSize: 16,
-                      paddingHorizontal: 10,
-                      paddingVertical: 8,
-                      color: dark ? COLORS.white : COLORS.black,
-                      paddingRight: 30,
-                    },
-                    iconContainer: {
-                      top: 10,
-                      right: 12,
-                    },
-                  }}
-                  useNativeAndroidPickerStyle={false}
-                  Icon={() => (
-                    <Image
-                      source={icons.down}
-                      style={{
-                        width: 18,
-                        height: 18,
-                        tintColor: dark ? COLORS.white : COLORS.black,
-                      }}
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons name="stop" size={18} color={COLORS.primary} />
+                    <Text
+                      style={[
+                        styles.label,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Date de fin
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[
+                      styles.dateButton,
+                      {
+                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    onPress={() => setShowEndDatePicker(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+                      {formatDate(endDate)}
+                    </Text>
+                    <Ionicons
+                      name="calendar"
+                      size={20}
+                      color={dark ? COLORS.white : COLORS.black}
+                    />
+                  </TouchableOpacity>
+
+                  {showEndDatePicker && (
+                    <DateTimePicker
+                      value={endDate}
+                      mode="datetime"
+                      display="default"
+                      onChange={onEndDateChange}
+                      minimumDate={startDate}
+                      {...(Platform.OS === "android" ? { is24Hour: true } : {})}
                     />
                   )}
-                />
-              </View>
-            </View>
+                </View>
+              </MotiView>
 
-            {/* Date de début */}
-            <View style={styles.inputGroup}>
-              <Text
-                style={[
-                  styles.label,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
+              {/* Statut initial */}
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 800 }}
               >
-                Date de début
-              </Text>
-              <TouchableOpacity
-                style={[
-                  styles.dateButton,
-                  {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
-                  },
-                ]}
-                onPress={() => setShowStartDatePicker(true)}
-              >
-                <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
-                  {formatDate(startDate)}
-                </Text>
-                <Image
-                  source={icons.calendar}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    tintColor: dark ? COLORS.white : COLORS.black,
-                  }}
-                />
-              </TouchableOpacity>
-
-              {showStartDatePicker && (
-                <DateTimePicker
-                  value={startDate}
-                  mode="datetime"
-                  display="default"
-                  onChange={onStartDateChange}
-                  {...(Platform.OS === "android" ? { is24Hour: true } : {})}
-                />
-              )}
-            </View>
-
-            {/* Date de fin */}
-            <View style={styles.inputGroup}>
-              <Text
-                style={[
-                  styles.label,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
-                Date de fin
-              </Text>
-              <TouchableOpacity
-                style={[
-                  styles.dateButton,
-                  {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
-                  },
-                ]}
-                onPress={() => setShowEndDatePicker(true)}
-              >
-                <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
-                  {formatDate(endDate)}
-                </Text>
-                <Image
-                  source={icons.calendar}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    tintColor: dark ? COLORS.white : COLORS.black,
-                  }}
-                />
-              </TouchableOpacity>
-
-              {showEndDatePicker && (
-                <DateTimePicker
-                  value={endDate}
-                  mode="datetime"
-                  display="default"
-                  onChange={onEndDateChange}
-                  minimumDate={startDate}
-                  {...(Platform.OS === "android" ? { is24Hour: true } : {})}
-                />
-              )}
-            </View>
-
-            {/* Statut initial */}
-            <View style={styles.inputGroup}>
-              <Text
-                style={[
-                  styles.label,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
-                Statut initial
-              </Text>
-              <View
-                style={[
-                  styles.pickerContainer,
-                  {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
-                  },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{ label: "Sélectionner un statut", value: null }}
-                  items={statusOptions}
-                  onValueChange={setInitialStatus}
-                  value={initialStatus}
-                  style={{
-                    inputIOS: {
-                      fontSize: 16,
-                      paddingVertical: 12,
-                      paddingHorizontal: 10,
-                      color: dark ? COLORS.white : COLORS.black,
-                      paddingRight: 30,
-                    },
-                    inputAndroid: {
-                      fontSize: 16,
-                      paddingHorizontal: 10,
-                      paddingVertical: 8,
-                      color: dark ? COLORS.white : COLORS.black,
-                      paddingRight: 30,
-                    },
-                    iconContainer: {
-                      top: 10,
-                      right: 12,
-                    },
-                  }}
-                  useNativeAndroidPickerStyle={false}
-                  Icon={() => (
-                    <Image
-                      source={icons.down}
-                      style={{
-                        width: 18,
-                        height: 18,
-                        tintColor: dark ? COLORS.white : COLORS.black,
-                      }}
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={18}
+                      color={COLORS.primary}
                     />
-                  )}
-                />
-              </View>
-            </View>
+                    <Text
+                      style={[
+                        styles.label,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Statut initial
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.pickerContainer,
+                      {
+                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                  >
+                    <TouchableOpacity
+                      style={styles.pickerTouchableOverlay}
+                      onPress={() => openPicker(statusPickerRef)}
+                      activeOpacity={0.7}
+                    />
 
-            {/* Message pour l'enfant (optionnel) */}
-            <View style={styles.inputGroup}>
-              <Text
-                style={[
-                  styles.label,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
+                    <RNPickerSelect
+                      ref={statusPickerRef}
+                      placeholder={{
+                        label: "Sélectionner un statut",
+                        value: null,
+                      }}
+                      items={statusOptions}
+                      onValueChange={setInitialStatus}
+                      value={initialStatus}
+                      style={{
+                        inputIOS: {
+                          fontSize: 16,
+                          paddingVertical: 12,
+                          paddingHorizontal: 16,
+                          color: dark ? COLORS.white : COLORS.black,
+                          paddingRight: 50,
+                        },
+                        inputAndroid: {
+                          fontSize: 16,
+                          paddingHorizontal: 16,
+                          paddingVertical: 12,
+                          color: dark ? COLORS.white : COLORS.black,
+                          paddingRight: 50,
+                        },
+                        iconContainer: {
+                          top: 18,
+                          right: 16,
+                        },
+                      }}
+                      useNativeAndroidPickerStyle={false}
+                      Icon={() => (
+                        <Ionicons
+                          name="chevron-down"
+                          size={20}
+                          color={dark ? COLORS.white : COLORS.black}
+                        />
+                      )}
+                    />
+                  </View>
+                </View>
+              </MotiView>
+
+              {/* Message pour l'enfant (optionnel) */}
+              <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 900 }}
               >
-                Message pour l&apos;enfant (optionnel)
-              </Text>
-              <TextInput
-                style={[
-                  styles.textInput,
-                  styles.textArea,
-                  {
-                    backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
-                    color: dark ? COLORS.white : COLORS.black,
-                  },
-                ]}
-                value={kidMessage}
-                onChangeText={setKidMessage}
-                placeholder="Entrez un message de félicitations ou d'encouragement..."
-                placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
-                multiline
-                numberOfLines={3}
-                textAlignVertical="top"
-              />
+                <View style={styles.inputGroup}>
+                  <View style={styles.labelContainer}>
+                    <Ionicons
+                      name="chatbubble-ellipses"
+                      size={18}
+                      color={COLORS.primary}
+                    />
+                    <Text
+                      style={[
+                        styles.label,
+                        { color: dark ? COLORS.white : COLORS.black },
+                      ]}
+                    >
+                      Message pour l&apos;enfant (optionnel)
+                    </Text>
+                  </View>
+                  <TextInput
+                    style={[
+                      styles.textInput,
+                      styles.textArea,
+                      {
+                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                        color: dark ? COLORS.white : COLORS.black,
+                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      },
+                    ]}
+                    value={kidMessage}
+                    onChangeText={setKidMessage}
+                    placeholder="Entrez un message de félicitations ou d'encouragement..."
+                    placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical="top"
+                  />
+                </View>
+              </MotiView>
+
+              {/* Note d'information */}
+              <MotiView
+                from={{ opacity: 0, translateY: 10 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ type: "timing", duration: 500, delay: 1000 }}
+              >
+                <View style={styles.noteContainer}>
+                  <Ionicons
+                    name="information-circle-outline"
+                    size={16}
+                    color={COLORS.primary}
+                  />
+                  <Text style={styles.note}>
+                    Les champs marqués d'un * sont obligatoires. Le message pour
+                    l'enfant est optionnel.
+                  </Text>
+                </View>
+              </MotiView>
             </View>
-          </View>
+          </MotiView>
         </ScrollView>
 
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
-          <Button
-            title="Annuler"
+        {/* Enhanced Buttons */}
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 500, delay: 1100 }}
+          style={styles.buttonContainer}
+        >
+          {/* Enhanced Cancel Button */}
+          <TouchableOpacity
             style={[
-              styles.button,
               styles.cancelButton,
-              {
-                backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
-              },
+              { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
             ]}
-            textColor={dark ? COLORS.white : COLORS.black}
             onPress={() => navigation.goBack()}
-          />
-          <Button
-            title="Enregistrer"
-            filled
-            style={[styles.button, styles.saveButton]}
+            activeOpacity={0.8}
+          >
+            <View style={styles.cancelButtonContent}>
+              <Ionicons
+                name="close-outline"
+                size={20}
+                color={dark ? COLORS.white : COLORS.black}
+              />
+              <Text
+                style={[
+                  styles.cancelButtonText,
+                  { color: dark ? COLORS.white : COLORS.black },
+                ]}
+              >
+                Annuler
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Enhanced Save Button */}
+          <TouchableOpacity
+            style={[styles.saveButton, { opacity: isSubmitting ? 0.8 : 1 }]}
             onPress={saveObjective}
-          />
-        </View>
+            disabled={isSubmitting}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#4CAF50", "#66BB6A"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.saveButtonGradient}
+            >
+              {isSubmitting ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color={COLORS.white} />
+                  <Text style={styles.saveButtonText}>Création...</Text>
+                </View>
+              ) : (
+                <View style={styles.saveButtonContent}>
+                  <Ionicons
+                    name="checkmark-outline"
+                    size={20}
+                    color={COLORS.white}
+                  />
+                  <Text style={styles.saveButtonText}>Enregistrer</Text>
+                </View>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+        </MotiView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -538,24 +732,46 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  formCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    marginVertical: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  iosShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+  },
   formContainer: {
-    paddingBottom: 20,
+    padding: 20,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: 20,
+  },
+  labelContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
   },
   label: {
     fontSize: 16,
     fontFamily: "medium",
-    marginBottom: 8,
+    marginLeft: 8,
   },
   textInput: {
     width: "100%",
-    height: 50,
+    height: 56,
     borderRadius: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     fontSize: 16,
     fontFamily: "regular",
+    borderWidth: 1.5,
   },
   textArea: {
     height: 100,
@@ -563,37 +779,106 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   pickerContainer: {
+    borderWidth: 1.5,
     borderRadius: 12,
-    overflow: "hidden",
+    height: 56,
+    position: "relative",
+  },
+  pickerTouchableOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10,
   },
   dateButton: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    height: 50,
+    height: 56,
     borderRadius: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+  },
+  noteContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: `${COLORS.primary}10`,
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  note: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: COLORS.primary,
+    fontStyle: "italic",
+    flex: 1,
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 16,
     paddingBottom: 24,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.grayscale200,
-  },
-  button: {
-    flex: 1,
-    height: 50,
+    gap: 12,
   },
   cancelButton: {
-    marginRight: 8,
+    flex: 1,
+    height: 56,
+    borderWidth: 2,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cancelButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontFamily: "semibold",
+    marginLeft: 8,
   },
   saveButton: {
+    flex: 1,
+    height: 56,
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: "#4CAF50",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  saveButtonGradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  saveButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontFamily: "semibold",
+    color: COLORS.white,
     marginLeft: 8,
-    backgroundColor: COLORS.greeen,
-    borderColor: COLORS.greeen,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
