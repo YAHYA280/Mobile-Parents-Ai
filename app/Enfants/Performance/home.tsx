@@ -51,7 +51,6 @@ const PerformanceHome: React.FC<PerformanceHomeProps> = ({
   );
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   // Handle filters using the activity filters hook
   const {
@@ -61,7 +60,6 @@ const PerformanceHome: React.FC<PerformanceHomeProps> = ({
     activityCalendarMode,
     advancedFilters,
     filteredActivities,
-    setSearchKeyword,
     toggleActivityCalendar,
     handleActivityDayPress,
     setAdvancedFilters,
