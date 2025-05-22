@@ -21,7 +21,9 @@ import {
   RefreshControl,
   StatusBar,
   Dimensions,
+  Platform,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Import components
 import EnhancedHeader from "@/components/home/EnhancedHeader";
@@ -42,6 +44,15 @@ const Index = () => {
   const { navigate } = useNavigation<Nav>();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const scrollY = useSharedValue(0);
+  const insets = useSafeAreaInsets();
+
+  // Calculate proper bottom padding to account for floating tab bar
+  const tabBarHeight = Platform.OS === "ios" ? 80 : 75;
+  const tabBarMargin =
+    Platform.OS === "ios"
+      ? Math.max(20, insets.bottom)
+      : Math.max(30, insets.bottom + 15);
+  const totalTabBarSpace = tabBarHeight + tabBarMargin + 20; // Extra 20 for breathing room
 
   // Map CHILDREN_DATA to the format required by ChildProgressCard
   const childrenProgress = CHILDREN_DATA.map((child) => {
@@ -206,7 +217,10 @@ const Index = () => {
         <Animated.ScrollView
           showsVerticalScrollIndicator={false}
           style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: totalTabBarSpace }, // Dynamic bottom padding
+          ]}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -423,7 +437,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 30,
+    paddingBottom: 30, // This will be overridden by the dynamic padding
   },
   sectionContainer: {
     marginTop: 24,

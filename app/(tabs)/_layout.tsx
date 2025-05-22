@@ -7,7 +7,7 @@ import { StyleSheet, Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../constants";
 
-// Direct modification of the existing tab bar to make it floating
+// Fixed tab bar with proper spacing and safe area handling
 const TabLayout = () => {
   const { dark } = useTheme();
   const insets = useSafeAreaInsets();
@@ -17,22 +17,29 @@ const TabLayout = () => {
   const activeIconColor = COLORS.primary;
   const inactiveIconColor = dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)";
 
+  // Calculate proper bottom margin to avoid overlapping with navigation buttons
+  const bottomMargin =
+    Platform.OS === "ios"
+      ? Math.max(20, insets.bottom)
+      : Math.max(30, insets.bottom + 15); // Extra space for Android nav buttons
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: Platform.OS !== "ios",
-        // Modified to create floating effect
+        // Modified to create floating effect with proper spacing
         tabBarStyle: {
           position: "absolute",
           height: Platform.OS === "ios" ? 80 : 75,
-          paddingBottom: Platform.OS === "ios" ? insets.bottom : 10,
+          paddingBottom:
+            Platform.OS === "ios" ? Math.max(insets.bottom, 10) : 10,
           paddingTop: 10,
           backgroundColor: tabBarBackground,
 
-          // Floating styles
+          // Floating styles with proper margins
           marginHorizontal: 20,
-          marginBottom: 20,
+          marginBottom: bottomMargin, // Dynamic bottom margin
           borderRadius: 30,
           borderTopWidth: 0,
           borderWidth: 1,
