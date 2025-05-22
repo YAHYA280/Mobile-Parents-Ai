@@ -1,252 +1,29 @@
+// app/Enfants/home.tsx
 import React, { useState, useEffect, useRef } from "react";
+import { View, Text, ScrollView, SafeAreaView } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  SafeAreaView,
-  TouchableOpacity,
-  Dimensions,
-  StatusBar,
-  Platform,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faArrowLeft,
-  faHome,
-  faBookOpen,
-  faChartLine,
-  faGraduationCap,
-  faUser,
-  faStar,
-  faCheck,
-  faExclamationTriangle,
-  faClock,
-} from "@fortawesome/free-solid-svg-icons";
 
-import { COLORS } from "../../constants/theme";
+import { CHILDREN_DATA, Child } from "../../data/Enfants/CHILDREN_DATA";
 import HistoriqueActivites from "./Historique/home";
 import PerformanceComponent from "./Performance/home";
-import {
-  CHILDREN_DATA,
-  enhanceActivity,
-} from "../../data/Enfants/CHILDREN_DATA";
-import type { Child } from "../../data/Enfants/CHILDREN_DATA";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// Constants
-const { width } = Dimensions.get("window");
+// Import our new components
+import ProfileHeader from "../../components/children/ProfileHeader";
+import AnimatedTabBar from "../../components/children/AnimatedTabBar";
+import ProgressCard from "../../components/children/ProgressCard";
+import SubjectsCard from "../../components/children/SubjectsCard";
+import RecentActivityCard from "../../components/children/RecentActivityCard";
 
-// Progress color function
-function getProgressColor(progress: number): string {
-  if (progress < 30) return "#FC4E00";
-  if (progress <= 50) return "#EBB016";
-  if (progress <= 70) return "#F3BB00";
-  return "#24D26D";
-}
-
-// Custom Tab Bar Component
-interface CustomTabBarProps {
-  activeTab: number;
-  onTabPress: (tabIndex: number) => void;
-}
-
-const CustomTabBar: React.FC<CustomTabBarProps> = ({
-  activeTab,
-  onTabPress,
-}) => {
-  const insets = useSafeAreaInsets();
-
-  return (
-    <View
-      style={{
-        height: Platform.OS === "ios" ? 75 : 70, // Adjusted height for Android
-        backgroundColor: "#FFFFFF", // Using solid color instead of rgba
-        position: "absolute",
-        bottom: Platform.OS === "ios" ? 13 : 20, // More space on Android
-        left: 20,
-        right: 20,
-        paddingBottom:
-          Platform.OS === "ios" ? Math.max(insets.bottom - 10, 5) : 10, // Safe area padding
-        paddingTop: 8,
-        borderRadius: 30,
-        borderWidth: 1,
-        borderColor: "rgba(0,0,0,0.05)",
-
-        // Improved shadow properties for Android
-        elevation: 10,
-        shadowColor: COLORS.primary,
-        shadowOpacity: 0.15,
-        shadowOffset: { height: 5, width: 0 },
-        shadowRadius: 10,
-
-        flexDirection: "row",
-        zIndex: 100,
-      }}
-    >
-      {/* Aperçu Tab */}
-      <TouchableOpacity
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-        }}
-        onPress={() => onTabPress(0)}
-        activeOpacity={0.7} // Improved touch feedback
-      >
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            width: 48,
-            height: 48,
-            borderRadius: 24,
-          }}
-        >
-          <FontAwesomeIcon
-            icon={faHome}
-            size={22}
-            color={activeTab === 0 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
-          />
-        </View>
-        <Text
-          style={{
-            color: activeTab === 0 ? COLORS.primary : "rgba(0, 0, 0, 0.4)",
-            fontSize: 12,
-            fontWeight: "600",
-            marginTop: 2,
-            textAlign: "center",
-          }}
-        >
-          Aperçu
-        </Text>
-      </TouchableOpacity>
-
-      {/* Activités Tab */}
-      <TouchableOpacity
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-        }}
-        onPress={() => onTabPress(1)}
-        activeOpacity={0.7}
-      >
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            width: 48,
-            height: 48,
-            borderRadius: 24,
-          }}
-        >
-          <FontAwesomeIcon
-            icon={faBookOpen}
-            size={22}
-            color={activeTab === 1 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
-          />
-        </View>
-        <Text
-          style={{
-            color: activeTab === 1 ? COLORS.primary : "rgba(0, 0, 0, 0.4)",
-            fontSize: 12,
-            fontWeight: "600",
-            marginTop: 2,
-            textAlign: "center",
-          }}
-        >
-          Activités
-        </Text>
-      </TouchableOpacity>
-
-      {/* Suivi Tab */}
-      <TouchableOpacity
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        onPress={() => onTabPress(2)}
-        activeOpacity={0.7}
-      >
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            width: 48,
-            height: 48,
-            borderRadius: 24,
-          }}
-        >
-          <FontAwesomeIcon
-            icon={faChartLine}
-            size={22}
-            color={activeTab === 2 ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
-          />
-        </View>
-        <Text
-          style={{
-            color: activeTab === 2 ? COLORS.primary : "rgba(0, 0, 0, 0.4)",
-            fontSize: 12,
-            fontWeight: "600",
-            marginTop: 2,
-            textAlign: "center",
-          }}
-        >
-          Suivi
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-// Overview Component
-interface OverviewProps {
+// Fix the interface to accept null
+interface OverviewContentProps {
   child: Child;
   scrollViewRef: React.RefObject<ScrollView | null>;
 }
 
-const Overview: React.FC<OverviewProps> = ({ child, scrollViewRef }) => {
-  const progressValue = parseFloat(child.progress.replace("%", ""));
-  const recentActivity = enhanceActivity(child.activitesRecentes[0]);
-
-  // Helper function to render subject tags
-  const renderSubjectTag = (matiere: string, isStrong: boolean) => {
-    const tagColor = isStrong ? "#24D26D" : "#FC4E00";
-    const tagBgColor = isStrong
-      ? "rgba(36, 210, 109, 0.1)"
-      : "rgba(252, 78, 0, 0.1)";
-
-    return (
-      <View
-        key={matiere}
-        style={{
-          backgroundColor: tagBgColor,
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 10,
-          paddingVertical: 5,
-          borderRadius: 20,
-          marginRight: 8,
-          marginBottom: 8,
-        }}
-      >
-        <FontAwesomeIcon
-          icon={isStrong ? faCheck : faExclamationTriangle}
-          color={tagColor}
-          size={16}
-          style={{ marginRight: 5 }}
-        />
-        <Text style={{ color: tagColor, fontWeight: "600" }}>{matiere}</Text>
-      </View>
-    );
-  };
-
+const OverviewContent: React.FC<OverviewContentProps> = ({
+  child,
+  scrollViewRef,
+}) => {
   return (
     <ScrollView
       ref={scrollViewRef}
@@ -254,311 +31,48 @@ const Overview: React.FC<OverviewProps> = ({ child, scrollViewRef }) => {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 100 }}
     >
-      {/* Progress Card */}
-      <LinearGradient
-        colors={["#FF8E69", "#FF7862"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={{
-          borderRadius: 16,
-          padding: 20,
-          marginBottom: 20,
-          shadowColor: "#FF8E69",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 8,
-          elevation: 6,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ fontSize: 18, fontWeight: "bold", color: "#FFFFFF" }}>
-            Progression Globale
-          </Text>
-          <View
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <FontAwesomeIcon icon={faStar} size={18} color="#FFFFFF" />
-          </View>
-        </View>
+      <ProgressCard progress={child.progress} />
 
-        <View style={{ marginTop: 16 }}>
-          <Text
-            style={{
-              fontSize: 28,
-              fontWeight: "bold",
-              color: "#FFFFFF",
-              marginBottom: 8,
-            }}
-          >
-            {child.progress}
-          </Text>
-          <View
-            style={{
-              height: 12,
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-              borderRadius: 6,
-              overflow: "hidden",
-            }}
-          >
-            <View
-              style={{
-                width: `${progressValue}%`,
-                height: "100%",
-                backgroundColor: "#FFFFFF",
-                borderRadius: 6,
-              }}
-            />
-          </View>
-        </View>
-      </LinearGradient>
+      <SubjectsCard
+        strongSubjects={child.matieresFortes}
+        improvementSubjects={child.matieresAmeliorer}
+      />
 
-      {/* Strengths and Weaknesses Card */}
-      <View
-        style={{
-          backgroundColor: "#FFFFFF",
-          borderRadius: 16,
-          padding: 20,
-          marginBottom: 20,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 4,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
-        >
-          <Text style={{ fontSize: 18, fontWeight: "bold", color: "#333333" }}>
-            Domaines d'Apprentissage
-          </Text>
-          <View
-            style={{
-              backgroundColor: "rgba(255, 142, 105, 0.1)",
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <FontAwesomeIcon
-              icon={faGraduationCap}
-              size={18}
-              color={COLORS.primary}
-            />
-          </View>
-        </View>
-
-        <View style={{ marginBottom: 16 }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: "#24D26D",
-              marginBottom: 10,
-            }}
-          >
-            Points Forts
-          </Text>
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            {child.matieresFortes.map((matiere) =>
-              renderSubjectTag(matiere, true)
-            )}
-          </View>
-        </View>
-
-        <View>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: "#FC4E00",
-              marginBottom: 10,
-            }}
-          >
-            À Améliorer
-          </Text>
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            {child.matieresAmeliorer.map((matiere) =>
-              renderSubjectTag(matiere.replace(/^\?/, "").trim(), false)
-            )}
-          </View>
-        </View>
-      </View>
-
-      {/* Recent Activity Card */}
-      <View
-        style={{
-          backgroundColor: "#FFFFFF",
-          borderRadius: 16,
-          padding: 20,
-          marginBottom: 20,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 4,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
-        >
-          <Text style={{ fontSize: 18, fontWeight: "bold", color: "#333333" }}>
-            Dernière Activité
-          </Text>
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            borderLeftWidth: 3,
-            borderLeftColor: COLORS.primary,
-            paddingLeft: 12,
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 12, color: "#9E9E9E", marginBottom: 4 }}>
-              {recentActivity.date}
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "600",
-                color: "#333333",
-                marginBottom: 8,
-              }}
-            >
-              {recentActivity.activite}
-            </Text>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 8,
-              }}
-            >
-              <FontAwesomeIcon
-                icon={faClock}
-                size={14}
-                color="#9E9E9E"
-                style={{ marginRight: 6 }}
-              />
-              <Text style={{ fontSize: 14, color: "#9E9E9E" }}>
-                {recentActivity.duree}
-              </Text>
-
-              {recentActivity.score && (
-                <>
-                  <View
-                    style={{
-                      width: 1,
-                      height: 12,
-                      backgroundColor: "#E0E0E0",
-                      marginHorizontal: 8,
-                    }}
-                  />
-                  <FontAwesomeIcon
-                    icon={faStar}
-                    size={14}
-                    color={COLORS.primary}
-                    style={{ marginRight: 6 }}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: COLORS.primary,
-                      fontWeight: "600",
-                    }}
-                  >
-                    {recentActivity.score}
-                  </Text>
-                </>
-              )}
-            </View>
-
-            {recentActivity.commentaires && (
-              <View
-                style={{
-                  backgroundColor: "rgba(0, 0, 0, 0.03)",
-                  padding: 12,
-                  borderRadius: 8,
-                  marginTop: 4,
-                }}
-              >
-                <Text style={{ fontSize: 14, color: "#666666" }}>
-                  {recentActivity.commentaires}
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-      </View>
+      <RecentActivityCard recentActivity={child.activitesRecentes[0]} />
     </ScrollView>
   );
 };
 
-// Main Component
 const EnfantsHome: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  // Fix: Keep the original typing as it was working
   const scrollViewRef = useRef<ScrollView | null>(null);
 
-  // Get child ID from params
   const childId =
     typeof params.childId === "string" ? parseInt(params.childId, 10) : 0;
-
-  // States
   const [child, setChild] = useState<Child | null>(null);
   const [activeTab, setActiveTab] = useState<number>(0);
 
-  // Fetch child data only once when component mounts or childId changes
   useEffect(() => {
     const foundChild = CHILDREN_DATA.find((c) => c.id === childId) || null;
     setChild(foundChild);
   }, [childId]);
 
-  // Handle back navigation
   const handleBack = (): void => {
     router.back();
   };
 
-  // Handle tab selection
   const handleTabPress = (tabIndex: number): void => {
     setActiveTab(tabIndex);
   };
 
-  // Render tab content based on active tab
   const renderContent = () => {
     if (!child) return null;
 
     switch (activeTab) {
       case 0:
-        return <Overview child={child} scrollViewRef={scrollViewRef} />;
+        return <OverviewContent child={child} scrollViewRef={scrollViewRef} />;
       case 1:
         return <HistoriqueActivites isTabComponent childData={child} />;
       case 2:
@@ -568,7 +82,6 @@ const EnfantsHome: React.FC = () => {
     }
   };
 
-  // If child data not found
   if (!child) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
@@ -583,148 +96,17 @@ const EnfantsHome: React.FC = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <StatusBar
-        backgroundColor="transparent"
-        barStyle="dark-content"
-        translucent
-      />
-
       <View style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
-        {/* Header Profile Section - Only show on Overview tab */}
+        {/* Profile Header - Only show on Overview tab */}
         {activeTab === 0 && (
-          <View
-            style={{
-              position: "relative",
-              zIndex: 10,
-              backgroundColor: "#FFFFFF",
-              paddingBottom: 20,
-              alignItems: "center",
-              justifyContent: "center",
-              // Use flex instead of fixed height
-              paddingTop: 20,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.05,
-              shadowRadius: 4,
-              elevation: 2,
-            }}
-          >
-            <TouchableOpacity
-              onPress={handleBack}
-              style={{
-                position: "absolute",
-                left: 16,
-                top: 16,
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: "rgba(0,0,0,0.05)",
-                justifyContent: "center",
-                alignItems: "center",
-                zIndex: 20,
-              }}
-            >
-              <FontAwesomeIcon icon={faArrowLeft} size={20} color="#333333" />
-            </TouchableOpacity>
-
-            <View
-              style={{
-                width: "100%",
-                alignItems: "center",
-                paddingTop: 40,
-              }}
-            >
-              <View
-                style={{
-                  width: 140,
-                  height: 140,
-                  borderRadius: 70,
-                  borderWidth: 4,
-                  borderColor: "#FFFFFF",
-                  overflow: "hidden",
-                  marginBottom: 20,
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.15,
-                  shadowRadius: 8,
-                  elevation: 10,
-                }}
-              >
-                <Image
-                  source={child.profileImage}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: 70,
-                  }}
-                />
-              </View>
-
-              <View
-                style={{
-                  width: "100%",
-                  alignItems: "center",
-                  paddingHorizontal: 20,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 5,
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faUser}
-                    size={16}
-                    color="#9E9E9E"
-                    style={{ marginRight: 8 }}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 22,
-                      fontWeight: "bold",
-                      color: "#333333",
-                      textAlign: "center",
-                    }}
-                  >
-                    {child.name}
-                  </Text>
-                </View>
-
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faGraduationCap}
-                    size={16}
-                    color="#9E9E9E"
-                    style={{ marginRight: 8 }}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "500",
-                      color: "#666666",
-                      textAlign: "center",
-                    }}
-                  >
-                    {child.classe} • {child.age} ans
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
+          <ProfileHeader child={child} onBackPress={handleBack} />
         )}
 
         {/* Main Content Area */}
         <View style={{ flex: 1, paddingBottom: 0 }}>{renderContent()}</View>
 
-        {/* Custom Tab Bar */}
-        <CustomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
+        {/* Animated Tab Bar */}
+        <AnimatedTabBar activeTab={activeTab} onTabPress={handleTabPress} />
       </View>
     </SafeAreaView>
   );
