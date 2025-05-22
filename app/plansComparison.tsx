@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -42,10 +43,13 @@ const PlansComparison: React.FC = () => {
   const fetchCatalogues = useCallback(async () => {
     try {
       setLoading(true);
+      console.log("Fetching catalogues..."); // Debug log
       const data = await getCatalogues();
+      console.log("Catalogues fetched:", data); // Debug log
       setCatalogues(data);
       setError(null);
     } catch (err) {
+      console.error("Error fetching catalogues:", err); // Debug log
       setError("Échec du chargement des plans. Veuillez réessayer plus tard.");
     } finally {
       setLoading(false);
@@ -58,28 +62,43 @@ const PlansComparison: React.FC = () => {
 
   // Create a list of all unique features across all plans
   const allFeatures = catalogues.reduce((features: string[], plan) => {
-    plan.features.forEach((feature) => {
-      if (!features.includes(feature)) {
-        features.push(feature);
-      }
-    });
+    if (plan && plan.features && Array.isArray(plan.features)) {
+      plan.features.forEach((feature) => {
+        if (!features.includes(feature)) {
+          features.push(feature);
+        }
+      });
+    }
     return features;
   }, []);
 
   // Helper function to check if a plan includes a feature
   const planHasFeature = (plan: CataloguePlan, feature: string) => {
-    return plan.features.includes(feature);
+    return plan && plan.features && plan.features.includes(feature);
   };
+
+  // Debug: Log current state
+  console.log("Current state:", {
+    loading,
+    error,
+    catalogues: catalogues.length,
+  });
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView
+        style={[
+          styles.safeArea,
+          { backgroundColor: colors?.background || "#FFFFFF" },
+        ]}
+      >
         <Header
           title="Comparaison des plans"
           onBackPress={() => router.back()}
         />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLOORS.primary.main} />
+          <Text style={styles.loadingText}>Chargement des plans...</Text>
         </View>
       </SafeAreaView>
     );
@@ -87,20 +106,71 @@ const PlansComparison: React.FC = () => {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView
+        style={[
+          styles.safeArea,
+          { backgroundColor: colors?.background || "#FFFFFF" },
+        ]}
+      >
         <Header
           title="Comparaison des plans"
           onBackPress={() => router.back()}
         />
         <View style={styles.errorContainer}>
+          <Ionicons
+            name="alert-circle-outline"
+            size={48}
+            color={COLOORS.status.expired.main}
+          />
           <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={fetchCatalogues}
+          >
+            <Text style={styles.retryButtonText}>Réessayer</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // If no catalogues are available
+  if (!catalogues || catalogues.length === 0) {
+    return (
+      <SafeAreaView
+        style={[
+          styles.safeArea,
+          { backgroundColor: colors?.background || "#FFFFFF" },
+        ]}
+      >
+        <Header
+          title="Comparaison des plans"
+          onBackPress={() => router.back()}
+        />
+        <View style={styles.errorContainer}>
+          <Ionicons name="folder-outline" size={48} color={COLOORS.gray3} />
+          <Text style={styles.errorText}>
+            Aucun plan disponible pour le moment.
+          </Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={fetchCatalogues}
+          >
+            <Text style={styles.retryButtonText}>Actualiser</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["right", "bottom", "left"]}>
+    <SafeAreaView
+      style={[
+        styles.safeArea,
+        { backgroundColor: colors?.background || "#FFFFFF" },
+      ]}
+      edges={["right", "bottom", "left"]}
+    >
       <Header title="Comparaison des plans" onBackPress={() => router.back()} />
 
       {/* Main content wrapped in vertical ScrollView */}
@@ -115,7 +185,12 @@ const PlansComparison: React.FC = () => {
             size={24}
             color={COLOORS.primary.main}
           />
-          <Text style={styles.headerTitle}>
+          <Text
+            style={[
+              styles.headerTitle,
+              { color: colors?.text || COLOORS.black },
+            ]}
+          >
             Trouvez le plan parfait pour vous
           </Text>
           <Text style={styles.headerSubtitle}>
@@ -146,7 +221,7 @@ const PlansComparison: React.FC = () => {
               {/* Features Rows */}
               {allFeatures.map((feature, index) => (
                 <View
-                  key={index}
+                  key={`feature-${index}`}
                   style={[
                     styles.featureCell,
                     index % 2 === 0 ? styles.evenRow : {},
@@ -159,10 +234,15 @@ const PlansComparison: React.FC = () => {
 
             {/* Plan columns */}
             {catalogues.map((plan, planIndex) => {
+              if (!plan) return null; // Safety check
+
               const planColor = getPlanColor(plan.id);
 
               return (
-                <View key={planIndex} style={styles.planColumn}>
+                <View
+                  key={`plan-${planIndex}-${plan.id}`}
+                  style={styles.planColumn}
+                >
                   {/* Plan Header */}
                   <View
                     style={[
@@ -170,7 +250,9 @@ const PlansComparison: React.FC = () => {
                       { backgroundColor: planColor },
                     ]}
                   >
-                    <Text style={styles.planName}>{plan.planName}</Text>
+                    <Text style={styles.planName}>
+                      {plan.planName || "Plan"}
+                    </Text>
                     {plan.recommended && (
                       <View style={styles.recommendedBadge}>
                         <Text style={styles.recommendedText}>Recommandé</Text>
@@ -180,14 +262,16 @@ const PlansComparison: React.FC = () => {
 
                   {/* Price Row */}
                   <View style={styles.featureCell}>
-                    <Text style={styles.priceText}>${plan.monthlyPrice}</Text>
+                    <Text style={styles.priceText}>
+                      ${plan.monthlyPrice || "0"}
+                    </Text>
                     <Text style={styles.monthText}>/mois</Text>
                   </View>
 
                   {/* Features Rows */}
                   {allFeatures.map((feature, featureIndex) => (
                     <View
-                      key={featureIndex}
+                      key={`feature-${featureIndex}-plan-${planIndex}`}
                       style={[
                         styles.featureCell,
                         featureIndex % 2 === 0 ? styles.evenRow : {},
@@ -238,7 +322,6 @@ const getPlanColor = (id: string): string => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
   },
   mainScrollView: {
     flex: 1,
@@ -247,6 +330,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  loadingText: {
+    ...TYPOGRAPHY.body2,
+    color: COLOORS.gray3,
+    marginTop: SPACING.md,
   },
   errorContainer: {
     flex: 1,
@@ -258,16 +346,27 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.body1,
     color: COLOORS.status.expired.main,
     textAlign: "center",
+    marginTop: SPACING.md,
+    marginBottom: SPACING.lg,
+  },
+  retryButton: {
+    backgroundColor: COLOORS.primary.main,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
+  },
+  retryButtonText: {
+    ...TYPOGRAPHY.button,
+    color: "#FFFFFF",
   },
   headerContainer: {
     alignItems: "center",
     padding: SPACING.lg,
     marginBottom: SPACING.md,
-    paddingTop: SPACING.md, // Reduced top padding
+    paddingTop: SPACING.md,
   },
   headerTitle: {
     ...TYPOGRAPHY.h2,
-    color: COLOORS.black,
     marginTop: SPACING.sm,
     marginBottom: SPACING.xs,
     textAlign: "center",
@@ -282,19 +381,19 @@ const styles = StyleSheet.create({
   },
   tableContainer: {
     flex: 1,
-    minHeight: height * 0.4, // Ensure minimum height for the table
+    minHeight: height * 0.4,
   },
   plansContainer: {
     paddingHorizontal: SPACING.md,
     paddingBottom: SPACING.md,
-    minWidth: width, // Ensure minimum width
+    minWidth: width,
   },
   featuresColumn: {
-    width: Math.max(150, width * 0.35), // Responsive width
+    width: Math.max(150, width * 0.35),
     marginRight: 2,
   },
   planColumn: {
-    width: Math.max(120, width * 0.28), // Responsive width
+    width: Math.max(120, width * 0.28),
     marginRight: 2,
   },
   planHeaderCell: {
@@ -363,3 +462,5 @@ const styles = StyleSheet.create({
     height: SPACING.xl,
   },
 });
+
+export default PlansComparison;

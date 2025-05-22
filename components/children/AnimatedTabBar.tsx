@@ -1,3 +1,4 @@
+// components/children/AnimatedTabBar.tsx
 import React from "react";
 import {
   View,
@@ -38,14 +39,14 @@ const AnimatedTabBar: React.FC<AnimatedTabBarProps> = ({
       style={[
         styles.container,
         {
-          bottom: Platform.OS === "ios" ? 13 : 20,
+          bottom: Platform.OS === "ios" ? 25 : 25,
           paddingBottom:
             Platform.OS === "ios" ? Math.max(insets.bottom - 10, 5) : 10,
         },
       ]}
-      from={{ opacity: 0, translateY: 100 }}
+      from={{ opacity: 0, translateY: 50 }}
       animate={{ opacity: 1, translateY: 0 }}
-      transition={{ type: "spring", delay: 500, damping: 15 }}
+      transition={{ type: "timing", duration: 300 }}
     >
       {tabs.map((tab, index) => (
         <TabButton
@@ -53,7 +54,6 @@ const AnimatedTabBar: React.FC<AnimatedTabBarProps> = ({
           tab={tab}
           isActive={activeTab === index}
           onPress={() => onTabPress(index)}
-          index={index}
         />
       ))}
     </MotiView>
@@ -64,64 +64,40 @@ interface TabButtonProps {
   tab: { id: number; name: string; icon: any };
   isActive: boolean;
   onPress: () => void;
-  index: number;
 }
 
-const TabButton: React.FC<TabButtonProps> = ({
-  tab,
-  isActive,
-  onPress,
-  index,
-}) => {
+const TabButton: React.FC<TabButtonProps> = ({ tab, isActive, onPress }) => {
   return (
     <TouchableOpacity
       style={styles.tabButton}
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <MotiView
-        style={styles.tabContent}
-        animate={{
-          scale: isActive ? 1.1 : 1,
-        }}
-        transition={{ type: "spring", damping: 15 }}
-      >
-        <MotiView
+      <View style={styles.tabContent}>
+        <View
           style={[
             styles.iconContainer,
             {
               backgroundColor: isActive ? `${COLORS.primary}15` : "transparent",
             },
           ]}
-          animate={{
-            backgroundColor: isActive ? `${COLORS.primary}15` : "transparent",
-          }}
-          transition={{ type: "timing", duration: 200 }}
         >
           <FontAwesomeIcon
             icon={tab.icon}
             size={22}
             color={isActive ? COLORS.primary : "rgba(0, 0, 0, 0.4)"}
           />
-        </MotiView>
+        </View>
 
-        <MotiView
-          animate={{
-            opacity: isActive ? 1 : 0.6,
-            translateY: isActive ? -2 : 0,
-          }}
-          transition={{ type: "timing", duration: 200 }}
+        <Text
+          style={[
+            styles.tabText,
+            { color: isActive ? COLORS.primary : "rgba(0, 0, 0, 0.4)" },
+          ]}
         >
-          <Text
-            style={[
-              styles.tabText,
-              { color: isActive ? COLORS.primary : "rgba(0, 0, 0, 0.4)" },
-            ]}
-          >
-            {tab.name}
-          </Text>
-        </MotiView>
-      </MotiView>
+          {tab.name}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -155,17 +131,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 2,
+    marginBottom: -2,
   },
   tabText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
     textAlign: "center",
+    marginTop: 2,
   },
 });
 
