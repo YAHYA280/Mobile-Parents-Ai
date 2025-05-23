@@ -201,9 +201,9 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             </View>
           </View>
 
-          <TouchableOpacity style={styles.moreButton}>
+          {/* <TouchableOpacity style={styles.moreButton}>
             <Ionicons name="chevron-forward" size={18} color={COLORS.primary} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <Text

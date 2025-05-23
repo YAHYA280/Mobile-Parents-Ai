@@ -244,8 +244,8 @@ const AICalendar = () => {
           <Header
             title="Calendrier IA"
             onBackPress={() => navigation.goBack()}
-            rightIcon="settings-outline"
-            onRightIconPress={() => console.log("Settings pressed")}
+            // rightIcon="settings-outline"
+            // onRightIconPress={() => console.log("Settings pressed")}
           />
         </View>
 
