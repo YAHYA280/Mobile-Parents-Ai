@@ -1,7 +1,9 @@
+import type { ViewStyle } from "react-native";
+
 // Fixed CircularProgress.tsx
-import React, { useEffect, useRef } from "react";
-import { View, StyleSheet, Animated, Easing, ViewStyle } from "react-native";
-import Svg, { Circle, G } from "react-native-svg";
+import React, { useRef, useEffect } from "react";
+import Svg, { G, Circle } from "react-native-svg";
+import { View, Easing, Animated, StyleSheet } from "react-native";
 
 // Create an animated version of the Circle component
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);

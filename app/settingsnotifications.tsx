@@ -1,21 +1,19 @@
-import { Image } from "expo-image";
-import React, { useMemo, useState } from "react";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView } from "react-native-virtualized-view";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
+import { ScrollView } from "react-native-virtualized-view";
 import {
   View,
   Text,
   Switch,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
 } from "react-native";
 
-import { icons, COLORS } from "../constants";
-import { useTheme } from "../theme/ThemeProvider";
+import { COLORS } from "../constants";
 import Header from "../components/ui/Header"; // Updated import path
+import { useTheme } from "../theme/ThemeProvider";
 
 // Component props
 interface SectionHeaderProps {

@@ -1,12 +1,13 @@
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
 import { COLORS } from "@/constants";
 
 const { width } = Dimensions.get("window");

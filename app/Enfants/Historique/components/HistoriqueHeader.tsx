@@ -1,10 +1,13 @@
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 // Historique home component/HistoriqueHeader.tsx
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { COLORS } from "../../../../constants/theme";
+
 import type { Child } from "../../../../data/Enfants/CHILDREN_DATA";
+
+import { COLORS } from "../../../../constants/theme";
 
 interface HistoriqueHeaderProps {
   onBackPress: () => void;
@@ -58,7 +61,7 @@ const HistoriqueHeader: React.FC<HistoriqueHeaderProps> = ({
             color: COLORS.black,
           }}
         >
-          Historique d'activités
+          Historique d&apos;activités
         </Text>
         {childData && (
           <Text

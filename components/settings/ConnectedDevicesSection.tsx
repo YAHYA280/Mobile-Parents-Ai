@@ -1,10 +1,11 @@
-import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
+import { View, Text, Switch, StyleSheet, TouchableOpacity } from "react-native";
+
+import type { Device } from "../../types/security";
+
 import { COLORS } from "../../constants";
-import { useTheme } from "../../theme/ThemeProvider";
-import { Device } from "../../types/security";
 
 interface ConnectedDevicesSectionProps {
   dark: boolean;

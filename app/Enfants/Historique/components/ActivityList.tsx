@@ -1,16 +1,20 @@
+import type {
+  ListRenderItemInfo} from "react-native";
+
 // Historique home component/ActivityList.tsx
 import React, { useRef } from "react";
 import {
   View,
   Text,
   FlatList,
-  TouchableOpacity,
-  ListRenderItemInfo,
+  TouchableOpacity
 } from "react-native";
-import { COLORS } from "../../../../constants/theme";
+
 import type { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
+
 import ActivityItem from "./ActivityItem";
 import EmptyActivities from "./EmptyActivities";
+import { COLORS } from "../../../../constants/theme";
 import PaginationControls from "./PaginationControls";
 
 interface ActivityListProps {

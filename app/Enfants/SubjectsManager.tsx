@@ -1,3 +1,6 @@
+import { MotiView } from "moti";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -5,18 +8,14 @@ import {
   Modal,
   Alert,
   FlatList,
+  Platform,
   StyleSheet,
   TouchableOpacity,
-  Platform,
   ActivityIndicator,
 } from "react-native";
 
 import { COLORS } from "../../constants/theme";
 import { useTheme } from "../../theme/ThemeProvider";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
-import { ColorSpace } from "react-native-reanimated";
 
 // Structure pour une matière
 export type ISubject = {

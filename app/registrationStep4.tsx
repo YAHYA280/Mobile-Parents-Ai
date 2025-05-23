@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigation } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
-import ProgressBar from "@/components/ProgressBar";
 import * as DocumentPicker from "expo-document-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -13,6 +12,8 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+
+import ProgressBar from "@/components/ProgressBar";
 
 import Header from "../components/Header";
 import Button from "../components/Button";

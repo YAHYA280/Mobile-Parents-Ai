@@ -1,19 +1,12 @@
 import type { ViewStyle, TextStyle, ImageStyle } from "react-native";
 
+import { MotiView } from "moti";
 import { Image } from "expo-image";
-import Input from "@/components/Input";
-import Header from "@/components/ui/Header";
-import { useTheme } from "@/theme/ThemeProvider";
-import { icons, COLORS, images } from "@/constants";
-import RNPickerSelect from "react-native-picker-select";
-import { reducer } from "@/utils/reducers/formReducers";
-import { validateInput } from "@/utils/actions/formActions";
-import { launchImagePicker } from "@/utils/ImagePickerHelper";
-import { useNavigation, useLocalSearchParams } from "expo-router";
-import React, { useState, useEffect, useReducer, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
+import RNPickerSelect from "react-native-picker-select";
+import { useNavigation, useLocalSearchParams } from "expo-router";
+import React, { useState, useEffect, useReducer, useCallback } from "react";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -27,10 +20,18 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  useWindowDimensions,
   ActivityIndicator,
+  useWindowDimensions,
+  KeyboardAvoidingView,
 } from "react-native";
+
+import Input from "@/components/Input";
+import Header from "@/components/ui/Header";
+import { COLORS, images } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
+import { reducer } from "@/utils/reducers/formReducers";
+import { validateInput } from "@/utils/actions/formActions";
+import { launchImagePicker } from "@/utils/ImagePickerHelper";
 
 // --------------------------------------------------
 // Mock Data (similar to "ChildAccount" snippet)
@@ -351,7 +352,7 @@ const EditChildScreen = () => {
       <Header
         title="Modifier les informations"
         onBackPress={handleBack}
-        showBackButton={true}
+        showBackButton
       />
 
       <KeyboardAvoidingView

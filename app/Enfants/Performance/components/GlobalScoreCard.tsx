@@ -1,27 +1,28 @@
 // Fixed GlobalScoreCard.tsx - ALWAYS shows data
-import React, { useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  Easing,
-} from "react-native";
+import React, { useRef, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
+  View,
+  Text,
+  Easing,
+  Animated,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import {
   faFilter,
-  faTimesCircle,
   faTrophy,
-  faChartLine,
   faArrowUp,
+  faChartLine,
   faArrowDown,
+  faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { COLORS } from "../../../../constants/theme";
-import { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
+import type { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
+
 import CircularProgress from "./CircularProgress";
+import { COLORS } from "../../../../constants/theme";
 
 interface GlobalScoreCardProps {
   activities: Activity[];

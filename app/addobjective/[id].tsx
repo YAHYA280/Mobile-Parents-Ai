@@ -1,14 +1,11 @@
+import { MotiView } from "moti";
 import React, { useState } from "react";
-import Header from "@/components/ui/Header";
-import { icons, COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import RNPickerSelect from "react-native-picker-select";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
 import {
   View,
   Text,
@@ -18,9 +15,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  KeyboardAvoidingView,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
+
+import { COLORS } from "@/constants";
+import Header from "@/components/ui/Header";
+import { useTheme } from "@/theme/ThemeProvider";
 
 // Options pour les matières
 const subjectOptions = [
@@ -47,7 +48,7 @@ const statusOptions = [
 ];
 
 const AddObjectiveScreen = () => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
   const childId = (params.id as string) || "1";
@@ -65,7 +66,7 @@ const AddObjectiveScreen = () => {
   // États pour les dates
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // +1 semaine par défaut
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
   );
 
   // États pour les pickers de date
@@ -126,7 +127,7 @@ const AddObjectiveScreen = () => {
       Alert.alert("Champ requis", "Veuillez sélectionner une priorité.");
       return false;
     }
-    return true; // kidMessage est optionnel
+    return true;
   };
 
   // Sauvegarde de l'objectif
@@ -134,7 +135,7 @@ const AddObjectiveScreen = () => {
     if (validateForm()) {
       setIsSubmitting(true);
 
-      // Dans une vraie application, vous enverriez tous ces champs (dont kidMessage) à votre API / backend
+      //  enverriez tous ces champs  à votre API / backend
       setTimeout(() => {
         setIsSubmitting(false);
         Alert.alert("Succès", "L'objectif a été créé avec succès", [
@@ -184,12 +185,7 @@ const AddObjectiveScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelContainer}>
                     <Ionicons name="flag" size={18} color={COLORS.primary} />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Titre de l&apos;objectif
                     </Text>
                   </View>
@@ -197,15 +193,15 @@ const AddObjectiveScreen = () => {
                     style={[
                       styles.textInput,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={title}
                     onChangeText={setTitle}
                     placeholder="Entrez le titre de l'objectif"
-                    placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                    placeholderTextColor={COLORS.gray}
                   />
                 </View>
               </MotiView>
@@ -223,12 +219,7 @@ const AddObjectiveScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Description
                     </Text>
                   </View>
@@ -237,15 +228,15 @@ const AddObjectiveScreen = () => {
                       styles.textInput,
                       styles.textArea,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={description}
                     onChangeText={setDescription}
                     placeholder="Décrivez l'objectif"
-                    placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                    placeholderTextColor={COLORS.gray}
                     multiline
                     numberOfLines={4}
                     textAlignVertical="top"
@@ -262,12 +253,7 @@ const AddObjectiveScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelContainer}>
                     <Ionicons name="school" size={18} color={COLORS.primary} />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Matière
                     </Text>
                   </View>
@@ -275,8 +261,8 @@ const AddObjectiveScreen = () => {
                     style={[
                       styles.pickerContainer,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                   >
@@ -300,14 +286,14 @@ const AddObjectiveScreen = () => {
                           fontSize: 16,
                           paddingVertical: 12,
                           paddingHorizontal: 16,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         inputAndroid: {
                           fontSize: 16,
                           paddingHorizontal: 16,
                           paddingVertical: 12,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         iconContainer: {
@@ -320,7 +306,7 @@ const AddObjectiveScreen = () => {
                         <Ionicons
                           name="chevron-down"
                           size={20}
-                          color={dark ? COLORS.white : COLORS.black}
+                          color={COLORS.black}
                         />
                       )}
                     />
@@ -341,12 +327,7 @@ const AddObjectiveScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Priorité
                     </Text>
                   </View>
@@ -354,8 +335,8 @@ const AddObjectiveScreen = () => {
                     style={[
                       styles.pickerContainer,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                   >
@@ -379,14 +360,14 @@ const AddObjectiveScreen = () => {
                           fontSize: 16,
                           paddingVertical: 12,
                           paddingHorizontal: 16,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         inputAndroid: {
                           fontSize: 16,
                           paddingHorizontal: 16,
                           paddingVertical: 12,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         iconContainer: {
@@ -399,7 +380,7 @@ const AddObjectiveScreen = () => {
                         <Ionicons
                           name="chevron-down"
                           size={20}
-                          color={dark ? COLORS.white : COLORS.black}
+                          color={COLORS.black}
                         />
                       )}
                     />
@@ -416,12 +397,7 @@ const AddObjectiveScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelContainer}>
                     <Ionicons name="play" size={18} color={COLORS.primary} />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Date de début
                     </Text>
                   </View>
@@ -429,21 +405,17 @@ const AddObjectiveScreen = () => {
                     style={[
                       styles.dateButton,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     onPress={() => setShowStartDatePicker(true)}
                     activeOpacity={0.7}
                   >
-                    <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+                    <Text style={{ color: COLORS.black }}>
                       {formatDate(startDate)}
                     </Text>
-                    <Ionicons
-                      name="calendar"
-                      size={20}
-                      color={dark ? COLORS.white : COLORS.black}
-                    />
+                    <Ionicons name="calendar" size={20} color={COLORS.black} />
                   </TouchableOpacity>
 
                   {showStartDatePicker && (
@@ -467,12 +439,7 @@ const AddObjectiveScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelContainer}>
                     <Ionicons name="stop" size={18} color={COLORS.primary} />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Date de fin
                     </Text>
                   </View>
@@ -480,21 +447,17 @@ const AddObjectiveScreen = () => {
                     style={[
                       styles.dateButton,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     onPress={() => setShowEndDatePicker(true)}
                     activeOpacity={0.7}
                   >
-                    <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+                    <Text style={{ color: COLORS.black }}>
                       {formatDate(endDate)}
                     </Text>
-                    <Ionicons
-                      name="calendar"
-                      size={20}
-                      color={dark ? COLORS.white : COLORS.black}
-                    />
+                    <Ionicons name="calendar" size={20} color={COLORS.black} />
                   </TouchableOpacity>
 
                   {showEndDatePicker && (
@@ -523,12 +486,7 @@ const AddObjectiveScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Statut initial
                     </Text>
                   </View>
@@ -536,8 +494,8 @@ const AddObjectiveScreen = () => {
                     style={[
                       styles.pickerContainer,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                   >
@@ -561,14 +519,14 @@ const AddObjectiveScreen = () => {
                           fontSize: 16,
                           paddingVertical: 12,
                           paddingHorizontal: 16,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         inputAndroid: {
                           fontSize: 16,
                           paddingHorizontal: 16,
                           paddingVertical: 12,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         iconContainer: {
@@ -581,7 +539,7 @@ const AddObjectiveScreen = () => {
                         <Ionicons
                           name="chevron-down"
                           size={20}
-                          color={dark ? COLORS.white : COLORS.black}
+                          color={COLORS.black}
                         />
                       )}
                     />
@@ -602,12 +560,7 @@ const AddObjectiveScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Message pour l&apos;enfant (optionnel)
                     </Text>
                   </View>
@@ -616,15 +569,15 @@ const AddObjectiveScreen = () => {
                       styles.textInput,
                       styles.textArea,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={kidMessage}
                     onChangeText={setKidMessage}
                     placeholder="Entrez un message de félicitations ou d'encouragement..."
-                    placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                    placeholderTextColor={COLORS.gray}
                     multiline
                     numberOfLines={3}
                     textAlignVertical="top"
@@ -663,25 +616,13 @@ const AddObjectiveScreen = () => {
         >
           {/* Enhanced Cancel Button */}
           <TouchableOpacity
-            style={[
-              styles.cancelButton,
-              { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
-            ]}
+            style={[styles.cancelButton, { borderColor: COLORS.greyscale300 }]}
             onPress={() => navigation.goBack()}
             activeOpacity={0.8}
           >
             <View style={styles.cancelButtonContent}>
-              <Ionicons
-                name="close-outline"
-                size={20}
-                color={dark ? COLORS.white : COLORS.black}
-              />
-              <Text
-                style={[
-                  styles.cancelButtonText,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Ionicons name="close-outline" size={20} color={COLORS.black} />
+              <Text style={[styles.cancelButtonText, { color: COLORS.black }]}>
                 Annuler
               </Text>
             </View>

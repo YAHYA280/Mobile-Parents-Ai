@@ -1,6 +1,7 @@
 // Historique home component/FilterSection.tsx
 import React from "react";
 import { View } from "react-native";
+
 import {
   SearchBar,
   DateRangeIndicator,

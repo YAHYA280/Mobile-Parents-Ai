@@ -1,6 +1,4 @@
 import React from "react";
-import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 import {
   View,
   Text,
@@ -8,6 +6,9 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+
+import { COLORS } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
 
 import { getNotificationCounts } from "./NotificationData";
 

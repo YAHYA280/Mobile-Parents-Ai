@@ -1,45 +1,44 @@
 // app/Enfants/Historique/historydetails.tsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faHome,
+  faRobot,
+  faSearch,
+  faChalkboardTeacher,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   View,
   Alert,
+  Share,
+  Animated,
   ScrollView,
+  StyleSheet,
   SafeAreaView,
   TouchableOpacity,
-  Animated,
-  Share,
-  StyleSheet,
 } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faChalkboardTeacher,
-  faSearch,
-  faHome,
-  faRobot,
-} from "@fortawesome/free-solid-svg-icons";
 
 import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
+// Import our custom components
+import type {
+  AssistantThemeObject,
+} from "./components/ActivityDetailsCard";
 
 import { COLORS } from "../../../constants/theme";
+// Import the UI Header component
+import Header from "../../../components/ui/Header";
+import LoadingState from "./components/LoadingState";
+import FeedbackModal from "./components/FeedbackModal";
+import NotFoundState from "./components/NotFoundState";
+import ConversationCard from "./components/ConversationCard";
+import ResourcesSection from "./components/ResourcesSection";
+import ActivityDetailsCard from "./components/ActivityDetailsCard";
+import ParentFeedbackSection from "./components/ParentFeedbackSection";
 import {
   CHILDREN_DATA,
   enhanceActivity,
 } from "../../../data/Enfants/CHILDREN_DATA";
-
-// Import the UI Header component
-import Header from "../../../components/ui/Header";
-
-// Import our custom components
-import ActivityDetailsCard, {
-  AssistantThemeObject,
-} from "./components/ActivityDetailsCard";
-import ConversationCard from "./components/ConversationCard";
-import ParentFeedbackSection from "./components/ParentFeedbackSection";
-import ResourcesSection from "./components/ResourcesSection";
-import FeedbackModal from "./components/FeedbackModal";
-import LoadingState from "./components/LoadingState";
-import NotFoundState from "./components/NotFoundState";
 
 // Define Assistant Type
 type AssistantType = "J'Apprends" | "Recherche" | "Accueil" | "Autre";
@@ -327,7 +326,7 @@ const HistoryDetails = () => {
             child ? `${child.name} • ${formattedDate.split(" ")[0]}` : ""
           }
           onBackPress={handleBack}
-          showBackButton={true}
+          showBackButton
         />
 
         {/* Action buttons */}

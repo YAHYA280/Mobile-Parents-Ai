@@ -1,15 +1,18 @@
-import React from "react";
-import {
-  View,
-  StyleSheet,
+import type {
   ViewStyle,
   ViewProps,
   StyleProp,
-  ColorValue,
-} from "react-native";
+  ColorValue} from "react-native";
+
+import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import {
+  View,
+  StyleSheet
+} from "react-native";
+
 import { useTheme } from "@/theme/ThemeProvider";
-import { COLOORS, RADIUS, SHADOWS } from "@/constants/theme";
+import { RADIUS, COLOORS, SHADOWS } from "@/constants/theme";
 
 /* ------------------------------------------------------------------ */
 /* Types                                                              */

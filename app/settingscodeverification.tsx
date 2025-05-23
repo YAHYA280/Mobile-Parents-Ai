@@ -1,13 +1,12 @@
 import { useNavigation } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { OtpInput } from "react-native-otp-entry";
 import React, { useState, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { COLORS } from "../constants";
 import Header from "../components/ui/Header"; // Updated import path
-import Button from "../components/Button";
 import { useTheme } from "../theme/ThemeProvider";
 
 type Nav = {

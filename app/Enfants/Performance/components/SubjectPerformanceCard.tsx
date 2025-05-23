@@ -1,7 +1,7 @@
 // Fixed SubjectPerformanceCard.tsx - Progress bars now work properly
-import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Animated, Easing } from "react-native";
+import React, { useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { View, Text, Easing, Animated, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faChartLine,
@@ -9,8 +9,7 @@ import {
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { COLORS } from "../../../../constants/theme";
-import { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
+import type { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
 
 interface SubjectPerformanceCardProps {
   activities: Activity[];
@@ -104,11 +103,11 @@ const SubjectPerformanceCard: React.FC<SubjectPerformanceCardProps> = ({
   const getRecommendation = (subject: SubjectData): string => {
     if (subject.percentage < 40) {
       return `Besoin d'attention particulière`;
-    } else if (subject.percentage < 70) {
+    } if (subject.percentage < 70) {
       return `Continuer à travailler`;
-    } else {
+    } 
       return `Excellente performance`;
-    }
+    
   };
 
   return (

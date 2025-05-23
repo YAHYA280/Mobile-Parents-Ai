@@ -1,5 +1,6 @@
-import { SIZES, COLORS } from "@/constants";
 import { Dimensions, StyleSheet } from "react-native";
+
+import { SIZES, COLORS } from "@/constants";
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.85;

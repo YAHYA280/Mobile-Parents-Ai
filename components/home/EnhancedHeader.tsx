@@ -1,7 +1,10 @@
+/* eslint-disable react/no-unused-prop-types */
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+
 import { COLORS } from "@/constants";
+
 import NotificationBell from "../../components/notifications/NotificationBell";
 
 interface EnhancedHeaderProps {

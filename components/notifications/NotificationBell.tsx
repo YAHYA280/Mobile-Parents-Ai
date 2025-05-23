@@ -1,10 +1,11 @@
 import type { ViewStyle } from "react-native";
 
-import { COLORS } from "@/constants";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@/theme/ThemeProvider";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+
+import { COLORS } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
 
 import NotificationModal from "./NotificationModal";
 import { getNotificationCounts } from "./NotificationData";

@@ -1,13 +1,12 @@
 // app/Enfants/Performance/components/LoadingScreen.tsx
-import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Animated, Easing } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useRef, useEffect } from "react";
+import { View, Text, Easing, Animated, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faChartLine,
-  faTrophy,
   faBook,
   faClock,
+  faTrophy,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { COLORS } from "../../../../constants/theme";

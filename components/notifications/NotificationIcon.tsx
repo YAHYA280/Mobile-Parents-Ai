@@ -1,13 +1,15 @@
 import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
-  TouchableOpacity,
-  StyleSheet,
   Animated,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
 import { COLORS } from "@/constants";
+
 import NotificationModal from "../notifications/NotificationModal";
 import { getNotificationCounts } from "../notifications/NotificationData";
 

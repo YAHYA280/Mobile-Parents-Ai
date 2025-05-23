@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { FONTS, COLORS } from "@/constants";
 import { Feather } from "@expo/vector-icons";
-import { useTheme } from "@/theme/ThemeProvider";
 import {
   View,
   Text,
@@ -10,6 +8,9 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
+
+import { FONTS, COLORS } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
 
 import NotificationList from "./NotificationList";
 import NotificationTabs from "./NotificationTabs";

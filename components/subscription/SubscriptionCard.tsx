@@ -1,18 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { MotiView } from "moti";
 import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+
+import { lightenColor } from "@/utils/colorUtils";
 import StatusBadge from "@/components/ui/StatusBadge";
 import {
-  COLORS,
-  TYPOGRAPHY,
   RADIUS,
-  SPACING,
   SHADOWS,
 } from "@/constants/theme";
 import { formatDate, getPricingPeriod } from "@/utils/formatUtils";
-import { lightenColor } from "@/utils/colorUtils";
 
 export type SubscriptionStatus = "active" | "suspended" | "expired";
 

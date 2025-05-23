@@ -1,8 +1,10 @@
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 // Historique home component/EmptyTipsModal.tsx
 import React from "react";
-import { View, Text, TouchableOpacity, Modal, FlatList } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { View, Text, Modal, FlatList, TouchableOpacity } from "react-native";
+
 import { COLORS } from "../../../../constants/theme";
 
 interface EmptyTipsModalProps {

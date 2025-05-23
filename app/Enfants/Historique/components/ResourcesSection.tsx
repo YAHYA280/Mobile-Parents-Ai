@@ -1,8 +1,9 @@
 // ResourcesSection.tsx
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { View, Text, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+
 import { COLORS } from "../../../../constants/theme";
 
 interface ResourcesSectionProps {

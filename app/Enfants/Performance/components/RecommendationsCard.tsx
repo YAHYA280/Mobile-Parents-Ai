@@ -1,26 +1,26 @@
 // app/Enfants/Performance/components/RecommendationsCard.tsx
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   View,
   Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Animated,
   Modal,
-  ScrollView,
+  Animated,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faLightbulb,
-  faPaperPlane,
   faPen,
   faTrashAlt,
+  faLightbulb,
+  faPaperPlane,
   faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
+import type { Child } from "../../../../data/Enfants/CHILDREN_DATA";
+
 import { COLORS } from "../../../../constants/theme";
-import { Child } from "../../../../data/Enfants/CHILDREN_DATA";
 
 interface RecommendationsCardProps {
   childData: Child;

@@ -1,8 +1,10 @@
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 // Videodetails components/VideoPlayer.tsx
 import React from "react";
-import { View, Text, TouchableOpacity, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 import { COLORS } from "../../../../constants/theme";
 
 interface VideoPlayerProps {

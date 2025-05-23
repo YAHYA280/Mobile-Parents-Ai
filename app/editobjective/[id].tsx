@@ -1,14 +1,11 @@
+import { MotiView } from "moti";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
-import { icons, COLORS } from "@/constants";
-import Header from "@/components/ui/Header";
-import { useTheme } from "@/theme/ThemeProvider";
+import { LinearGradient } from "expo-linear-gradient";
 import RNPickerSelect from "react-native-picker-select";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
 import {
   View,
   Text,
@@ -19,9 +16,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  KeyboardAvoidingView,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
+
+import { COLORS } from "@/constants";
+import Header from "@/components/ui/Header";
+import { useTheme } from "@/theme/ThemeProvider";
 
 const subjectOptions = [
   { label: "Mathématiques", value: "math" },

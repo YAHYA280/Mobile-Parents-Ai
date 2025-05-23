@@ -2,24 +2,23 @@ import type { NavigationProp } from "@react-navigation/native";
 
 import { Image } from "expo-image";
 import React, { useRef } from "react";
-import Button from "@/components/Button";
 import { useNavigation } from "expo-router";
-import { useTheme } from "@/theme/ThemeProvider";
-import { SIZES, icons, COLORS } from "@/constants";
 import RBSheet from "react-native-raw-bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
+import Button from "@/components/Button";
+import { useTheme } from "@/theme/ThemeProvider";
+import { SIZES, icons, COLORS } from "@/constants";
 
 const Support = () => {
   const refRBSheet = useRef<any>(null);
   const { dark, colors } = useTheme();
   const navigation = useNavigation<NavigationProp<any>>();
-  
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      <View style={[styles.viewRight, { marginLeft: 'auto' }]}>
+      <View style={[styles.viewRight, { marginLeft: "auto" }]}>
         <TouchableOpacity onPress={() => navigation.navigate("notifications")}>
           <Image
             source={icons.notificationBell2}
@@ -150,16 +149,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.grayscale200,
     marginTop: 12,
   },
-    viewRight: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    bellIcon: {
-      height: 24,
-      width: 24,
-      tintColor: COLORS.black,
-      marginRight: 8,
-    },
+  viewRight: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  bellIcon: {
+    height: 24,
+    width: 24,
+    tintColor: COLORS.black,
+    marginRight: 8,
+  },
 });
 
 export default Support;

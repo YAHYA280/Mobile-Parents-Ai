@@ -1,11 +1,14 @@
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 // Videodetails components/RelatedResourcesCard.tsx
 import React from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import { View, Text, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { LinearGradient } from "expo-linear-gradient";
+
+import type { RelatedResource } from "@/types/video";
+
 import { COLORS } from "../../../../constants/theme";
-import { RelatedResource } from "@/types/video";
 
 interface RelatedResourcesCardProps {
   resources: RelatedResource[];

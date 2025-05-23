@@ -1,7 +1,8 @@
 // FeedbackModal.tsx
 import React from "react";
-import { View, Text, TouchableOpacity, TextInput, Modal } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { View, Text, Modal, TextInput, TouchableOpacity } from "react-native";
+
 import { COLORS } from "../../../../constants/theme";
 
 interface FeedbackModalProps {
@@ -87,7 +88,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               fontSize: 16,
             }}
             placeholder="Votre commentaire..."
-            placeholderTextColor={"rgba(0,0,0,0.3)"}
+            placeholderTextColor="rgba(0,0,0,0.3)"
           />
 
           <View

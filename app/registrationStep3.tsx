@@ -1,5 +1,4 @@
 import { useNavigation } from "expo-router";
-import ProgressBar from "@/components/ProgressBar";
 import React, { useRef, useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -10,6 +9,8 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+
+import ProgressBar from "@/components/ProgressBar";
 
 import Header from "../components/Header";
 import Button from "../components/Button";

@@ -1,13 +1,14 @@
 import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
   Modal,
+  StyleSheet,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
 import { COLORS } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
@@ -170,7 +171,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
   return (
     <Modal
       visible={visible}
-      transparent={true}
+      transparent
       animationType="fade"
       onRequestClose={onClose}
     >

@@ -1,25 +1,25 @@
 // app/Enfants/Historique/Videodetails.tsx - Refactored with Fixed Header
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
+  View,
+  Share,
+  Animated,
+  StatusBar,
   ScrollView,
   Dimensions,
-  SafeAreaView,
-  Animated,
-  Share,
-  StatusBar,
-  View,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
-import { VideoResource } from "@/types/video";
-import Header from "../../../components/ui/Header";
+import type { VideoResource } from "@/types/video";
 
+import Header from "../../../components/ui/Header";
 // Import components
 import {
+  TagsCard,
   VideoPlayer,
   VideoInfoCard,
-  TagsCard,
   RelatedResourcesCard,
 } from "./components";
 
@@ -196,7 +196,7 @@ const VideoDetails: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={"dark-content"} backgroundColor={"#FFFFFF"} />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* Header - Hidden in fullscreen mode, fixed to top */}
       {!isFullScreen && (

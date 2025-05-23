@@ -1,34 +1,32 @@
 import React from "react";
 import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { View, Platform, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { Paths } from "@/navigation";
 import { useTheme } from "@/theme/ThemeProvider";
-import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, Platform, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { COLORS } from "../../constants";
 
-// Fixed tab bar with proper spacing and safe area handling
 const TabLayout = () => {
   const { dark } = useTheme();
   const insets = useSafeAreaInsets();
 
-  // Generate styles based on theme
   const tabBarBackground = dark ? COLORS.dark1 : COLORS.white;
   const activeIconColor = COLORS.primary;
   const inactiveIconColor = dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)";
 
-  // Calculate proper bottom margin to avoid overlapping with navigation buttons
   const bottomMargin =
     Platform.OS === "ios"
       ? Math.max(20, insets.bottom)
-      : Math.max(30, insets.bottom + 15); // Extra space for Android nav buttons
+      : Math.max(30, insets.bottom + 15);
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: Platform.OS !== "ios",
-        // Modified to create floating effect with proper spacing
         tabBarStyle: {
           position: "absolute",
           height: Platform.OS === "ios" ? 80 : 75,
@@ -37,15 +35,13 @@ const TabLayout = () => {
           paddingTop: 10,
           backgroundColor: tabBarBackground,
 
-          // Floating styles with proper margins
           marginHorizontal: 20,
-          marginBottom: bottomMargin, // Dynamic bottom margin
+          marginBottom: bottomMargin,
           borderRadius: 30,
           borderTopWidth: 0,
           borderWidth: 1,
           borderColor: dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
 
-          // Shadow
           elevation: 10,
           shadowColor: dark ? "#000" : COLORS.primary,
           shadowOpacity: 0.2,

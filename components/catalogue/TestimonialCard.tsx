@@ -1,15 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
 import { MotiView } from "moti";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { View, Text, Image, StyleSheet } from "react-native";
+
 import { useTheme } from "@/theme/ThemeProvider";
 import {
-  COLOORS,
-  TYPOGRAPHY,
   RADIUS,
+  COLOORS,
   SHADOWS,
   SPACING,
+  TYPOGRAPHY,
 } from "@/constants/theme";
 
 interface TestimonialCardProps {

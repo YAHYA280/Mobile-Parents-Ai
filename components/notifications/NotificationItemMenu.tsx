@@ -1,7 +1,5 @@
 import React from "react";
-import { COLORS } from "@/constants";
 import { Feather } from "@expo/vector-icons";
-import { useTheme } from "@/theme/ThemeProvider";
 import {
   View,
   Text,
@@ -11,6 +9,9 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+
+import { COLORS } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
 
 interface Notification {
   id: string;

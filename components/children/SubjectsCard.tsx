@@ -1,12 +1,13 @@
 import React from "react";
+import { MotiView } from "moti";
 import { View, Text, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faGraduationCap,
   faCheck,
+  faGraduationCap,
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
-import { MotiView } from "moti";
+
 import { COLORS } from "@/constants/theme";
 
 interface SubjectsCardProps {

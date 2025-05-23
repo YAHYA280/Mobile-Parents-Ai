@@ -1,11 +1,14 @@
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
 import React from "react";
 import { View, Text } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
-import { COLORS } from "../../../../constants/theme";
+
+import type { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
+
 import ExerciseItem from "./ExerciseItem";
+import { COLORS } from "../../../../constants/theme";
 import RecommendationItem from "./RecommendationItem";
 
 // Define the AssistantThemeObject type

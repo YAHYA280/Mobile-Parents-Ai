@@ -1,6 +1,8 @@
 import type { NavigationProp } from "@react-navigation/native";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView } from "react-native-virtualized-view";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,19 +12,15 @@ import {
   Modal,
   Image,
   Alert,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-  TouchableWithoutFeedback,
   StatusBar,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
-import { MotiView } from "moti";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
 
 import Header from "../components/ui/Header";
-import Button from "../components/ui/Button";
-import { COLORS, COLOORS, RADIUS } from "../constants/theme";
+import { COLOORS } from "../constants/theme";
 import { icons, illustrations } from "../constants";
 
 const { width } = Dimensions.get("window");

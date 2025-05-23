@@ -1,20 +1,21 @@
 import React from "react";
+import { MotiView } from "moti";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faUser,
+  faArrowLeft,
+  faGraduationCap,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
   Image,
   StatusBar,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faArrowLeft,
-  faUser,
-  faGraduationCap,
-} from "@fortawesome/free-solid-svg-icons";
-import { MotiView } from "moti";
-import { Child } from "@/data/Enfants/CHILDREN_DATA";
+
+import type { Child } from "@/data/Enfants/CHILDREN_DATA";
 
 interface ProfileHeaderProps {
   child: Child;

@@ -1,6 +1,4 @@
-import { COLORS } from "@/constants";
 import React, { useState } from "react";
-import { useTheme } from "@/theme/ThemeProvider";
 import {
   View,
   Text,
@@ -8,6 +6,9 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
+import { COLORS } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
 
 import NotificationItem from "./NotificationItem";
 // Mock data - in a real app, this would come from a context or API

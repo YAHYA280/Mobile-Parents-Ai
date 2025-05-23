@@ -1,16 +1,16 @@
 import React from "react";
+import { MotiView } from "moti";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Dimensions,
-  Image,
+  TouchableOpacity,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+
 import { COLORS } from "@/constants";
-import { Ionicons } from "@expo/vector-icons";
-import { MotiView } from "moti";
 
 const { width } = Dimensions.get("window");
 

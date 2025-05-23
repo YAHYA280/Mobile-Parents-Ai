@@ -1,9 +1,9 @@
+import { MotiView } from "moti";
 import { Image } from "expo-image";
 import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, useNavigation } from "expo-router";
-import Button from "@/components/Button";
-import Header from "@/components/ui/Header";
-import { COLORS, images } from "@/constants";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -13,14 +13,15 @@ import {
   Text,
   Modal,
   FlatList,
-  StyleSheet,
-  Pressable,
-  useWindowDimensions,
   Platform,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
 } from "react-native";
-import { MotiView } from "moti";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+
+import Button from "@/components/Button";
+import Header from "@/components/ui/Header";
+import { COLORS, images } from "@/constants";
 
 interface Child {
   id: string;

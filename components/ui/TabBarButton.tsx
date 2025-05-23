@@ -1,13 +1,14 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
 import React, { useEffect } from "react";
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import { View, Pressable, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import Animated, {
+  withSpring,
+  interpolate,
+  useSharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
 interface TabBarButtonProps {
   isFocused: boolean;

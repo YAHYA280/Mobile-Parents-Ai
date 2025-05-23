@@ -1,8 +1,9 @@
 import { useNavigation } from "expo-router";
-import DotsView from "@/components/DotsView";
 import { View, Text, Image } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import DotsView from "@/components/DotsView";
 
 import { images } from "../constants";
 import Button from "../components/Button";

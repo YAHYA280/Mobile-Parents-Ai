@@ -1,15 +1,15 @@
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
-  TouchableOpacity,
-  StyleSheet,
   StatusBar,
-  Platform,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
 import { useTheme } from "@/theme/ThemeProvider";
-import { COLORS, SPACING, TYPOGRAPHY, COLOORS } from "@/constants/theme";
+import { COLORS, SPACING, COLOORS, TYPOGRAPHY } from "@/constants/theme";
 
 interface HeaderProps {
   title: string;

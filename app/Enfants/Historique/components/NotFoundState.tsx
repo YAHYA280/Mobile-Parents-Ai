@@ -1,7 +1,8 @@
 // NotFoundState.tsx
 import React from "react";
-import { View, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
+
 import { COLORS } from "../../../../constants/theme";
 import Header from "../../../../components/ui/Header";
 
@@ -15,7 +16,7 @@ const NotFoundState: React.FC<NotFoundStateProps> = ({ handleBack }) => {
       <Header
         title="Détails de l'activité"
         onBackPress={handleBack}
-        showBackButton={true}
+        showBackButton
       />
       <View
         style={{

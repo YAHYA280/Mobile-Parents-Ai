@@ -1,20 +1,21 @@
 // components/children/AnimatedTabBar.tsx
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import { MotiView } from "moti";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faHome,
   faBookOpen,
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
-import { MotiView } from "moti";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  View,
+  Text,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+
 import { COLORS } from "@/constants/theme";
 
 interface AnimatedTabBarProps {

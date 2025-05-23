@@ -1,7 +1,6 @@
 import { Image } from "expo-image";
 import { useNavigation } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import ProgressBar from "@/components/ProgressBar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useReducer, useCallback } from "react";
 import {
@@ -16,6 +15,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+
+import ProgressBar from "@/components/ProgressBar";
 
 import Input from "../components/Input";
 import Header from "../components/Header";

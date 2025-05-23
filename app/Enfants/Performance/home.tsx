@@ -1,31 +1,31 @@
 // Fixed home.tsx - Ensures all cards show data immediately
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
   Text,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
   Animated,
   StatusBar,
+  ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
 
 import type { Child } from "../../../data/Enfants/CHILDREN_DATA";
-import { CHILDREN_DATA } from "../../../data/Enfants/CHILDREN_DATA";
+
 import { COLORS } from "../../../constants/theme";
 import { useActivityFilters } from "./activityFilters";
-
+import LoadingScreen from "./components/LoadingScreen";
+import GlobalScoreCard from "./components/GlobalScoreCard";
 // Import components
 import PerformanceHeader from "./components/PerformanceHeader";
-import GlobalScoreCard from "./components/GlobalScoreCard";
-import SubjectPerformanceCard from "./components/SubjectPerformanceCard";
-import TimeDistributionCard from "./components/TimeDistributionCard";
 import ProgressTrendsCard from "./components/ProgressTrendsCard";
-import RecommendationsCard from "./components/RecommendationsCard";
 import SkillBreakdownCard from "./components/SkillBreakdownCard";
+import RecommendationsCard from "./components/RecommendationsCard";
+import { CHILDREN_DATA } from "../../../data/Enfants/CHILDREN_DATA";
+import TimeDistributionCard from "./components/TimeDistributionCard";
+import SubjectPerformanceCard from "./components/SubjectPerformanceCard";
 import PerformanceFilterModal from "./components/PerformanceFilterModal";
-import LoadingScreen from "./components/LoadingScreen";
 
 // Performance component props
 interface PerformanceHomeProps {

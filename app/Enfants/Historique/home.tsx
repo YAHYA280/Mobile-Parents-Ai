@@ -1,14 +1,19 @@
-// app/Enfants/Historique/home.tsx - Refactored
+// app/Enfants/Historique/home.tsx - Clean version
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "expo-router";
 import { View, Animated, StatusBar, SafeAreaView } from "react-native";
 import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
 import { useActivityFilters } from "./filtre";
-import { FilterModal } from "./filtres";
 
-// Import components
+// Import the new filter components
+import {
+  SearchBarComponent,
+  DateRangeIndicator,
+  FilterModal,
+} from "@/app/Enfants/Historique/filtres/index";
+
+// Import other components
 import HistoriqueHeader from "../../Enfants/Historique/components/HistoriqueHeader";
-import FilterSection from "../../Enfants/Historique/components/FilterSection";
 import ActivityList from "../../Enfants/Historique/components/ActivityList";
 import LoadingIndicator from "../../Enfants/Historique/components/LoadingIndicator";
 import EmptyTipsModal from "../../Enfants/Historique/components/EmptyTipsModal";
@@ -111,10 +116,20 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
     [router, childData]
   );
 
-  // Toggle advanced filters
-  const toggleAdvancedFilters = () => {
-    setShowAdvancedFilters(!showAdvancedFilters);
-  };
+  // Handle assistant types selection with proper typing
+  const handleAssistantTypesChange = useCallback(
+    (assistantsUpdater: ((prev: string[]) => string[]) | string[]) => {
+      if (typeof assistantsUpdater === "function") {
+        const newAssistants = assistantsUpdater(
+          advancedFilters.selectedAssistants
+        );
+        setAdvancedFilters({ selectedAssistants: newAssistants });
+      } else {
+        setAdvancedFilters({ selectedAssistants: assistantsUpdater });
+      }
+    },
+    [advancedFilters.selectedAssistants, setAdvancedFilters]
+  );
 
   // Main content
   const renderContent = () => (
@@ -125,28 +140,23 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         transform: [{ translateY: slideAnim }],
       }}
     >
-      {/* Filter Section */}
-      <FilterSection
-        searchKeyword={searchKeyword}
-        setSearchKeyword={setSearchKeyword}
-        activityDateRange={activityDateRange}
-        setActivityDateRange={setActivityDateRange}
-        toggleActivityCalendar={toggleActivityCalendar}
-        resetAllFilters={resetActivityFilters}
-        hasFilters={hasActiveFilters()}
-        uniqueAssistantTypes={uniqueAssistantTypes}
-        selectedAssistantTypes={advancedFilters.selectedAssistants}
-        setSelectedAssistantTypes={(assistantsUpdater) => {
-          if (typeof assistantsUpdater === "function") {
-            const newAssistants = assistantsUpdater(
-              advancedFilters.selectedAssistants
-            );
-            setAdvancedFilters({ selectedAssistants: newAssistants });
-          } else {
-            setAdvancedFilters({ selectedAssistants: assistantsUpdater });
-          }
-        }}
-      />
+      {/* Search Bar Component */}
+      <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+        <SearchBarComponent
+          searchKeyword={searchKeyword}
+          setSearchKeyword={setSearchKeyword}
+          activityDateRange={activityDateRange}
+          toggleActivityCalendar={toggleActivityCalendar}
+          resetAllFilters={resetActivityFilters}
+          hasFilters={hasActiveFilters()}
+        />
+
+        {/* Date Range Indicator */}
+        <DateRangeIndicator
+          activityDateRange={activityDateRange}
+          setActivityDateRange={setActivityDateRange}
+        />
+      </View>
 
       {/* Activities List */}
       <View style={{ flex: 1, paddingHorizontal: 16, marginTop: 16 }}>
@@ -175,23 +185,14 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         setSearchKeyword={setSearchKeyword}
         uniqueAssistantTypes={uniqueAssistantTypes}
         selectedAssistantTypes={advancedFilters.selectedAssistants}
-        setSelectedAssistantTypes={(assistantsUpdater) => {
-          if (typeof assistantsUpdater === "function") {
-            const newAssistants = assistantsUpdater(
-              advancedFilters.selectedAssistants
-            );
-            setAdvancedFilters({ selectedAssistants: newAssistants });
-          } else {
-            setAdvancedFilters({ selectedAssistants: assistantsUpdater });
-          }
-        }}
+        setSelectedAssistantTypes={handleAssistantTypesChange}
         activityCalendarMode={activityCalendarMode}
         activityDateRange={activityDateRange}
         handleActivityDayPress={handleActivityDayPress}
         resetAllFilters={resetActivityFilters}
-        availableSubjects={[]}
-        availableChapters={[]}
-        availableExercises={[]}
+        availableSubjects={availableSubjects}
+        availableChapters={availableChapters}
+        availableExercises={availableExercises}
         advancedFilters={advancedFilters}
         setAdvancedFilters={setAdvancedFilters}
       />
@@ -225,7 +226,7 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
         backgroundColor: "#F8F8F8",
       }}
     >
-      <StatusBar barStyle={"dark-content"} backgroundColor={"#FFFFFF"} />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <HistoriqueHeader onBackPress={handleBack} childData={childData} />
       {renderContent()}
     </SafeAreaView>

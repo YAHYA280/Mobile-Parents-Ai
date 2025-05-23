@@ -1,41 +1,41 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { MotiView } from "moti";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
+  Animated,
+  FlatList,
   StatusBar,
   StyleSheet,
-  Animated,
-  ActivityIndicator,
-  FlatList,
-  TouchableOpacity,
   Dimensions,
   ScrollView,
-  Platform,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { MotiView } from "moti";
 
 // Import Custom Components
 import Header from "@/components/ui/Header";
+import PlanCard from "@/components/catalogue/PlanCard";
 import BenefitsSection from "@/components/catalogue/BenefitsSection";
 import TestimonialCard from "@/components/catalogue/TestimonialCard";
-import PlanCard from "@/components/catalogue/PlanCard";
-
 // Import Types and Utilities
 import {
+  RADIUS,
   COLOORS,
   SPACING,
-  TYPOGRAPHY,
-  RADIUS,
   SHADOWS,
+  TYPOGRAPHY,
 } from "@/constants/theme";
+
+import type { CataloguePlan } from "./services/mocksApi/abonnementApiMock";
+
 import {
   getCatalogues,
   getAbonnementActiveByUser,
 } from "./services/mocksApi/abonnementApiMock";
-import type { CataloguePlan } from "./services/mocksApi/abonnementApiMock";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.85;

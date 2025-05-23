@@ -2,17 +2,16 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import Svg, { G, Path, Circle, Text as SvgText } from "react-native-svg";
 import {
-  faClock,
   faBook,
+  faFilm,
+  faClock,
   faRobot,
   faRunning,
-  faFilm,
 } from "@fortawesome/free-solid-svg-icons";
-import Svg, { G, Path, Circle, Text as SvgText } from "react-native-svg";
 
-import { COLORS } from "../../../../constants/theme";
-import { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
+import type { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
 
 interface TimeDistributionCardProps {
   activities: Activity[];
@@ -99,11 +98,11 @@ const TimeDistributionCard: React.FC<TimeDistributionCardProps> = ({
 
     if (hours === 0) {
       return `${mins} min`;
-    } else if (mins === 0) {
-      return `${hours} h`;
-    } else {
-      return `${hours} h ${mins} min`;
     }
+    if (mins === 0) {
+      return `${hours} h`;
+    }
+    return `${hours} h ${mins} min`;
   };
 
   // Function to create a pie chart path
@@ -111,6 +110,7 @@ const TimeDistributionCard: React.FC<TimeDistributionCardProps> = ({
     startAngle: number,
     endAngle: number,
     outerRadius: number,
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     innerRadius: number = 0
   ): string => {
     const startRadians = (startAngle - 90) * (Math.PI / 180);
@@ -155,7 +155,6 @@ const TimeDistributionCard: React.FC<TimeDistributionCardProps> = ({
       const endAngle = startAngle + angleToRender;
       const path = createPieSlice(startAngle, endAngle, radius, innerRadius);
 
-      const thisStartAngle = startAngle;
       startAngle = endAngle;
 
       return (
@@ -238,9 +237,9 @@ const TimeDistributionCard: React.FC<TimeDistributionCardProps> = ({
 
       <View style={styles.insightContainer}>
         <Text style={styles.insightText}>
-          L'activité principale est{" "}
-          <Text style={styles.insightHighlight}>J'Apprends</Text> qui représente
-          presque la moitié du temps d'apprentissage.
+          L&apos;activité principale est{" "}
+          <Text style={styles.insightHighlight}>J&apos;Apprends</Text> qui
+          représente presque la moitié du temps d&apos;apprentissage.
         </Text>
       </View>
 
@@ -253,7 +252,7 @@ const TimeDistributionCard: React.FC<TimeDistributionCardProps> = ({
             style={styles.timeIcon}
           />
           <Text style={styles.timeTitle}>
-            Temps d'apprentissage par semaine
+            Temps d&apos;apprentissage par semaine
           </Text>
         </View>
 

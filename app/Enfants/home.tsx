@@ -1,17 +1,18 @@
 // app/Enfants/home.tsx
-import React, { useState, useEffect, useRef } from "react";
-import { View, Text, ScrollView, SafeAreaView } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { View, Text, ScrollView, SafeAreaView } from "react-native";
 
-import { CHILDREN_DATA, Child } from "../../data/Enfants/CHILDREN_DATA";
+import type { Child } from "../../data/Enfants/CHILDREN_DATA";
+
 import HistoriqueActivites from "./Historique/home";
 import PerformanceComponent from "./Performance/home";
-
+import { CHILDREN_DATA } from "../../data/Enfants/CHILDREN_DATA";
+import ProgressCard from "../../components/children/ProgressCard";
+import SubjectsCard from "../../components/children/SubjectsCard";
 // Import our new components
 import ProfileHeader from "../../components/children/ProfileHeader";
 import AnimatedTabBar from "../../components/children/AnimatedTabBar";
-import ProgressCard from "../../components/children/ProgressCard";
-import SubjectsCard from "../../components/children/SubjectsCard";
 import RecentActivityCard from "../../components/children/RecentActivityCard";
 
 // Fix the interface to accept null

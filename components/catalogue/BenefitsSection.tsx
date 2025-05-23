@@ -1,15 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MotiView } from "moti";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router"; // Import useRouter instead of useNavigation
+import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+
 import { useTheme } from "@/theme/ThemeProvider";
 import {
-  COLOORS,
-  TYPOGRAPHY,
   RADIUS,
+  COLOORS,
   SHADOWS,
   SPACING,
+  TYPOGRAPHY,
 } from "@/constants/theme";
 
 interface BenefitItem {

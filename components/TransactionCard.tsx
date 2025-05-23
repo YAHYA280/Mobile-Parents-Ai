@@ -2,8 +2,9 @@ import type { ImageSourcePropType } from "react-native";
 
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { translateTransactionStatus } from "@/utils/translation";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+
+import { translateTransactionStatus } from "@/utils/translation";
 
 import { SIZES, COLORS } from "../constants";
 import { useTheme } from "../theme/ThemeProvider";

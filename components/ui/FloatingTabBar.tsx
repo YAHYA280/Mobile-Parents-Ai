@@ -1,18 +1,20 @@
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
-import React, { useEffect } from "react";
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "@/theme/ThemeProvider";
-import { COLORS } from "@/constants";
-import { Ionicons } from "@expo/vector-icons";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+
 import { MotiView } from "moti";
+import React, { useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
   withSpring,
   interpolate,
+  useSharedValue,
+  useAnimatedStyle,
 } from "react-native-reanimated";
+
+import { COLORS } from "@/constants";
 import { Paths } from "@/navigation";
+import { useTheme } from "@/theme/ThemeProvider";
 
 const FloatingTabBar: React.FC<BottomTabBarProps> = ({
   state,

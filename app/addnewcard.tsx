@@ -1,32 +1,32 @@
 import type { NavigationProp } from "@react-navigation/native";
 
+import { MotiView } from "moti";
 import { useNavigation } from "expo-router";
-import {
-  View,
-  Text,
-  Alert,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  StatusBar,
-  Keyboard,
-} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Platform, ScrollView, KeyboardAvoidingView } from "react-native";
 import React, {
+  useRef,
   useState,
   useEffect,
   useReducer,
   useCallback,
-  useRef,
 } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  View,
+  Text,
+  Alert,
+  Keyboard,
+  StatusBar,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 
 import Input from "../components/Input";
 import Header from "../components/ui/Header";
-import { COLORS, COLOORS, RADIUS } from "../constants/theme";
+import { COLOORS } from "../constants/theme";
 import { reducer } from "../utils/reducers/formReducers";
 import { validateInput } from "../utils/actions/formActions";
 
@@ -100,9 +100,9 @@ const AddNewCard = () => {
 
     if (month && year) {
       return `${month.padStart(2, "0")}/${year}`;
-    } else if (month) {
+    } if (month) {
       return `${month.padStart(2, "0")}/YY`;
-    } else if (year) {
+    } if (year) {
       return `MM/${year}`;
     }
     return "MM/YY";

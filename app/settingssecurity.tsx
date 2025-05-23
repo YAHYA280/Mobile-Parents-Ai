@@ -1,22 +1,22 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { ScrollView } from "react-native-virtualized-view";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
+import { ScrollView } from "react-native-virtualized-view";
 
+import type { Device, PaymentMethod } from "../types/security";
+
+import { COLORS } from "../constants";
 // Import Header from ui components
 import Header from "../components/ui/Header";
 import { useTheme } from "../theme/ThemeProvider";
-import { COLORS } from "../constants";
-import { Device, PaymentMethod } from "../types/security";
-
 // Import our component sections
 import SecuritySectionCard from "../components/settings/SecuritySectionCard";
-import ConnectedDevicesSection from "../components/settings/ConnectedDevicesSection";
-import ChangePasswordSection from "../components/settings/ChangePasswordSection";
 import ResetPasswordSection from "../components/settings/ResetPasswordSection";
+import ChangePasswordSection from "../components/settings/ChangePasswordSection";
 import PaymentMethodsSection from "../components/settings/PaymentMethodsSection";
+import ConnectedDevicesSection from "../components/settings/ConnectedDevicesSection";
 
 // Mock data
 const mockPaymentMethods: PaymentMethod[] = [

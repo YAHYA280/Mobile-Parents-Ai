@@ -1,8 +1,10 @@
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 // Historique home component/PaginationControls.tsx
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 import { COLORS } from "../../../../constants/theme";
 
 interface PaginationControlsProps {

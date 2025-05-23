@@ -1,8 +1,9 @@
 // components/aicalendar/RecommendationCard.tsx
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
+import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+
 import { COLORS } from "@/constants";
 import { useTheme } from "@/theme/ThemeProvider";
 

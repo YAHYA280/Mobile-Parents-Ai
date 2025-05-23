@@ -1,42 +1,44 @@
+import type {
+  NativeScrollEvent,
+  NativeSyntheticEvent} from "react-native";
+
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, {
+  useRef,
   useMemo,
   useState,
   useEffect,
   useCallback,
-  useRef,
 } from "react";
 import {
   View,
   Text,
-  ScrollView,
   StatusBar,
+  ScrollView,
   StyleSheet,
-  ActivityIndicator,
   Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 
+import Alert from "@/components/ui/Alert";
 // Import Custom Components
 import Header from "@/components/ui/Header";
-import PricingCard from "@/components/ui/PricingCard";
-import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
-
-// Import Types and Utilities
-import { COLOORS, TYPOGRAPHY, SPACING, RADIUS } from "@/constants/theme";
+import PricingCard from "@/components/ui/PricingCard";
 import { getPlanColor, getPlanEmoji } from "@/utils/formatUtils";
-import { lightenColor } from "@/utils/colorUtils";
+// Import Types and Utilities
+import { COLOORS, SPACING, TYPOGRAPHY } from "@/constants/theme";
+
+import type { CataloguePlan } from "../app/services/mocksApi/abonnementApiMock";
+
 import {
   getCatalogues,
   updateUserSubscription,
   getAbonnementActiveByUser,
 } from "../app/services/mocksApi/abonnementApiMock";
-import type { CataloguePlan } from "../app/services/mocksApi/abonnementApiMock";
 
 // Constants
 const { width } = Dimensions.get("window");
@@ -302,20 +304,20 @@ const PlanDetails: React.FC = () => {
       {
         duration: "Mensuel",
         price: pricing.monthlyPrice,
-        features: features,
+        features,
         apiDuration: "monthly",
       },
       {
         duration: "6 Mois",
         price: pricing.sixMonthPrice,
-        features: features,
+        features,
         discountPercentage: 15,
         apiDuration: "six_months",
       },
       {
         duration: "Annuel",
         price: pricing.yearlyPrice,
-        features: features,
+        features,
         discountPercentage: 25,
         apiDuration: "yearly",
       },

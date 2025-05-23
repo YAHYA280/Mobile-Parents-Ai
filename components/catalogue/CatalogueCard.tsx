@@ -1,18 +1,19 @@
-import React, { useMemo } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { MotiView } from "moti";
+import React, { useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  COLOORS,
-  TYPOGRAPHY,
-  RADIUS,
-  SHADOWS,
-  SPACING,
-} from "@/constants/theme";
-import { lightenColor, darkenColor } from "@/utils/colorUtils";
+import { LinearGradient } from "expo-linear-gradient";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import type { CataloguePlan } from "@/app/services/mocksApi/abonnementApiMock";
+
+import { darkenColor, lightenColor } from "@/utils/colorUtils";
+import {
+  RADIUS,
+  COLOORS,
+  SHADOWS,
+  SPACING,
+  TYPOGRAPHY,
+} from "@/constants/theme";
 
 interface CatalogueCardProps {
   plan: CataloguePlan;

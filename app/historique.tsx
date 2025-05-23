@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { Feather } from "@expo/vector-icons";
-import { useTheme } from "@/theme/ThemeProvider";
-import { SIZES, FONTS, COLORS } from "@/constants";
 import { ScrollView } from "react-native-virtualized-view";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ConditionalComponent from "@/components/ConditionalComponent";
 import {
     View,
     Text,
@@ -16,6 +13,10 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
 } from "react-native";
+
+import { useTheme } from "@/theme/ThemeProvider";
+import { SIZES, FONTS, COLORS } from "@/constants";
+import ConditionalComponent from "@/components/ConditionalComponent";
 
 
 const notificationsData = [

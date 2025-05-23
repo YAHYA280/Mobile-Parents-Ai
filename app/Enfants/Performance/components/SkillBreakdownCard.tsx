@@ -1,11 +1,11 @@
 // Fixed SkillBreakdownCard.tsx - ALWAYS shows data
-import React, { useEffect, useState, useRef } from "react";
-import { View, Text, StyleSheet, Dimensions, Animated } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import React, { useRef, useState, useEffect } from "react";
 import { faBrain, faCheck } from "@fortawesome/free-solid-svg-icons";
-import Svg, { Polygon, Circle, Line, Text as SvgText } from "react-native-svg";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { View, Text, Animated, StyleSheet, Dimensions } from "react-native";
+import Svg, { Line, Circle, Polygon, Text as SvgText } from "react-native-svg";
 
-import { Child } from "../../../../data/Enfants/CHILDREN_DATA";
+import type { Child } from "../../../../data/Enfants/CHILDREN_DATA";
 
 interface SkillBreakdownCardProps {
   childData: Child;

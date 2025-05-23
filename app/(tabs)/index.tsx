@@ -1,40 +1,34 @@
-import React, { useState, useRef } from "react";
-import { Image } from "expo-image";
+import React, { useState } from "react";
 import { useNavigation } from "expo-router";
-import { COLORS, images, icons } from "@/constants";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import Animated, {
-  useSharedValue,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  interpolate,
-  Extrapolate,
-} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  StatusBar,
-  Dimensions,
   Platform,
+  StatusBar,
+  StyleSheet,
+  RefreshControl,
+  TouchableOpacity,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, {
+  interpolate,
+  Extrapolate,
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedScrollHandler,
+} from "react-native-reanimated";
 
-// Import components
-import EnhancedHeader from "@/components/home/EnhancedHeader";
+import { COLORS, images } from "@/constants";
 import WelcomeCard from "@/components/home/WelcomeCard";
+import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
+import EnhancedHeader from "@/components/home/EnhancedHeader";
 import QuickActionCard from "@/components/home/QuickActionCard";
 import ChildProgressCard from "@/components/home/ChildProgressCard";
 import RecentActivityCard from "@/components/home/RecentActivityCard";
 import UpcomingHomeworkCard from "@/components/home/UpcomingHomeworkCard";
-
-// Import CHILDREN_DATA
-import { CHILDREN_DATA, enhanceActivity } from "@/data/Enfants/CHILDREN_DATA";
 
 type Nav = {
   navigate: (value: string, params?: object) => void;
@@ -46,28 +40,21 @@ const Index = () => {
   const scrollY = useSharedValue(0);
   const insets = useSafeAreaInsets();
 
-  // Calculate proper bottom padding to account for floating tab bar
   const tabBarHeight = Platform.OS === "ios" ? 80 : 75;
   const tabBarMargin =
     Platform.OS === "ios"
       ? Math.max(20, insets.bottom)
       : Math.max(30, insets.bottom + 15);
-  const totalTabBarSpace = tabBarHeight + tabBarMargin + 20; // Extra 20 for breathing room
+  const totalTabBarSpace = tabBarHeight + tabBarMargin + 20;
 
-  // Map CHILDREN_DATA to the format required by ChildProgressCard
   const childrenProgress = CHILDREN_DATA.map((child) => {
-    // Extract progress value (remove % sign)
     const progressValue = parseFloat(child.progress.replace("%", "")) || 0;
 
-    // Get the most recent activity for lastActivity
-    const lastActivity =
-      child.activitesRecentes.length > 0
-        ? child.activitesRecentes[0].duree || "0 min"
-        : "N/A";
-
-    // Map subjects data (take first 2 for simplicity)
+    // const lastActivity =
+    // child.activitesRecentes.length > 0
+    //   ? child.activitesRecentes[0].duree || "0 min"
+    //   : "N/A";
     const mappedSubjects = child.subjects.slice(0, 2).map((subject) => {
-      // Calculate average progress for each subject based on activities
       const subjectActivities = child.activitesRecentes.filter(
         (act) => act.matiere === subject.name
       );
@@ -81,8 +68,7 @@ const Index = () => {
               }
               return sum;
             }, 0) / subjectActivities.length
-          : 65; // Default value if no data
-
+          : 65;
       return {
         name: subject.name,
         progress: Math.round(subjectProgress),
@@ -94,7 +80,7 @@ const Index = () => {
       name: child.name,
       progress: progressValue,
       profileImage: child.profileImage,
-      lastActivity: "2 heures", // Default value
+      lastActivity: "2 heures",
       subjects:
         mappedSubjects.length > 0
           ? mappedSubjects
@@ -105,10 +91,8 @@ const Index = () => {
     };
   });
 
-  // Map recent activities from CHILDREN_DATA
   const recentActivities = CHILDREN_DATA.flatMap((child, childIndex) =>
     child.activitesRecentes.slice(0, 1).map((activity, activityIndex) => ({
-      // Create a unique ID by combining child ID and activity index/ID
       id: `${child.id}-${activity.id || activityIndex}`,
       childName: child.name,
       activity: activity.activite,
@@ -117,12 +101,10 @@ const Index = () => {
     }))
   ).slice(0, 2);
 
-  // Create upcoming homework data based on subjects and activities
   const upcomingHomework = CHILDREN_DATA.flatMap((child, childIndex) =>
     child.subjects.flatMap((subject, subjectIndex) =>
       subject.chapters.flatMap((chapter, chapterIndex) =>
         chapter.exercises.slice(0, 1).map((exercise, exerciseIndex) => ({
-          // Create a truly unique key by combining multiple IDs
           id: `${child.id}-${subjectIndex}-${chapterIndex}-${exerciseIndex}`,
           subject: subject.name,
           title: exercise.name,
@@ -134,7 +116,6 @@ const Index = () => {
     )
   ).slice(0, 2);
 
-  // Updated Quick actions data - commented out Devoirs and Messages
   const quickActions = [
     // {
     //   id: "1",
@@ -168,7 +149,6 @@ const Index = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // Simulate data refresh
     setTimeout(() => {
       setIsRefreshing(false);
     }, 1500);
@@ -219,7 +199,7 @@ const Index = () => {
           style={styles.scrollView}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: totalTabBarSpace }, // Dynamic bottom padding
+            { paddingBottom: totalTabBarSpace },
           ]}
           refreshControl={
             <RefreshControl
@@ -437,7 +417,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 30, // This will be overridden by the dynamic padding
+    paddingBottom: 30,
   },
   sectionContainer: {
     marginTop: 24,

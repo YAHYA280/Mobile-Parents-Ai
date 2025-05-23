@@ -1,21 +1,22 @@
 import React from "react";
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
 import { MotiView } from "moti";
 import { Ionicons } from "@expo/vector-icons";
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+
 import { useTheme } from "@/theme/ThemeProvider";
 import {
   COLORS,
-  TYPOGRAPHY,
   RADIUS,
   SHADOWS,
   COLOORS,
+  TYPOGRAPHY,
 } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
@@ -48,25 +49,25 @@ const Alert: React.FC<AlertProps> = ({
   const getAlertIcon = () => {
     if (title.toLowerCase().includes("erreur")) {
       return "alert-circle";
-    } else if (title.toLowerCase().includes("annuler")) {
+    } if (title.toLowerCase().includes("annuler")) {
       return "help-circle";
-    } else if (title.toLowerCase().includes("succès")) {
+    } if (title.toLowerCase().includes("succès")) {
       return "checkmark-circle";
-    } else {
+    } 
       return "information-circle";
-    }
+    
   };
 
   const getAlertIconColor = () => {
     if (title.toLowerCase().includes("erreur")) {
       return COLOORS.status.expired.main;
-    } else if (title.toLowerCase().includes("annuler")) {
+    } if (title.toLowerCase().includes("annuler")) {
       return COLOORS.status.suspended.main;
-    } else if (title.toLowerCase().includes("succès")) {
+    } if (title.toLowerCase().includes("succès")) {
       return COLOORS.status.active.main;
-    } else {
+    } 
       return COLOORS.primary.main;
-    }
+    
   };
 
   const getButtonStyle = (buttonStyle?: AlertButtonStyle) => {

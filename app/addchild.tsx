@@ -1,19 +1,12 @@
 import type { ViewStyle, TextStyle, ImageStyle } from "react-native";
 
+import { MotiView } from "moti";
 import { Image } from "expo-image";
-import Input from "@/components/Input";
-import Header from "@/components/ui/Header";
 import { useNavigation } from "expo-router";
-import { icons, COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
-import RNPickerSelect from "react-native-picker-select";
-import { reducer } from "@/utils/reducers/formReducers";
-import { validateInput } from "@/utils/actions/formActions";
-import { launchImagePicker } from "@/utils/ImagePickerHelper";
-import React, { useState, useReducer, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
+import RNPickerSelect from "react-native-picker-select";
+import React, { useState, useReducer, useCallback } from "react";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -26,10 +19,18 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  useWindowDimensions,
   ActivityIndicator,
+  useWindowDimensions,
+  KeyboardAvoidingView,
 } from "react-native";
+
+import Input from "@/components/Input";
+import Header from "@/components/ui/Header";
+import { icons, COLORS } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
+import { reducer } from "@/utils/reducers/formReducers";
+import { validateInput } from "@/utils/actions/formActions";
+import { launchImagePicker } from "@/utils/ImagePickerHelper";
 
 const initialFormState = {
   inputValues: {
@@ -138,7 +139,7 @@ const AddChildScreen = () => {
       <Header
         title="Ajouter un Enfant"
         onBackPress={() => navigation.goBack()}
-        showBackButton={true}
+        showBackButton
       />
 
       <KeyboardAvoidingView

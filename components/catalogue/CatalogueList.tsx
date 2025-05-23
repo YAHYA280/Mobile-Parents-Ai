@@ -1,12 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, StyleSheet } from "react-native";
+import type { StackNavigationProp } from "@react-navigation/stack";
+
 import { useNavigation } from "expo-router";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { FlatList, StyleSheet } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+
+import type { CataloguePlan } from "@/app/services/mocksApi/abonnementApiMock";
+
+import { SPACING } from "@/constants/theme";
 import { getAbonnementActiveByUser } from "@/app/services/mocksApi/abonnementApiMock";
 
 import CatalogueCard from "./CatalogueCard";
-import { SPACING } from "@/constants/theme";
-import type { CataloguePlan } from "@/app/services/mocksApi/abonnementApiMock";
 
 /* ------------------------------------------------------------------ */
 /* Navigation types                                                   */

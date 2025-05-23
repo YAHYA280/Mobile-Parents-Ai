@@ -221,7 +221,7 @@ export const useActivityFilters = (activities: Activity[]) => {
           // Don't close calendar yet so user can select end date
           showActivityCalendar: true,
         };
-      } else {
+      } 
         // We're selecting the end date
         newEndDate = selectedDate;
 
@@ -243,7 +243,7 @@ export const useActivityFilters = (activities: Activity[]) => {
           activityCalendarMode: "start", // Reset to start mode for next time
           showActivityCalendar: false, // Close calendar after selecting both dates
         };
-      }
+      
     });
   };
 

@@ -3,10 +3,11 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChartLine, faLightbulb } from "@fortawesome/free-solid-svg-icons";
-import Svg, { Path, Line, Text as SvgText, G, Circle } from "react-native-svg";
+import Svg, { G, Path, Line, Circle, Text as SvgText } from "react-native-svg";
+
+import type { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
 
 import { COLORS } from "../../../../constants/theme";
-import { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
 
 interface ProgressTrendsCardProps {
   activities: Activity[];
@@ -183,15 +184,15 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
 
     if (growth >= 20) {
       return "Progression exceptionnelle ! Continuez dans cette direction.";
-    } else if (growth >= 10) {
+    } if (growth >= 10) {
       return "Bonne progression sur la période. Les efforts portent leurs fruits.";
-    } else if (growth >= 0) {
+    } if (growth >= 0) {
       return "Progression stable. Continuez à pratiquer régulièrement.";
-    } else if (growth >= -10) {
+    } if (growth >= -10) {
       return "Légère baisse des performances. Un peu plus de pratique pourrait aider.";
-    } else {
+    } 
       return "Baisse significative. Un soutien supplémentaire pourrait être nécessaire.";
-    }
+    
   };
 
   return (

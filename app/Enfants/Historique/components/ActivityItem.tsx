@@ -1,11 +1,14 @@
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 // Historique home component/ActivityItem.tsx
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { View, Text, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { COLORS } from "../../../../constants/theme";
+
 import type { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
+
+import { COLORS } from "../../../../constants/theme";
 
 interface ActivityItemProps {
   item: Activity;
@@ -180,7 +183,7 @@ const ActivityItem: React.FC<ActivityItemProps> = ({
                 <FontAwesomeIcon
                   icon={"clock" as IconProp}
                   size={12}
-                  color={"#666666"}
+                  color="#666666"
                   style={{ marginRight: 4 }}
                 />
                 <Text
@@ -238,7 +241,7 @@ const ActivityItem: React.FC<ActivityItemProps> = ({
                   <FontAwesomeIcon
                     icon={"book" as IconProp}
                     size={12}
-                    color={"#666666"}
+                    color="#666666"
                     style={{ marginRight: 4 }}
                   />
                   <Text

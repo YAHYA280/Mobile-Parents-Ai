@@ -1,21 +1,22 @@
 import React from "react";
+import { MotiView } from "moti";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Dimensions,
-  ScrollView,
+  TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
-import { Ionicons } from "@expo/vector-icons";
+
 import { useTheme } from "@/theme/ThemeProvider";
-import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY } from "@/constants/theme";
-import { formatDuration } from "@/utils/formatUtils";
-import FeatureItem from "./FeatureItem";
 import { lightenColor } from "@/utils/colorUtils";
+import { formatDuration } from "@/utils/formatUtils";
+import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY } from "@/constants/theme";
+
+import FeatureItem from "./FeatureItem";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.85;

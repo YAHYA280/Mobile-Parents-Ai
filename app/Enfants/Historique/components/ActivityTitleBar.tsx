@@ -1,10 +1,13 @@
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 // Chat components/ActivityTitleBar.tsx
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+
+import type { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
+
 import { COLORS } from "../../../../constants/theme";
-import { Activity } from "../../../../data/Enfants/CHILDREN_DATA";
 
 interface ActivityTitleBarProps {
   activity: Activity;

@@ -1,14 +1,10 @@
+import { MotiView } from "moti";
 import { Image } from "expo-image";
 import React, { useState } from "react";
-import Header from "@/components/ui/Header";
 import { useNavigation } from "expo-router";
-import { useTheme } from "@/theme/ThemeProvider";
-import ObjectiveCard from "@/components/ObjectiveCard";
-import { SIZES, COLORS, images } from "@/constants";
-import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -18,14 +14,19 @@ import {
   Text,
   Alert,
   Modal,
+  Platform,
   TextInput,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  useWindowDimensions,
-  Platform,
   ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
+
+import Header from "@/components/ui/Header";
+import { useTheme } from "@/theme/ThemeProvider";
+import { SIZES, COLORS, images } from "@/constants";
+import ObjectiveCard from "@/components/ObjectiveCard";
 
 import SubjectsManager from "../Enfants/SubjectsManager";
 
@@ -144,7 +145,7 @@ const ProgressBar = ({ progress, color }: ProgressBarProps) => (
 const ChildAccount = () => {
   const navigation = useNavigation();
   const router = useRouter();
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
@@ -174,7 +175,7 @@ const ChildAccount = () => {
           onBackPress={() => navigation.goBack()}
         />
         <View style={{ padding: 16 }}>
-          <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+          <Text style={{ color: COLORS.black }}>
             Désolé, aucune donnée trouvée pour cet enfant.
           </Text>
         </View>
@@ -235,21 +236,13 @@ const ChildAccount = () => {
           from={{ opacity: 0, scale: 0.9, translateY: 20 }}
           animate={{ opacity: 1, scale: 1, translateY: 0 }}
           transition={{ type: "spring", damping: 15 }}
-          style={[
-            styles.modalView,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
+          style={[styles.modalView, { backgroundColor: COLORS.white }]}
         >
           <View style={styles.modalIconContainer}>
             <Ionicons name="settings" size={48} color={COLORS.primary} />
           </View>
 
-          <Text
-            style={[
-              styles.modalTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.modalTitle, { color: COLORS.black }]}>
             Paramètres du Compte Enfant
           </Text>
 
@@ -275,12 +268,7 @@ const ChildAccount = () => {
                 color={COLORS.white}
               />
             </LinearGradient>
-            <Text
-              style={[
-                styles.modalOptionText,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.modalOptionText, { color: COLORS.black }]}>
               Préférences et restrictions
             </Text>
           </TouchableOpacity>
@@ -303,12 +291,7 @@ const ChildAccount = () => {
             >
               <Ionicons name="add" size={20} color={COLORS.white} />
             </LinearGradient>
-            <Text
-              style={[
-                styles.modalOptionText,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.modalOptionText, { color: COLORS.black }]}>
               Ajouter un objectif
             </Text>
           </TouchableOpacity>
@@ -367,10 +350,7 @@ const ChildAccount = () => {
           from={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "spring", damping: 15 }}
-          style={[
-            styles.confirmModalView,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
+          style={[styles.confirmModalView, { backgroundColor: COLORS.white }]}
         >
           <View style={styles.modalIconContainer}>
             <Ionicons name="warning" size={48} color={COLORS.error} />
@@ -385,22 +365,15 @@ const ChildAccount = () => {
             <TouchableOpacity
               style={[
                 styles.confirmCancelButton,
-                { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
+                { borderColor: COLORS.greyscale300 },
               ]}
               onPress={() => setShowDeleteConfirmModal(false)}
               activeOpacity={0.8}
             >
               <View style={styles.confirmCancelContent}>
-                <Ionicons
-                  name="close-outline"
-                  size={18}
-                  color={dark ? COLORS.white : COLORS.black}
-                />
+                <Ionicons name="close-outline" size={18} color={COLORS.black} />
                 <Text
-                  style={[
-                    styles.confirmCancelText,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
+                  style={[styles.confirmCancelText, { color: COLORS.black }]}
                 >
                   Annuler
                 </Text>
@@ -472,12 +445,7 @@ const ChildAccount = () => {
               )}
             </View>
             <View style={styles.profileInfo}>
-              <Text
-                style={[
-                  styles.childDetails,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.childDetails, { color: COLORS.black }]}>
                 {childData.age} ans • {childData.grade}
               </Text>
               <View style={styles.timeSpentContainer}>
@@ -501,18 +469,13 @@ const ChildAccount = () => {
           transition={{ type: "timing", duration: 600, delay: 200 }}
           style={[
             styles.section,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            { backgroundColor: COLORS.white },
             Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
           <View style={styles.sectionHeader}>
             <Ionicons name="trending-up" size={24} color={COLORS.primary} />
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
               Progrès global
             </Text>
           </View>
@@ -567,18 +530,13 @@ const ChildAccount = () => {
           transition={{ type: "timing", duration: 600, delay: 400 }}
           style={[
             styles.section,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            { backgroundColor: COLORS.white },
             Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
           <View style={styles.sectionHeader}>
             <Ionicons name="flag" size={24} color={COLORS.primary} />
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
               Objectifs d'apprentissage
             </Text>
           </View>
@@ -654,7 +612,7 @@ const ChildAccount = () => {
           transition={{ type: "timing", duration: 600, delay: 600 }}
           style={[
             styles.section,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+            { backgroundColor: COLORS.white },
             Platform.OS === "ios" && styles.iosShadow,
           ]}
         >
@@ -664,12 +622,7 @@ const ChildAccount = () => {
               size={24}
               color={COLORS.primary}
             />
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
               Envoyer un message de soutien
             </Text>
           </View>
@@ -678,18 +631,16 @@ const ChildAccount = () => {
             style={[
               styles.messageInput,
               {
-                color: dark ? COLORS.white : COLORS.black,
-                borderColor: dark ? COLORS.greyscale300 : COLORS.grayscale200,
-                backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale100,
+                color: COLORS.black,
+                borderColor: COLORS.grayscale200,
+                backgroundColor: COLORS.greyscale100,
               },
             ]}
             onChangeText={(text) => setMessage(text)}
             value={message}
             placeholder="Écris ton message ici..."
             multiline
-            placeholderTextColor={
-              dark ? COLORS.greyscale400 : COLORS.grayscale400
-            }
+            placeholderTextColor={COLORS.grayscale400}
           />
 
           {/* Enhanced Send Button */}

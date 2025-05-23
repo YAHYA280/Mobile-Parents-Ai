@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import React, { useMemo, createContext, useContext } from "react";
+
+import React, { useMemo, useContext, createContext } from "react";
+
 import { lightColors } from "./colors";
 
 interface ThemeContextType {

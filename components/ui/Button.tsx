@@ -1,21 +1,23 @@
-import React from "react";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  ActivityIndicator,
+import type {
   ViewStyle,
   TextStyle,
-  ColorValue,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+  ColorValue} from "react-native";
+
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import {
-  COLORS,
-  TYPOGRAPHY,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator
+} from "react-native";
+
+import {
   RADIUS,
   SHADOWS,
   COLOORS,
+  TYPOGRAPHY,
 } from "@/constants/theme";
 
 type GradientTuple = readonly [ColorValue, ColorValue, ...ColorValue[]];

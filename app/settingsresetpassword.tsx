@@ -1,7 +1,7 @@
 import Checkbox from "expo-checkbox";
 import { useNavigation } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useState, useEffect, useReducer, useCallback } from "react";
 import {
   View,

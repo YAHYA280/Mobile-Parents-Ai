@@ -1,6 +1,7 @@
 // Historique home component/LoadingIndicator.tsx
 import React from "react";
 import { View, Text, ActivityIndicator } from "react-native";
+
 import { COLORS } from "../../../../constants/theme";
 
 const LoadingIndicator: React.FC = () => {

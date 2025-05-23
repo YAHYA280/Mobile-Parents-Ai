@@ -1,27 +1,27 @@
-import React, { useState, useRef, useEffect } from "react";
+import { MotiView } from "moti";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import React, { useRef, useState, useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
   FlatList,
   Animated,
+  StyleSheet,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { MotiView } from "moti";
-import { useNavigation } from "@react-navigation/native";
-import { useTheme } from "@/theme/ThemeProvider";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS, TYPOGRAPHY, RADIUS, SHADOWS } from "@/constants/theme";
-import Header from "@/components/ui/Header";
-import Card from "@/components/ui/Card";
-import Alert from "@/components/ui/Alert";
-import CalendarModal from "@/components/CalendarModal"; // Import the new CalendarModal component
 
 // Mock data types
-import type { TransactionStatus } from "@/utils/translation";
 import type { TRANSACTION } from "@/contexts/type/transaction";
+
+import Card from "@/components/ui/Card";
+import Alert from "@/components/ui/Alert";
+import { COLORS } from "@/constants/theme";
+import Header from "@/components/ui/Header";
+import { useTheme } from "@/theme/ThemeProvider";
+import CalendarModal from "@/components/CalendarModal"; // Import the new CalendarModal component
 import {
   TRANSACTION_STATUS_OPTIONS,
   transactions as initialTransactions,
@@ -245,9 +245,9 @@ const Transactions = () => {
   const getDateRangeDisplayText = () => {
     if (dateRange.startDate && dateRange.endDate) {
       return `${formatDateDisplay(dateRange.startDate)} - ${formatDateDisplay(dateRange.endDate)}`;
-    } else if (dateRange.startDate) {
+    } if (dateRange.startDate) {
       return `À partir du ${formatDateDisplay(dateRange.startDate)}`;
-    } else if (dateRange.endDate) {
+    } if (dateRange.endDate) {
       return `Jusqu'au ${formatDateDisplay(dateRange.endDate)}`;
     }
     return "Période personnalisée";

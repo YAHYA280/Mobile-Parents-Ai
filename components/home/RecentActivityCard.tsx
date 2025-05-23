@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { COLORS } from "@/constants";
-import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
+import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
+
+import { COLORS } from "@/constants";
 
 const { width } = Dimensions.get("window");
 
@@ -23,17 +24,17 @@ const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
   const getActivityIcon = () => {
     if (activity.toLowerCase().includes("terminé")) {
       return "checkmark-circle";
-    } else if (activity.toLowerCase().includes("commencé")) {
-      return "play-circle-outline";
-    } else {
-      return "time-outline";
     }
+    if (activity.toLowerCase().includes("commencé")) {
+      return "play-circle-outline";
+    }
+    return "time-outline";
   };
 
   // Determine card left border color based on activity
   const getActivityColor = () => {
     if (score) {
-      const scoreValue = parseInt(score);
+      const scoreValue = parseInt(score, 10);
       if (scoreValue >= 80) return "#4CAF50";
       if (scoreValue >= 60) return "#2196F3";
       if (scoreValue >= 40) return "#FFC107";
@@ -42,11 +43,11 @@ const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
 
     if (activity.toLowerCase().includes("terminé")) {
       return "#4CAF50";
-    } else if (activity.toLowerCase().includes("commencé")) {
-      return "#2196F3";
-    } else {
-      return COLORS.primary;
     }
+    if (activity.toLowerCase().includes("commencé")) {
+      return "#2196F3";
+    }
+    return COLORS.primary;
   };
 
   const activityIcon = getActivityIcon();

@@ -1,8 +1,8 @@
 // app/Enfants/Performance/components/PerformanceHeader.tsx
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faArrowLeft, faShareAlt } from "@fortawesome/free-solid-svg-icons";
+import { faShareAlt, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 import { COLORS } from "../../../../constants/theme";
 

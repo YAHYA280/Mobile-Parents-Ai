@@ -1,16 +1,17 @@
 import React from "react";
+import { MotiView } from "moti";
+import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import { Image } from "expo-image";
+
 import { COLORS } from "@/constants";
-import { Ionicons } from "@expo/vector-icons";
-import { MotiView } from "moti";
-import { LinearGradient } from "expo-linear-gradient";
 
 const { width } = Dimensions.get("window");
 
@@ -116,7 +117,7 @@ const ChildProgressCard: React.FC<ChildProgressCardProps> = ({
                 <LinearGradient
                   colors={[
                     getProgressColor(subject.progress),
-                    getProgressColor(subject.progress) + "80",
+                    `${getProgressColor(subject.progress)  }80`,
                   ]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}

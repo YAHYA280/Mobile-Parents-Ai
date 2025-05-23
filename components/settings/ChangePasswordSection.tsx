@@ -1,20 +1,21 @@
+import { useReducer } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useCallback } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
+  Modal,
   StyleSheet,
   TouchableOpacity,
-  Modal,
   TouchableWithoutFeedback,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { useReducer } from "react";
-import { reducer } from "../../utils/reducers/formReducers";
-import { validateInput } from "../../utils/actions/formActions";
+
 import { COLORS } from "../../constants";
 import Input from "../../components/Input";
+import { reducer } from "../../utils/reducers/formReducers";
+import { validateInput } from "../../utils/actions/formActions";
 
 type Nav = {
   navigate: (value: string) => void;

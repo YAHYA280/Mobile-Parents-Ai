@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
 import { MotiView } from "moti";
 import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet } from "react-native";
+
 import { useTheme } from "@/theme/ThemeProvider";
 import FeatureItem from "@/components/ui/FeatureItem";
-import { COLORS, TYPOGRAPHY, SPACING } from "@/constants/theme";
+import { COLORS, SPACING, TYPOGRAPHY } from "@/constants/theme";
 
 interface SubscriptionFeaturesProps {
   features: string[];

@@ -1,39 +1,39 @@
+import { MotiView } from "moti";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
-  ScrollView,
-  StatusBar,
-  ActivityIndicator,
-  StyleSheet,
   Text,
-  TouchableOpacity,
-  Image,
   Platform,
+  StatusBar,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { MotiView } from "moti";
-import { LinearGradient } from "expo-linear-gradient";
 
-import Header from "@/components/ui/Header";
 import Alert from "@/components/ui/Alert";
+import Header from "@/components/ui/Header";
+import { formatDate } from "@/utils/formatUtils";
+import { lightenColor } from "@/utils/colorUtils";
 import NoSubscriptionView from "@/components/subscription/NoSubscriptionView";
-
 import {
+  RADIUS,
   COLOORS,
   SPACING,
-  TYPOGRAPHY,
-  RADIUS,
   SHADOWS,
+  TYPOGRAPHY,
 } from "@/constants/theme";
+
+import type { Abonnement } from "./services/mocksApi/abonnementApiMock";
+
 import {
   getCurrentUser,
   getAbonnementActiveByUser,
 } from "./services/mocksApi/abonnementApiMock";
-import type { Abonnement } from "./services/mocksApi/abonnementApiMock";
-import { formatDate } from "@/utils/formatUtils";
-import { lightenColor } from "@/utils/colorUtils";
 
 // Helper Functions
 const getPlanColor = (abonnement: Abonnement | null): string => {

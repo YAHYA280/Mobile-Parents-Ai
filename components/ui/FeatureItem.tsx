@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
+import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet } from "react-native";
+
 import { useTheme } from "@/theme/ThemeProvider";
-import { COLORS, TYPOGRAPHY, COLOORS } from "@/constants/theme";
+import { COLORS, COLOORS, TYPOGRAPHY } from "@/constants/theme";
 
 interface FeatureItemProps {
   feature: string;

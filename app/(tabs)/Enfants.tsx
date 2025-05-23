@@ -1,10 +1,9 @@
-// app/(tabs)/Enfants.tsx
 import React from "react";
+import { MotiView } from "moti";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { MotiView } from "moti";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -13,34 +12,32 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import { COLORS, TYPOGRAPHY, SHADOWS, RADIUS } from "../../constants/theme";
-import { CHILDREN_DATA, Child } from "../../data/Enfants/CHILDREN_DATA";
+import type { Child } from "../../data/Enfants/CHILDREN_DATA";
+
+import { CHILDREN_DATA } from "../../data/Enfants/CHILDREN_DATA";
+import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY } from "../../constants/theme";
 import NotificationBell from "../../components/notifications/NotificationBell";
 
-// Function to get progress color based on value
 function getProgressColor(progress: number) {
   if (progress < 30) {
-    return COLORS.error; // Rouge
+    return COLORS.error;
   }
   if (progress <= 50) {
-    return COLORS.secondary; // Orange
+    return COLORS.secondary;
   }
   if (progress <= 70) {
-    return COLORS.primary; // Jaune
+    return COLORS.primary;
   }
-  return COLORS.greeen; // Vert
+  return COLORS.greeen;
 }
 
-// Main EnfantsList Component
 const EnfantsList: React.FC = () => {
   const router = useRouter();
 
   const handleChildPress = (childId: number) => {
-    // Make sure this matches your route structure
     router.push(`/Enfants/home?childId=${childId}`);
   };
 
-  // Render header with animated appearance
   const renderHeader = () => (
     <MotiView
       from={{ opacity: 0, translateY: -20 }}

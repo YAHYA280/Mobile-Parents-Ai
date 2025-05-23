@@ -1,9 +1,9 @@
 import React from "react";
+import { MotiView } from "moti";
 import { View, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { MotiView } from "moti";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
 interface ProgressCardProps {
   progress: string;

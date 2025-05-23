@@ -1,11 +1,13 @@
 // components/aicalendar/RecommendationDetailSheet.tsx
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import RBSheet from "react-native-raw-bottom-sheet";
+import { View, Text, StyleSheet } from "react-native";
+
 import { COLORS } from "@/constants";
 import { useTheme } from "@/theme/ThemeProvider";
-import { AIRecommendation } from "./RecommendationCard";
+
+import type { AIRecommendation } from "./RecommendationCard";
 
 interface RecommendationDetailSheetProps {
   sheetRef: React.RefObject<any>;

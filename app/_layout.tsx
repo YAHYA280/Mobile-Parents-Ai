@@ -1,12 +1,14 @@
 import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
-import { FONTS } from "@/constants/fonts";
 import { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
-import "react-native-reanimated";
-import { ThemeProvider } from "@/theme/ThemeProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import "react-native-reanimated";
+
+import { FONTS } from "@/constants/fonts";
+import { ThemeProvider } from "@/theme/ThemeProvider";
+
 import "../constants/fontawesome";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.

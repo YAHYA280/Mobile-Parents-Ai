@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
-import { useTheme } from "@/theme/ThemeProvider";
-import { COLOORS, TYPOGRAPHY, RADIUS, SHADOWS } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet } from "react-native";
+
 import Button from "@/components/ui/Button";
+import { useTheme } from "@/theme/ThemeProvider";
+import { RADIUS, COLOORS, SHADOWS, TYPOGRAPHY } from "@/constants/theme";
 
 interface NoSubscriptionViewProps {
   onChoosePlan: () => void;

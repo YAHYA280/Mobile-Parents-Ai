@@ -1,32 +1,32 @@
 // app/Enfants/Performance/components/PerformanceFilterModal.tsx
-import React, { useEffect, useRef } from "react";
+import React, { useRef, useEffect } from "react";
+import { Calendar } from "react-native-calendars";
+import MultiSlider from "@ptomasroos/react-native-multi-slider";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   View,
   Text,
   Modal,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
   Animated,
+  StyleSheet,
+  ScrollView,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import { Calendar } from "react-native-calendars";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
+  faBook,
+  faCheck,
+  faRobot,
+  faSearch,
+  faBookOpen,
+  faArrowRight,
   faTimesCircle,
   faCalendarAlt,
-  faChartLine,
-  faCheck,
-  faArrowRight,
-  faSearch,
-  faRobot,
-  faBook,
-  faBookOpen,
 } from "@fortawesome/free-solid-svg-icons";
-import MultiSlider from "@ptomasroos/react-native-multi-slider";
+
+import type { Child } from "../../../../data/Enfants/CHILDREN_DATA";
 
 import { COLORS } from "../../../../constants/theme";
-import { Child } from "../../../../data/Enfants/CHILDREN_DATA";
 
 interface PerformanceFilterModalProps {
   showFilterModal: boolean;

@@ -1,26 +1,27 @@
-import { COLORS } from "@/constants";
+import { MotiView } from "moti";
 import React, { useState } from "react";
-import Header from "@/components/ui/Header";
-import { useTheme } from "@/theme/ThemeProvider";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation, useLocalSearchParams } from "expo-router";
 import {
   View,
   Text,
   Alert,
   Switch,
   Keyboard,
+  Platform,
   TextInput,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Platform,
   ActivityIndicator,
   KeyboardAvoidingView,
 } from "react-native";
+
+import { COLORS } from "@/constants";
+import Header from "@/components/ui/Header";
+import { useTheme } from "@/theme/ThemeProvider";
 
 // --------------------------------------------------
 // Updated Type
@@ -708,7 +709,7 @@ const ChildPreferencesScreen = () => {
                   onSubmitEditing={handleAddRestrictedWord}
                   onFocus={handleInputFocus}
                   returnKeyType="done"
-                  blurOnSubmit={true}
+                  blurOnSubmit
                 />
               </View>
               <TouchableOpacity

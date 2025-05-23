@@ -1,6 +1,7 @@
 // LoadingState.tsx
 import React from "react";
-import { View, Text, ActivityIndicator, SafeAreaView } from "react-native";
+import { View, Text, SafeAreaView, ActivityIndicator } from "react-native";
+
 import { COLORS } from "../../../../constants/theme";
 import Header from "../../../../components/ui/Header";
 
@@ -14,7 +15,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({ handleBack }) => {
       <Header
         title="Détails de l'activité"
         onBackPress={handleBack}
-        showBackButton={true}
+        showBackButton
       />
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color={COLORS.primary} />

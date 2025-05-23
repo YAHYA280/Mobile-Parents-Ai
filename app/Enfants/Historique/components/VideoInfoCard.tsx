@@ -1,10 +1,13 @@
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 // Videodetails components/VideoInfoCard.tsx
 import React from "react";
 import { View, Text } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+
+import type { VideoResource } from "@/types/video";
+
 import { COLORS } from "../../../../constants/theme";
-import { VideoResource } from "@/types/video";
 
 interface VideoInfoCardProps {
   resource: VideoResource;

@@ -1,33 +1,33 @@
+import { MotiView } from "moti";
+import { useNavigation } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 // app/aicalendar.tsx
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
+  StatusBar,
   StyleSheet,
   ScrollView,
   Dimensions,
-  StatusBar,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
-import { useTheme } from "@/theme/ThemeProvider";
-import { COLORS } from "@/constants";
-import { MotiView } from "moti";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import type { CalendarDay } from "@/components/aicalendar/CalendarGrid";
+import type { AIRecommendation } from "@/components/aicalendar/RecommendationCard";
+
+import { COLORS } from "@/constants";
 // Import components
 import Header from "@/components/ui/Header";
+import { useTheme } from "@/theme/ThemeProvider";
 import AIInfoCard from "@/components/aicalendar/AIInfoCard";
-import MonthNavigation from "@/components/aicalendar/MonthNavigation";
-import CalendarGrid from "@/components/aicalendar/CalendarGrid";
-import type { CalendarDay } from "@/components/aicalendar/CalendarGrid";
-import RecommendationCard from "@/components/aicalendar/RecommendationCard";
-import type { AIRecommendation } from "@/components/aicalendar/RecommendationCard";
 import EmptyState from "@/components/aicalendar/EmptyState";
-import RecommendationDetailSheet from "@/components/aicalendar/RecommendationDetailSheet";
-
 // Import children data
 import { CHILDREN_DATA } from "@/data/Enfants/CHILDREN_DATA";
+import CalendarGrid from "@/components/aicalendar/CalendarGrid";
+import MonthNavigation from "@/components/aicalendar/MonthNavigation";
+import RecommendationCard from "@/components/aicalendar/RecommendationCard";
+import RecommendationDetailSheet from "@/components/aicalendar/RecommendationDetailSheet";
 
 const { width } = Dimensions.get("window");
 

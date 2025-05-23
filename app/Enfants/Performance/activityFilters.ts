@@ -1,5 +1,5 @@
 // Fixed activityFilters.ts
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 
 import type { Activity } from "../../../data/Enfants/CHILDREN_DATA";
 

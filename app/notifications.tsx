@@ -1,29 +1,22 @@
 import React, { useState } from "react";
-import { FONTS, COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
+import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { Feather, FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
-  Modal,
-  FlatList,
-  TextInput,
   StyleSheet,
-  Dimensions,
-  ScrollView,
   TouchableOpacity,
-  TouchableWithoutFeedback,
 } from "react-native";
 
+import { FONTS, COLORS } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
 // Import notification components
 import {
   NotificationList,
   NotificationTabs,
   NotificationSearch,
   NotificationHeaderMenu,
-  getNotificationCounts,
 } from "@/components/notifications";
 
 type TabKey = "all" | "unread" | "read" | "favorite" | "archive";

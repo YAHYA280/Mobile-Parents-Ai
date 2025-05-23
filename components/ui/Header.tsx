@@ -1,15 +1,16 @@
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
-  TouchableOpacity,
-  StyleSheet,
   StatusBar,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
 import { useTheme } from "@/theme/ThemeProvider";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS, SPACING, TYPOGRAPHY, COLOORS } from "@/constants/theme";
+import { COLORS, SPACING, COLOORS, TYPOGRAPHY } from "@/constants/theme";
 
 interface HeaderProps {
   title: string;

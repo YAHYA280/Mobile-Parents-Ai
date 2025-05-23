@@ -1,28 +1,27 @@
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 // app/Enfants/Historique/chat.tsx - With Bottom Padding
 import React, { useRef, useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-
 import {
-  faChalkboardTeacher,
-  faSearch,
   faHome,
   faRobot,
+  faSearch,
+  faChalkboardTeacher,
 } from "@fortawesome/free-solid-svg-icons";
-
 import {
   View,
   Text,
   Alert,
   Platform,
+  Animated,
+  StatusBar,
   ScrollView,
+  StyleSheet,
   SafeAreaView,
   ActivityIndicator,
   KeyboardAvoidingView,
-  Animated,
-  StyleSheet,
-  StatusBar,
 } from "react-native";
 
 import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
@@ -34,13 +33,12 @@ import {
   CHILDREN_DATA,
   enhanceActivity,
 } from "../../../data/Enfants/CHILDREN_DATA";
-
 // Import components
 import {
-  ActivityTitleBar,
+  InfoBanner,
   MessageBubble,
   ReadOnlyInput,
-  InfoBanner,
+  ActivityTitleBar,
 } from "./components";
 
 // Assistant mapping with colors and icons
@@ -229,7 +227,7 @@ const ChatScreen: React.FC = () => {
             title={`Assistant ${assistantName}`}
             subtitle={formattedDate}
             onBackPress={handleBack}
-            showBackButton={true}
+            showBackButton
             transparent={false}
           />
         </View>

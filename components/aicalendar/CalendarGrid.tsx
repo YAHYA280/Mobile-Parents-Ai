@@ -1,7 +1,8 @@
 // components/aicalendar/CalendarGrid.tsx
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MotiView } from "moti";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+
 import { COLORS } from "@/constants";
 import { useTheme } from "@/theme/ThemeProvider";
 

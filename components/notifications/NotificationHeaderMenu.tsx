@@ -1,6 +1,4 @@
 import React from "react";
-import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import {
   View,
@@ -10,6 +8,9 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+
+import { COLORS } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
 
 interface NotificationHeaderMenuProps {
   visible: boolean;

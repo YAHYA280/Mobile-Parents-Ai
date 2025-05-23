@@ -1,18 +1,15 @@
 // app/Enfants/Historique/statement.tsx
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   View,
   Text,
-  Image,
   Animated,
   TouchableOpacity,
-  ScrollView,
 } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
 import type { Activity } from "../../../data/Enfants/CHILDREN_DATA";
 
-import icons from "../../../constants/icons";
 import { COLORS } from "../../../constants/theme";
 
 interface StatementProps {

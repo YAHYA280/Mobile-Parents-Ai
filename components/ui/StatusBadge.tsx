@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { COLOORS, TYPOGRAPHY, RADIUS } from "@/constants/theme";
+import { View, Text, StyleSheet } from "react-native";
+
+import { RADIUS, COLOORS, TYPOGRAPHY } from "@/constants/theme";
 
 export type SubscriptionStatus = "active" | "suspended" | "expired";
 
@@ -72,7 +73,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
       style={[
         styles.badge,
         sizeStyles[size].badge,
-        { backgroundColor: backgroundColor },
+        { backgroundColor },
       ]}
     >
       <Ionicons

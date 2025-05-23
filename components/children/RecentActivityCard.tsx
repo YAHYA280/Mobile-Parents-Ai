@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faClock, faStar } from "@fortawesome/free-solid-svg-icons";
 import { MotiView } from "moti";
+import { View, Text, StyleSheet } from "react-native";
+import { faStar, faClock } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+
 import { COLORS } from "@/constants/theme";
 import { enhanceActivity } from "@/data/Enfants/CHILDREN_DATA";
 

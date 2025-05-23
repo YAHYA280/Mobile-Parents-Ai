@@ -1,7 +1,8 @@
 // ParentFeedbackSection.tsx
 import React from "react";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+
 import { COLORS } from "../../../../constants/theme";
 
 interface ParentFeedbackSectionProps {
@@ -133,7 +134,7 @@ const ParentFeedbackSection: React.FC<ParentFeedbackSectionProps> = ({
       >
         <TextInput
           placeholder="Ajouter un commentaire..."
-          placeholderTextColor={"rgba(0,0,0,0.3)"}
+          placeholderTextColor="rgba(0,0,0,0.3)"
           value={feedback}
           onChangeText={setFeedback}
           multiline

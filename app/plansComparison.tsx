@@ -1,32 +1,31 @@
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
-  ActivityIndicator,
   Dimensions,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@/theme/ThemeProvider";
 
 // Import Custom Components
 import Header from "@/components/ui/Header";
-import Card from "@/components/ui/Card";
-
+import { useTheme } from "@/theme/ThemeProvider";
 // Import Types and Utilities
 import {
+  RADIUS,
   COLOORS,
   SPACING,
   TYPOGRAPHY,
-  RADIUS,
-  SHADOWS,
 } from "@/constants/theme";
-import { getCatalogues } from "./services/mocksApi/abonnementApiMock";
+
 import type { CataloguePlan } from "./services/mocksApi/abonnementApiMock";
+
+import { getCatalogues } from "./services/mocksApi/abonnementApiMock";
 
 const { width, height } = Dimensions.get("window");
 
