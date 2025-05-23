@@ -1,0 +1,59 @@
+// components/aicalendar/EmptyState.tsx
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { MotiView } from "moti";
+import { COLORS } from "@/constants";
+import { useTheme } from "@/theme/ThemeProvider";
+
+const EmptyState: React.FC = () => {
+  const { dark } = useTheme();
+
+  return (
+    <MotiView
+      from={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", damping: 15 }}
+      style={styles.container}
+    >
+      <Ionicons name="calendar-outline" size={64} color={COLORS.greyscale400} />
+      <Text
+        style={[styles.title, { color: dark ? COLORS.white : COLORS.black }]}
+      >
+        Aucune suggestion pour ce jour
+      </Text>
+      <Text
+        style={[
+          styles.subtitle,
+          { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+        ]}
+      >
+        L'IA génère des recommandations basées sur les progrès et les besoins de
+        vos enfants
+      </Text>
+    </MotiView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    paddingVertical: 48,
+    paddingHorizontal: 32,
+  },
+  title: {
+    fontSize: 18,
+    fontFamily: "bold",
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 14,
+    fontFamily: "regular",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+});
+
+export default EmptyState;
