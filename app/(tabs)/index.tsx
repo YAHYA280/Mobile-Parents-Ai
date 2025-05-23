@@ -134,28 +134,28 @@ const Index = () => {
     )
   ).slice(0, 2);
 
-  // Quick actions data
+  // Updated Quick actions data - commented out Devoirs and Messages
   const quickActions = [
-    {
-      id: "1",
-      title: "Devoirs",
-      icon: "book-outline",
-      color: "#4CAF50",
-      onPress: () => navigate("homework"),
-    },
-    {
-      id: "2",
-      title: "Messages",
-      icon: "chatbubble-outline",
-      color: "#2196F3",
-      onPress: () => navigate("messages"),
-    },
+    // {
+    //   id: "1",
+    //   title: "Devoirs",
+    //   icon: "book-outline",
+    //   color: "#4CAF50",
+    //   onPress: () => navigate("homework"),
+    // },
+    // {
+    //   id: "2",
+    //   title: "Messages",
+    //   icon: "chatbubble-outline",
+    //   color: "#2196F3",
+    //   onPress: () => navigate("messages"),
+    // },
     {
       id: "3",
-      title: "Calendrier",
+      title: "Calendrier AI",
       icon: "calendar-outline",
       color: "#FF9800",
-      onPress: () => navigate("calendar"),
+      onPress: () => navigate("aicalendar"),
     },
     {
       id: "4",
