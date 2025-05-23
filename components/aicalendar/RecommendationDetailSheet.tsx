@@ -165,13 +165,13 @@ const RecommendationDetailSheet: React.FC<RecommendationDetailSheetProps> = ({
         </Text>
 
         <View style={styles.actions}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: COLORS.primary }]}
           >
             <Text style={styles.actionButtonText}>Commencer maintenant</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[
               styles.actionButton,
               styles.secondaryButton,
@@ -189,7 +189,7 @@ const RecommendationDetailSheet: React.FC<RecommendationDetailSheetProps> = ({
             >
               Programmer plus tard
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </RBSheet>
