@@ -142,7 +142,7 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
       <RBSheet
         ref={bottomSheetRef}
         closeOnPressMask
-        height={380}
+        height={420}
         customStyles={{
           wrapper: {
             backgroundColor: "rgba(0,0,0,0.5)",
@@ -157,6 +157,7 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
             borderTopRightRadius: 24,
             backgroundColor: dark ? COLORS.dark1 : COLORS.white,
             padding: 16,
+            paddingBottom: 32,
           },
         }}
       >
@@ -250,24 +251,26 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
               </View>
             </View>
 
-            <TouchableOpacity
-              style={[
-                styles.logoutButton,
-                { backgroundColor: dark ? COLORS.dark3 : "#FFE5E5" },
-              ]}
-              onPress={() => handleLogout(selectedDevice.id)}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="log-out"
-                size={18}
-                color="#F44336"
-                style={styles.logoutIcon}
-              />
-              <Text style={styles.logoutButtonText}>
-                Déconnecter cet appareil
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.actionButtonContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.logoutButton,
+                  { backgroundColor: dark ? COLORS.dark3 : "#FFE5E5" },
+                ]}
+                onPress={() => handleLogout(selectedDevice.id)}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="log-out"
+                  size={18}
+                  color="#F44336"
+                  style={styles.logoutIcon}
+                />
+                <Text style={styles.logoutButtonText}>
+                  Déconnecter cet appareil
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ) : (
           <></>
@@ -379,13 +382,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "medium",
   },
+  actionButtonContainer: {
+    paddingBottom: 16,
+  },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     padding: 16,
     borderRadius: 12,
-    marginTop: 8,
   },
   logoutIcon: {
     marginRight: 8,
