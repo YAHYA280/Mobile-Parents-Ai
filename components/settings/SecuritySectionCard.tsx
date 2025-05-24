@@ -9,7 +9,7 @@ import { COLORS } from "../../constants";
 interface SecuritySectionCardProps {
   title: string;
   icon: string;
-  dark: boolean;
+
   isOpen: boolean;
   onToggle: () => void;
 }
@@ -17,7 +17,7 @@ interface SecuritySectionCardProps {
 const SecuritySectionCard: React.FC<SecuritySectionCardProps> = ({
   title,
   icon,
-  dark,
+
   isOpen,
   onToggle,
 }) => (
@@ -26,7 +26,7 @@ const SecuritySectionCard: React.FC<SecuritySectionCardProps> = ({
     style={[
       styles.sectionCard,
       isOpen && styles.sectionCardActive,
-      { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
+      { backgroundColor: "#FFFFFF" },
     ]}
     activeOpacity={0.8}
   >
@@ -45,24 +45,14 @@ const SecuritySectionCard: React.FC<SecuritySectionCardProps> = ({
           />
         </LinearGradient>
       </View>
-      <Text
-        style={[
-          styles.sectionTitle,
-          { color: dark ? COLORS.white : COLORS.black },
-        ]}
-      >
+      <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
         {title}
       </Text>
-      <View
-        style={[
-          styles.sectionExpandIcon,
-          { backgroundColor: dark ? COLORS.dark3 : "#F8F9FA" },
-        ]}
-      >
+      <View style={[styles.sectionExpandIcon, { backgroundColor: "#F8F9FA" }]}>
         <Ionicons
           name={isOpen ? "chevron-up" : "chevron-down"}
           size={16}
-          color={dark ? COLORS.greyscale500 : COLORS.greyscale600}
+          color={COLORS.greyscale600}
         />
       </View>
     </View>

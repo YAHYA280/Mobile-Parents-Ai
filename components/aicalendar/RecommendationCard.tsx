@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 
 export interface AIRecommendation {
   id: string;
@@ -30,8 +29,6 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   index,
   onPress,
 }) => {
-  const { dark } = useTheme();
-
   const getRecommendationIcon = (type: string) => {
     switch (type) {
       case "study":
@@ -87,10 +84,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
       }}
     >
       <TouchableOpacity
-        style={[
-          styles.container,
-          { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-        ]}
+        style={[styles.container, { backgroundColor: COLORS.white }]}
         onPress={() => onPress(recommendation)}
         activeOpacity={0.8}
       >
@@ -112,12 +106,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
           <View style={styles.info}>
             <View style={styles.titleRow}>
-              <Text
-                style={[
-                  styles.title,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.title, { color: COLORS.black }]}>
                 {recommendation.title}
               </Text>
               <View
@@ -156,7 +145,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
                   style={[
                     styles.detailText,
                     {
-                      color: dark ? COLORS.greyscale500 : COLORS.greyscale600,
+                      color: COLORS.greyscale600,
                     },
                   ]}
                 >
@@ -174,7 +163,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
                   style={[
                     styles.detailText,
                     {
-                      color: dark ? COLORS.greyscale500 : COLORS.greyscale600,
+                      color: COLORS.greyscale600,
                     },
                   ]}
                 >
@@ -192,7 +181,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
                   style={[
                     styles.detailText,
                     {
-                      color: dark ? COLORS.greyscale500 : COLORS.greyscale600,
+                      color: COLORS.greyscale600,
                     },
                   ]}
                 >
@@ -211,7 +200,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           style={[
             styles.description,
             {
-              color: dark ? COLORS.greyscale400 : COLORS.greyScale700,
+              color: COLORS.greyScale700,
             },
           ]}
         >

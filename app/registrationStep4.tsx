@@ -33,7 +33,7 @@ type DocumentType = {
 
 const RegistrationStep4 = () => {
   const { navigate } = useNavigation<Nav>();
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   const [frontDocument, setFrontDocument] = useState<DocumentType | null>(null);
   const [backDocument, setBackDocument] = useState<DocumentType | null>(null);
@@ -231,7 +231,7 @@ const RegistrationStep4 = () => {
         <Button
           title="Précédent"
           style={styles.prevButton}
-          textColor={dark ? COLORS.white : COLORS.primary}
+          textColor={COLORS.primary}
           onPress={() => navigate("registrationStep3")}
         />
         <Button

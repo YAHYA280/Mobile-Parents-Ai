@@ -6,11 +6,8 @@ import { useNavigation } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import RNPickerSelect from "react-native-picker-select";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useReducer, useCallback } from "react";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -20,7 +17,6 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  useWindowDimensions,
   KeyboardAvoidingView,
 } from "react-native";
 
@@ -54,10 +50,8 @@ const gradeOptions = [
 ];
 
 const AddChildScreen = () => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
 
   const [formState, dispatchFormState] = useReducer(reducer, initialFormState);
   const [selectedGrade, setSelectedGrade] = useState("");
@@ -194,12 +188,7 @@ const AddChildScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.fieldLabel,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.fieldLabel, { color: COLORS.black }]}>
                       Nom complet
                     </Text>
                   </View>
@@ -208,7 +197,7 @@ const AddChildScreen = () => {
                     onInputChanged={inputChangedHandler}
                     errorText={formState.inputValidities.fullName}
                     placeholder="Nom et prénom de l'enfant"
-                    placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
+                    placeholderTextColor={COLORS.black}
                   />
                 </View>
               </MotiView>
@@ -225,12 +214,7 @@ const AddChildScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.fieldLabel,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.fieldLabel, { color: COLORS.black }]}>
                       Âge
                     </Text>
                   </View>
@@ -239,7 +223,7 @@ const AddChildScreen = () => {
                     onInputChanged={inputChangedHandler}
                     errorText={formState.inputValidities.age}
                     placeholder="Âge de l'enfant"
-                    placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
+                    placeholderTextColor={COLORS.black}
                     keyboardType="numeric"
                   />
                 </View>
@@ -257,12 +241,7 @@ const AddChildScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.fieldLabel,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.fieldLabel, { color: COLORS.black }]}>
                       Niveau scolaire
                     </Text>
                   </View>
@@ -272,8 +251,8 @@ const AddChildScreen = () => {
                     style={[
                       styles.pickerContainer,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                   >
@@ -290,7 +269,7 @@ const AddChildScreen = () => {
                       placeholder={{
                         label: "Sélectionner le niveau",
                         value: null,
-                        color: dark ? COLORS.grayTie : COLORS.gray,
+                        color: COLORS.gray,
                       }}
                       items={gradeOptions}
                       onValueChange={handleGradeChange}
@@ -300,7 +279,7 @@ const AddChildScreen = () => {
                           fontSize: 16,
                           paddingVertical: 12,
                           paddingHorizontal: 16,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                           width: "100%",
                           height: "100%",
@@ -309,13 +288,13 @@ const AddChildScreen = () => {
                           fontSize: 16,
                           paddingHorizontal: 16,
                           paddingVertical: 12,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                           width: "100%",
                           height: "100%",
                         },
                         placeholder: {
-                          color: dark ? COLORS.grayTie : COLORS.gray,
+                          color: COLORS.gray,
                           fontSize: 16,
                         },
                         iconContainer: {
@@ -334,7 +313,7 @@ const AddChildScreen = () => {
                             <Ionicons
                               name="chevron-down"
                               size={20}
-                              color={dark ? COLORS.white : COLORS.black}
+                              color={COLORS.black}
                             />
                           </View>
                         );
@@ -372,25 +351,13 @@ const AddChildScreen = () => {
         >
           {/* Enhanced Cancel Button */}
           <TouchableOpacity
-            style={[
-              styles.cancelButton,
-              { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
-            ]}
+            style={[styles.cancelButton, { borderColor: COLORS.greyscale300 }]}
             onPress={() => navigation.goBack()}
             activeOpacity={0.8}
           >
             <View style={styles.cancelButtonContent}>
-              <Ionicons
-                name="close-outline"
-                size={20}
-                color={dark ? COLORS.white : COLORS.black}
-              />
-              <Text
-                style={[
-                  styles.cancelButtonText,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Ionicons name="close-outline" size={20} color={COLORS.black} />
+              <Text style={[styles.cancelButtonText, { color: COLORS.black }]}>
                 Annuler
               </Text>
             </View>

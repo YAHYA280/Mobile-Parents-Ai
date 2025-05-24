@@ -16,12 +16,7 @@ import {
 import Header from "@/components/ui/Header";
 import { useTheme } from "@/theme/ThemeProvider";
 // Import Types and Utilities
-import {
-  RADIUS,
-  COLOORS,
-  SPACING,
-  TYPOGRAPHY,
-} from "@/constants/theme";
+import { RADIUS, COLOORS, SPACING, TYPOGRAPHY } from "@/constants/theme";
 
 import type { CataloguePlan } from "./services/mocksApi/abonnementApiMock";
 
@@ -31,7 +26,7 @@ const { width, height } = Dimensions.get("window");
 
 const PlansComparison: React.FC = () => {
   const router = useRouter();
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   // State
   const [catalogues, setCatalogues] = useState<CataloguePlan[]>([]);

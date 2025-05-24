@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({
   transparent = false,
   subtitle,
 }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   return (
     <SafeAreaView
@@ -44,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({
       edges={["top"]}
     >
       <StatusBar
-        barStyle={dark ? "light-content" : "dark-content"}
+        barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
@@ -52,29 +52,13 @@ const Header: React.FC<HeaderProps> = ({
         <View style={styles.leftSection}>
           {showBackButton && (
             <TouchableOpacity style={styles.backButton} onPress={onBackPress}>
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color={dark ? COLORS.white : COLORS.black}
-              />
+              <Ionicons name="arrow-back" size={24} color={COLORS.black} />
             </TouchableOpacity>
           )}
           <View>
-            <Text
-              style={[
-                styles.title,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
-              {title}
-            </Text>
+            <Text style={[styles.title, { color: COLORS.black }]}>{title}</Text>
             {subtitle && (
-              <Text
-                style={[
-                  styles.subtitle,
-                  { color: dark ? COLORS.gray2 : COLORS.gray3 },
-                ]}
-              >
+              <Text style={[styles.subtitle, { color: COLORS.gray3 }]}>
                 {subtitle}
               </Text>
             )}

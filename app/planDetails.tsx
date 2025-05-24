@@ -1,6 +1,4 @@
-import type {
-  NativeScrollEvent,
-  NativeSyntheticEvent} from "react-native";
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -71,12 +69,13 @@ const PlanDetails: React.FC = () => {
 
   // Extract and parse parameters
   const { planId } = params;
-  const pricingData = params.pricing
-    ? JSON.parse(params.pricing as string)
-    : null;
-  const featuresData = params.features
-    ? JSON.parse(params.features as string)
-    : [];
+  const pricingData = useMemo(() => {
+    return params.pricing ? JSON.parse(params.pricing as string) : null;
+  }, [params.pricing]);
+
+  const featuresData = useMemo(() => {
+    return params.features ? JSON.parse(params.features as string) : [];
+  }, [params.features]);
 
   // State
   const [activeDot, setActiveDot] = useState(0);
@@ -285,7 +284,7 @@ const PlanDetails: React.FC = () => {
     setHeaderHeight(height);
   };
 
-  // Derived State
+  // Derived State - Fixed useMemo dependencies
   const pricingOptions = useMemo<PricingOption[]>(() => {
     if (!selectedCatalogue) return [];
 

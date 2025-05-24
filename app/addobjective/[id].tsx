@@ -598,8 +598,8 @@ const AddObjectiveScreen = () => {
                     color={COLORS.primary}
                   />
                   <Text style={styles.note}>
-                    Les champs marqués d'un * sont obligatoires. Le message pour
-                    l'enfant est optionnel.
+                    Les champs marqués d&apos;un * sont obligatoires. Le message
+                    pour l&apos;enfant est optionnel.
                   </Text>
                 </View>
               </MotiView>

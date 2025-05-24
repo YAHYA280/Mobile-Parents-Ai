@@ -6,18 +6,16 @@ import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 
 import { SIZES, COLORS } from "../constants";
-import { useTheme } from "../theme/ThemeProvider";
 
 interface InputProps extends TextInputProps {
   id: string;
-  icon?: string;
+  icon?: string | React.ReactNode;
   errorText?: string[];
   onInputChanged: (id: string, text: string) => void;
 }
 
 const Input: FC<InputProps> = (props) => {
   const [isFocused, setIsFocused] = useState(false);
-  const { dark } = useTheme();
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -31,42 +29,53 @@ const Input: FC<InputProps> = (props) => {
     props.onInputChanged(props.id, text);
   };
 
+  // Function to render the icon based on its type
+  const renderIcon = () => {
+    if (!props.icon) return null;
+
+    // If icon is a React component (ReactNode), render it directly
+    if (typeof props.icon === "object" && React.isValidElement(props.icon)) {
+      return <View style={styles.iconContainer}>{props.icon}</View>;
+    }
+
+    // If icon is a string (image source), use Image component
+    if (typeof props.icon === "string") {
+      return (
+        <Image
+          source={props.icon}
+          style={[
+            styles.icon,
+            {
+              tintColor: isFocused ? COLORS.primary : "#BCBCBC",
+            },
+          ]}
+        />
+      );
+    }
+
+    return null;
+  };
+
   return (
     <View style={styles.container}>
       <View
         style={[
           styles.inputContainer,
           {
-            borderColor: isFocused
-              ? COLORS.primary
-              : dark
-                ? COLORS.dark2
-                : COLORS.greyscale500,
+            borderColor: isFocused ? COLORS.primary : COLORS.greyscale500,
             backgroundColor: isFocused
               ? COLORS.tansparentPrimary
-              : dark
-                ? COLORS.dark2
-                : COLORS.greyscale500,
+              : COLORS.greyscale500,
           },
         ]}
       >
-        {props.icon && (
-          <Image
-            source={props.icon}
-            style={[
-              styles.icon,
-              {
-                tintColor: isFocused ? COLORS.primary : "#BCBCBC",
-              },
-            ]}
-          />
-        )}
+        {renderIcon()}
         <TextInput
           {...props}
           onChangeText={onChangeText}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          style={[styles.input, { color: dark ? COLORS.white : COLORS.black }]}
+          style={[styles.input, { color: COLORS.black }]}
           placeholder={props.placeholder}
           placeholderTextColor={props.placeholderTextColor}
           autoCapitalize="none"
@@ -95,6 +104,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     height: 52,
     alignItems: "center",
+  },
+  iconContainer: {
+    marginRight: 10,
+    height: 20,
+    width: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   icon: {
     marginRight: 10,

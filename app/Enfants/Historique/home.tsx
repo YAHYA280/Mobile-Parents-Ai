@@ -1,22 +1,20 @@
-// app/Enfants/Historique/home.tsx - Clean version
-import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "expo-router";
 import { View, Animated, StatusBar, SafeAreaView } from "react-native";
-import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
-import { useActivityFilters } from "./filtre";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 
-// Import the new filter components
 import {
+  FilterModal,
   SearchBarComponent,
   DateRangeIndicator,
-  FilterModal,
 } from "@/app/Enfants/Historique/filtres/index";
 
-// Import other components
-import HistoriqueHeader from "../../Enfants/Historique/components/HistoriqueHeader";
+import type { Child, Activity } from "../../../data/Enfants/CHILDREN_DATA";
+
+import { useActivityFilters } from "./filtre";
 import ActivityList from "../../Enfants/Historique/components/ActivityList";
-import LoadingIndicator from "../../Enfants/Historique/components/LoadingIndicator";
 import EmptyTipsModal from "../../Enfants/Historique/components/EmptyTipsModal";
+import HistoriqueHeader from "../../Enfants/Historique/components/HistoriqueHeader";
+import LoadingIndicator from "../../Enfants/Historique/components/LoadingIndicator";
 
 interface HistoriqueActivitesProps {
   isTabComponent?: boolean;
@@ -31,13 +29,10 @@ const HistoriqueActivites: React.FC<HistoriqueActivitesProps> = ({
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
-  // States
   const [currentPage, setCurrentPage] = useState(1);
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showEmptyTips, setShowEmptyTips] = useState(false);
 
-  // Activity filters
   const {
     searchKeyword,
     activityDateRange,

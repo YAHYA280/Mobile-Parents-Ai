@@ -1,12 +1,18 @@
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
-import { callData } from '../data';
-import { icons, COLORS } from '../constants';
-import { useTheme } from '../theme/ThemeProvider';
+import { callData } from "../data";
+import { icons, COLORS } from "../constants";
 
 // Define the type for call item
 interface CallItem {
@@ -22,22 +28,25 @@ type NavigationProp = NativeStackNavigationProp<any, any>;
 
 const Calls: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { dark } = useTheme();
 
   const renderItem = ({ item, index }: { item: CallItem; index: number }) => (
     <TouchableOpacity
-      onPress={() => navigation.navigate('call')}
+      onPress={() => navigation.navigate("call")}
       style={styles.callContainer}
       key={index}
     >
       <View style={styles.callLeftContainer}>
-        <Image source={item.userImg} resizeMode="contain" style={styles.userImg} />
+        <Image
+          source={item.userImg}
+          resizeMode="contain"
+          style={styles.userImg}
+        />
         <View style={styles.userInfoContainer}>
           <Text
             style={[
               styles.fullName,
               {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               },
             ]}
           >
@@ -46,9 +55,9 @@ const Calls: React.FC = () => {
           <View style={styles.statusContainer}>
             <Image
               source={
-                item.status === 'Incoming'
+                item.status === "Incoming"
                   ? icons.arrowDownSquare
-                  : item.status === 'Outgoing'
+                  : item.status === "Outgoing"
                     ? icons.arrowUpSquare
                     : icons.cancelSquare
               }
@@ -57,11 +66,11 @@ const Calls: React.FC = () => {
                 styles.arrowIcon,
                 {
                   tintColor:
-                    item.status === 'Incoming'
+                    item.status === "Incoming"
                       ? COLORS.primary
-                      : item.status === 'Outgoing'
+                      : item.status === "Outgoing"
                         ? COLORS.greeen
-                        : 'red',
+                        : "red",
                 },
               ]}
             />
@@ -71,7 +80,11 @@ const Calls: React.FC = () => {
         </View>
       </View>
       <View style={styles.callRightContainer}>
-        <Image source={icons.telephoneOutline} resizeMode="contain" style={styles.telephoneIcon} />
+        <Image
+          source={icons.telephoneOutline}
+          resizeMode="contain"
+          style={styles.telephoneIcon}
+        />
       </View>
     </TouchableOpacity>
   );
@@ -90,18 +103,18 @@ const Calls: React.FC = () => {
 
 const styles = StyleSheet.create({
   callContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginVertical: 12,
   },
   callLeftContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   callRightContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   userImg: {
     height: 50,
@@ -111,25 +124,25 @@ const styles = StyleSheet.create({
   fullName: {
     fontSize: 14,
     color: COLORS.black,
-    fontFamily: 'bold',
+    fontFamily: "bold",
   },
   userInfoContainer: {
     marginLeft: 12,
   },
   statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 6,
   },
   date: {
     fontSize: 12,
-    fontFamily: 'regular',
-    color: 'gray',
+    fontFamily: "regular",
+    color: "gray",
   },
   status: {
     fontSize: 12,
-    fontFamily: 'regular',
-    color: 'gray',
+    fontFamily: "regular",
+    color: "gray",
   },
   arrowIcon: {
     width: 12,

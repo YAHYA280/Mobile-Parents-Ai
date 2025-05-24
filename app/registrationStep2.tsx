@@ -51,7 +51,7 @@ const RegistrationStep2 = () => {
   const { navigate } = useNavigation<Nav>();
   const [error, setError] = useState();
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
@@ -251,7 +251,7 @@ const RegistrationStep2 = () => {
         <Button
           title="Précédent"
           style={styles.prevButton}
-          textColor={dark ? COLORS.white : COLORS.primary}
+          textColor={COLORS.primary}
           onPress={() => navigate("registrationStep1")}
         />
         <Button

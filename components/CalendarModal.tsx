@@ -53,7 +53,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
     const days = Array(firstDayOfMonth).fill(null);
 
     // Add the days of the month
-    for (let i = 1; i <= daysInMonth; i++) {
+    for (let i = 1; i <= daysInMonth; i += 1) {
       days.push(new Date(year, month, i));
     }
 

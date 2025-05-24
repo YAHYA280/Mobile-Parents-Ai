@@ -1,36 +1,47 @@
-import type { DateData } from "react-native-calendars";
+// app/Enfants/Historique/filtres.tsx – Fixed version with correct imports
+import type React from "react";
 
-import React from "react";
-
+// Import from the correct path - your actual component files
 import {
   FilterModal,
+  SUBJECT_THEME,
+  ASSISTANT_THEME,
+  getActivityTheme,
+  getProgressColor,
   SearchBarComponent,
   DateRangeIndicator,
-} from "@/app/Enfants/Historique/filtres/index.js";
+  AssistantTypeFilters,
+  extractAssistantType,
+} from "./filtres/index";
 
+// Re-export the SearchBar component with the original name for compatibility
 export const SearchBar = SearchBarComponent;
 
-export { FilterModal, DateRangeIndicator };
+// Re-export other components
+export {
+  FilterModal,
+  DateRangeIndicator,
+  SearchBarComponent,
+  AssistantTypeFilters,
+};
 
+// Re-export helper functions and constants
 export {
   SUBJECT_THEME,
   ASSISTANT_THEME,
   getActivityTheme,
   getProgressColor,
   extractAssistantType,
-} from "@/app/Enfants/Historique/filtres/index.js";
+};
 
+// Additional filter components for backward compatibility
 interface SubjectFiltersProps {
   availableSubjects: string[];
   selectedSubjects: string[];
   setSelectedSubjects: (subjects: string[]) => void;
 }
 
-export const SubjectFilters: React.FC<SubjectFiltersProps> = ({
-  availableSubjects,
-  selectedSubjects,
-  setSelectedSubjects,
-}) => {
+export const SubjectFilters: React.FC<SubjectFiltersProps> = () => {
   return null;
 };
 
@@ -40,12 +51,7 @@ interface ChapterFiltersProps {
   setSelectedChapters: (chapters: string[]) => void;
 }
 
-export const ChapterFilters: React.FC<ChapterFiltersProps> = ({
-  availableChapters,
-  selectedChapters,
-  setSelectedChapters,
-}) => {
-  // Implementation would go here - simplified for now
+export const ChapterFilters: React.FC<ChapterFiltersProps> = () => {
   return null;
 };
 
@@ -55,46 +61,16 @@ interface ExerciseFiltersProps {
   setSelectedExercises: (exercises: string[]) => void;
 }
 
-export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
-  availableExercises,
-  selectedExercises,
-  setSelectedExercises,
-}) => {
-  // Implementation would go here - simplified for now
+export const ExerciseFilters: React.FC<ExerciseFiltersProps> = () => {
   return null;
-};
-
-// Main FilterModal component with cleaned up props
-interface CleanFilterModalProps {
-  showActivityCalendar: boolean;
-  toggleActivityCalendar: () => void;
-  searchKeyword: string;
-  setSearchKeyword: (value: string) => void;
-  uniqueAssistantTypes: string[];
-  activityCalendarMode: "start" | "end";
-  activityDateRange: { startDate: string | null; endDate: string | null };
-  handleActivityDayPress: (day: DateData) => void;
-  resetAllFilters: () => void;
-  advancedFilters: {
-    selectedAssistants: string[];
-    selectedSubjects: string[];
-    selectedChapters: string[];
-    selectedExercises: string[];
-  };
-  setAdvancedFilters: (filters: any) => void;
-}
-
-// Clean version of FilterModal without unused props
-export const CleanFilterModal: React.FC<CleanFilterModalProps> = (props) => {
-  return <FilterModal {...props} />;
 };
 
 export default {
   SearchBar,
+  SearchBarComponent,
   DateRangeIndicator,
   FilterModal,
   SubjectFilters,
   ChapterFilters,
   ExerciseFilters,
-  CleanFilterModal,
 };

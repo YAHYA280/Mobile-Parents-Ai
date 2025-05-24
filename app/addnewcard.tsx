@@ -59,21 +59,20 @@ const AddNewCard = () => {
   const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
 
   // Keyboard listeners
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
-      (e) => {
-        setKeyboardHeight(e.endCoordinates.height);
+      () => {
+        // Keyboard shown - you can add any additional logic here if needed
       }
     );
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
       () => {
-        setKeyboardHeight(0);
+        // Keyboard hidden - you can add any additional logic here if needed
       }
     );
 
@@ -100,9 +99,11 @@ const AddNewCard = () => {
 
     if (month && year) {
       return `${month.padStart(2, "0")}/${year}`;
-    } if (month) {
+    }
+    if (month) {
       return `${month.padStart(2, "0")}/YY`;
-    } if (year) {
+    }
+    if (year) {
       return `MM/${year}`;
     }
     return "MM/YY";
@@ -124,7 +125,7 @@ const AddNewCard = () => {
         // Ensure month is between 01-12
         if (
           inputValue &&
-          (parseInt(inputValue) < 1 || parseInt(inputValue) > 12)
+          (parseInt(inputValue, 10) < 1 || parseInt(inputValue, 10) > 12)
         ) {
           return;
         }
@@ -179,6 +180,9 @@ const AddNewCard = () => {
             case "cvv":
               scrollToY = cardHeight + 200;
               break;
+            default:
+              scrollToY = 0;
+              break;
           }
 
           scrollViewRef.current.scrollTo({
@@ -221,8 +225,8 @@ const AddNewCard = () => {
   }, [error]);
 
   const onHeaderLayout = (event: any) => {
-    const { height } = event.nativeEvent.layout;
-    setHeaderHeight(height);
+    const { height: headerLayoutHeight } = event.nativeEvent.layout;
+    setHeaderHeight(headerLayoutHeight);
   };
 
   const cardWidth = isTablet ? Math.min(400, width - 64) : width - 32;
@@ -667,9 +671,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 8, // Reduced gap from 12 to 8
   },
-  inputHalf: {
-    flex: 1,
-  },
   inputThird: {
     flex: 1,
   },
@@ -708,5 +709,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-
-export default AddNewCard;

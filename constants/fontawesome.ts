@@ -10,6 +10,7 @@ import {
   faSync,
   faHome,
   faSave,
+  faLock, // Added padlock icon
   faClock,
   faPause,
   faCheck,
@@ -86,5 +87,6 @@ library.add(
   faPaperPlane,
   faSave,
   faTrashAlt,
-  faTimes
+  faTimes,
+  faLock
 );

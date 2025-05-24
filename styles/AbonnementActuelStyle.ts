@@ -1,6 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
-
-const { width } = Dimensions.get("window");
+import { StyleSheet } from "react-native";
 
 const LOGO_COLORS = {
   lighter: "#f9a99a",

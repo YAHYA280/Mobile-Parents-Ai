@@ -15,7 +15,6 @@ import {
 } from "react-native";
 
 import { COLORS } from "../../constants/theme";
-import { useTheme } from "../../theme/ThemeProvider";
 
 // Structure pour une matière
 export type ISubject = {
@@ -78,7 +77,6 @@ interface ChildSubjectsManagerProps {
 const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
   childId,
 }) => {
-  const { dark } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [subscription] = useState<ISubscription>(MOCK_SUBSCRIPTION);
   const [allChildren] = useState<IChildInfo[]>(MOCK_CHILDREN);
@@ -195,18 +193,13 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
         transition={{ type: "timing", duration: 600 }}
         style={[
           styles.container,
-          { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+          { backgroundColor: COLORS.white },
           Platform.OS === "ios" && styles.iosShadow,
         ]}
       >
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={48} color={COLORS.error} />
-          <Text
-            style={[
-              styles.errorText,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.errorText, { color: COLORS.black }]}>
             Enfant non trouvé. Veuillez vérifier l&apos;identifiant.
           </Text>
         </View>
@@ -221,19 +214,14 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
       transition={{ type: "timing", duration: 600 }}
       style={[
         styles.container,
-        { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+        { backgroundColor: COLORS.white },
         Platform.OS === "ios" && styles.iosShadow,
       ]}
     >
       <View style={styles.headerRow}>
         <View style={styles.headerLeft}>
           <Ionicons name="library" size={24} color={COLORS.primary} />
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
             Matières
           </Text>
         </View>
@@ -254,12 +242,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
 
       <View style={styles.infoContainer}>
         <Ionicons name="information-circle" size={16} color={COLORS.primary} />
-        <Text
-          style={[
-            styles.infoText,
-            { color: dark ? COLORS.greyscale300 : COLORS.gray },
-          ]}
-        >
+        <Text style={[styles.infoText, { color: COLORS.gray }]}>
           Votre abonnement {subscription.title} permet d&apos;assigner un total
           de {subscription.nbr_subjects} matières pour{" "}
           {subscription.nbr_children_access} enfants.
@@ -279,12 +262,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
               <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-              <Text
-                style={[
-                  styles.statText,
-                  { color: dark ? COLORS.greyscale300 : COLORS.gray },
-                ]}
-              >
+              <Text style={[styles.statText, { color: COLORS.gray }]}>
                 {selectedCount} / {subscription.nbr_subjects} matières
               </Text>
             </View>
@@ -341,25 +319,11 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
             </View>
           ) : (
             <View style={styles.emptyContainer}>
-              <Ionicons
-                name="school"
-                size={48}
-                color={dark ? COLORS.dark3 : COLORS.greyscale300}
-              />
-              <Text
-                style={[
-                  styles.emptyText,
-                  { color: dark ? COLORS.greyscale300 : COLORS.gray },
-                ]}
-              >
+              <Ionicons name="school" size={48} color={COLORS.greyscale300} />
+              <Text style={[styles.emptyText, { color: COLORS.gray }]}>
                 Aucune matière assignée
               </Text>
-              <Text
-                style={[
-                  styles.emptySubtext,
-                  { color: dark ? COLORS.greyscale400 : COLORS.gray },
-                ]}
-              >
+              <Text style={[styles.emptySubtext, { color: COLORS.gray }]}>
                 Ajoutez des matières pour personnaliser l&apos;apprentissage
               </Text>
             </View>
@@ -378,20 +342,12 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
             from={{ opacity: 0, scale: 0.9, translateY: 50 }}
             animate={{ opacity: 1, scale: 1, translateY: 0 }}
             transition={{ type: "spring", damping: 15 }}
-            style={[
-              styles.modalContent,
-              { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
-            ]}
+            style={[styles.modalContent, { backgroundColor: COLORS.white }]}
           >
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderLeft}>
                 <Ionicons name="settings" size={24} color={COLORS.primary} />
-                <Text
-                  style={[
-                    styles.modalTitle,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
+                <Text style={[styles.modalTitle, { color: COLORS.black }]}>
                   Gérer les matières
                 </Text>
               </View>
@@ -400,11 +356,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                 style={styles.closeButton}
                 activeOpacity={0.7}
               >
-                <Ionicons
-                  name="close"
-                  size={24}
-                  color={dark ? COLORS.white : COLORS.black}
-                />
+                <Ionicons name="close" size={24} color={COLORS.black} />
               </TouchableOpacity>
             </View>
 
@@ -427,12 +379,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                     size={16}
                     color={COLORS.primary}
                   />
-                  <Text
-                    style={[
-                      styles.modalSubtitle,
-                      { color: dark ? COLORS.greyscale300 : COLORS.gray },
-                    ]}
-                  >
+                  <Text style={[styles.modalSubtitle, { color: COLORS.gray }]}>
                     Vous pouvez sélectionner jusqu&apos;à {remainingSubjects}{" "}
                     matières (sur {subscription.nbr_subjects} de votre
                     abonnement).
@@ -458,14 +405,10 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                           {
                             backgroundColor: item.isSelected
                               ? "#4CAF5015"
-                              : dark
-                                ? COLORS.dark2
-                                : COLORS.greyscale100,
+                              : COLORS.greyscale100,
                             borderColor: item.isSelected
                               ? "#4CAF50"
-                              : dark
-                                ? COLORS.dark3
-                                : COLORS.greyscale300,
+                              : COLORS.greyscale300,
                           },
                         ]}
                         onPress={() => toggleSubject(item.id)}
@@ -478,28 +421,20 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                               {
                                 backgroundColor: item.isSelected
                                   ? "#4CAF5020"
-                                  : dark
-                                    ? COLORS.dark3
-                                    : COLORS.greyscale300,
+                                  : COLORS.greyscale300,
                               },
                             ]}
                           >
                             <Ionicons
                               name={item.icon as any}
                               size={16}
-                              color={
-                                item.isSelected
-                                  ? "#4CAF50"
-                                  : dark
-                                    ? COLORS.white
-                                    : COLORS.gray
-                              }
+                              color={item.isSelected ? "#4CAF50" : COLORS.gray}
                             />
                           </View>
                           <Text
                             style={[
                               styles.subjectItemText,
-                              { color: dark ? COLORS.white : COLORS.black },
+                              { color: COLORS.black },
                             ]}
                           >
                             {item.name}
@@ -525,10 +460,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                 <View style={styles.allocationInfo}>
                   <Ionicons name="pie-chart" size={16} color={COLORS.primary} />
                   <Text
-                    style={[
-                      styles.allocationInfoText,
-                      { color: dark ? COLORS.greyscale300 : COLORS.gray },
-                    ]}
+                    style={[styles.allocationInfoText, { color: COLORS.gray }]}
                   >
                     Vous pouvez distribuer librement les{" "}
                     {subscription.nbr_subjects} matières de votre abonnement
@@ -543,7 +475,7 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                 style={[
                   styles.cancelButton,
                   {
-                    borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                    borderColor: COLORS.greyscale300,
                   },
                 ]}
                 onPress={() => setModalVisible(false)}
@@ -553,13 +485,10 @@ const ChildSubjectsManager: React.FC<ChildSubjectsManagerProps> = ({
                   <Ionicons
                     name="close-outline"
                     size={18}
-                    color={dark ? COLORS.white : COLORS.black}
+                    color={COLORS.black}
                   />
                   <Text
-                    style={[
-                      styles.cancelButtonText,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
+                    style={[styles.cancelButtonText, { color: COLORS.black }]}
                   >
                     Annuler
                   </Text>

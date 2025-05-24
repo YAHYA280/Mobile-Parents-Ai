@@ -8,13 +8,11 @@ import type { PaymentMethod } from "../../types/security";
 import { COLORS } from "../../constants";
 
 interface PaymentMethodsSectionProps {
-  dark: boolean;
   isOpen: boolean;
   paymentMethods?: PaymentMethod[];
 }
 
 const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
-  dark,
   isOpen,
   paymentMethods = [],
 }) => {
@@ -70,10 +68,7 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
       {paymentMethods.map((paymentMethod) => (
         <TouchableOpacity
           key={paymentMethod.id}
-          style={[
-            styles.paymentMethodItem,
-            { backgroundColor: dark ? COLORS.dark3 : "#F8F9FA" },
-          ]}
+          style={[styles.paymentMethodItem, { backgroundColor: "#F8F9FA" }]}
           onPress={() => handlePaymentMethodPress(paymentMethod)}
           activeOpacity={0.7}
         >
@@ -93,20 +88,12 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
               />
             </View>
             <View style={styles.paymentInfo}>
-              <Text
-                style={[
-                  styles.paymentCardNumber,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.paymentCardNumber, { color: COLORS.black }]}>
                 {paymentMethod.cardNumber}
               </Text>
               {paymentMethod.expiryDate !== "N/A" && (
                 <Text
-                  style={[
-                    styles.paymentExpiry,
-                    { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-                  ]}
+                  style={[styles.paymentExpiry, { color: COLORS.greyscale600 }]}
                 >
                   Expire: {paymentMethod.expiryDate}
                 </Text>
@@ -120,9 +107,7 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
               {
                 backgroundColor: paymentMethod.isActive
                   ? "#4CAF5020"
-                  : dark
-                    ? COLORS.dark2
-                    : "#EEEEEE",
+                  : "#EEEEEE",
               },
             ]}
           >
@@ -132,9 +117,7 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
                 {
                   color: paymentMethod.isActive
                     ? "#4CAF50"
-                    : dark
-                      ? COLORS.greyscale500
-                      : COLORS.greyscale600,
+                    : COLORS.greyscale600,
                 },
               ]}
             >
@@ -154,14 +137,14 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
             backgroundColor: "rgba(0,0,0,0.5)",
           },
           draggableIcon: {
-            backgroundColor: dark ? COLORS.greyscale500 : COLORS.grayscale400,
+            backgroundColor: COLORS.grayscale400,
             width: 40,
             height: 5,
           },
           container: {
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
-            backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+            backgroundColor: COLORS.white,
             padding: 16,
             paddingBottom: 32, // Added extra bottom padding
           },
@@ -185,19 +168,14 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
                 />
               </View>
 
-              <Text
-                style={[
-                  styles.paymentSheetTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.paymentSheetTitle, { color: COLORS.black }]}>
                 {selectedPaymentMethod.cardNumber}
               </Text>
 
               <Text
                 style={[
                   styles.paymentSheetSubtitle,
-                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                  { color: COLORS.greyscale600 },
                 ]}
               >
                 Dernière utilisation: {selectedPaymentMethod.lastUsed}
@@ -209,16 +187,13 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
                 <Text
                   style={[
                     styles.paymentDetailLabel,
-                    { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                    { color: COLORS.greyscale600 },
                   ]}
                 >
-                  Date d'expiration
+                  Date d&apos;expiration
                 </Text>
                 <Text
-                  style={[
-                    styles.paymentDetailValue,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
+                  style={[styles.paymentDetailValue, { color: COLORS.black }]}
                 >
                   {selectedPaymentMethod.expiryDate}
                 </Text>
@@ -228,17 +203,14 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
                 <Text
                   style={[
                     styles.paymentDetailLabel,
-                    { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                    { color: COLORS.greyscale600 },
                   ]}
                 >
                   Statut
                 </Text>
                 <View style={styles.paymentStatusToggle}>
                   <Text
-                    style={[
-                      styles.paymentStatusLabel,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
+                    style={[styles.paymentStatusLabel, { color: COLORS.black }]}
                   >
                     {selectedPaymentMethod.isActive ? "Actif" : "Inactif"}
                   </Text>
@@ -248,7 +220,7 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
                       console.log(`Payment method status changed to: ${value}`)
                     }
                     trackColor={{
-                      false: dark ? COLORS.dark3 : "#EEEEEE",
+                      false: "#EEEEEE",
                       true: COLORS.primary,
                     }}
                     thumbColor={COLORS.white}
@@ -258,10 +230,7 @@ const PaymentMethodsSection: React.FC<PaymentMethodsSectionProps> = ({
             </View>
 
             <TouchableOpacity
-              style={[
-                styles.removeButton,
-                { backgroundColor: dark ? COLORS.dark3 : "#FFE5E5" },
-              ]}
+              style={[styles.removeButton, { backgroundColor: "#FFE5E5" }]}
               onPress={() =>
                 handleRemovePaymentMethod(selectedPaymentMethod.id)
               }

@@ -9,7 +9,6 @@ import {
 } from "react-native";
 
 import { COLORS } from "../constants";
-import { useTheme } from "../theme/ThemeProvider";
 
 interface PaymentMethodItemProps {
   checked: boolean;
@@ -26,15 +25,13 @@ const PaymentMethodItem: React.FC<PaymentMethodItemProps> = ({
   icon,
   tintColor,
 }) => {
-  const { dark } = useTheme();
-
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[
         styles.container,
         Platform.OS === "android" ? styles.androidShadow : styles.iosShadow,
-        { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+        { backgroundColor: COLORS.white },
       ]}
     >
       <View style={styles.rightContainer}>
@@ -44,12 +41,7 @@ const PaymentMethodItem: React.FC<PaymentMethodItemProps> = ({
           style={[styles.icon, { tintColor }]}
         />
         <View>
-          <Text
-            style={[
-              styles.title,
-              { color: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
-          >
+          <Text style={[styles.title, { color: COLORS.greyscale900 }]}>
             {title}
           </Text>
         </View>

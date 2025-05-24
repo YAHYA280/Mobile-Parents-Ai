@@ -3,7 +3,6 @@ import { MotiView } from "moti";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet } from "react-native";
 
-import { useTheme } from "@/theme/ThemeProvider";
 import FeatureItem from "@/components/ui/FeatureItem";
 import { COLORS, SPACING, TYPOGRAPHY } from "@/constants/theme";
 
@@ -16,8 +15,6 @@ const SubscriptionFeatures: React.FC<SubscriptionFeaturesProps> = ({
   features,
   planColor,
 }) => {
-  const { dark } = useTheme();
-
   return (
     <View>
       <MotiView
@@ -32,12 +29,7 @@ const SubscriptionFeatures: React.FC<SubscriptionFeaturesProps> = ({
           color={planColor}
           style={styles.featuresIcon}
         />
-        <Text
-          style={[
-            styles.featuresTitle,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
+        <Text style={[styles.featuresTitle, { color: COLORS.black }]}>
           Fonctionnalités incluses
         </Text>
       </MotiView>

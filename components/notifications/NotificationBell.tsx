@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 
 import NotificationModal from "./NotificationModal";
 import { getNotificationCounts } from "./NotificationData";
@@ -15,7 +14,6 @@ interface NotificationBellProps {
 }
 
 const NotificationBell: React.FC<NotificationBellProps> = ({ style }) => {
-  const { dark } = useTheme();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   // Get the unread count from our notification data
@@ -31,7 +29,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ style }) => {
           <Ionicons
             name="notifications"
             size={24}
-            color={dark ? COLORS.white : COLORS.greyscale900}
+            color={COLORS.greyscale900}
           />
 
           {unreadCount > 0 && (

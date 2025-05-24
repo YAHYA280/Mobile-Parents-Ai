@@ -8,7 +8,6 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 
 import { getNotificationCounts } from "./NotificationData";
 
@@ -23,8 +22,6 @@ const NotificationTabs: React.FC<NotificationTabsProps> = ({
   activeTab,
   onTabChange,
 }) => {
-  const { dark } = useTheme();
-
   // Get counts from our data
   const counts = getNotificationCounts();
 
@@ -61,10 +58,8 @@ const NotificationTabs: React.FC<NotificationTabsProps> = ({
                   : [
                       styles.inactiveTabButton,
                       {
-                        backgroundColor: dark
-                          ? COLORS.dark2
-                          : COLORS.greyscale100,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.greyscale100,
+                        borderColor: COLORS.greyscale300,
                       },
                     ],
               ]}
@@ -73,11 +68,7 @@ const NotificationTabs: React.FC<NotificationTabsProps> = ({
                 style={[
                   styles.tabLabel,
                   {
-                    color: isActive
-                      ? COLORS.white
-                      : dark
-                        ? COLORS.white
-                        : COLORS.greyscale900,
+                    color: isActive ? COLORS.white : COLORS.greyscale900,
                   },
                 ]}
               >

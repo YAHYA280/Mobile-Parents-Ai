@@ -7,7 +7,6 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { translateTransactionStatus } from "@/utils/translation";
 
 import { SIZES, COLORS } from "../constants";
-import { useTheme } from "../theme/ThemeProvider";
 
 // Define the prop types for the component
 interface TransactionCardProps {
@@ -26,13 +25,12 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   isSelectionMode = false,
 }) => {
   const navigation = useNavigation();
-  const { colors, dark } = useTheme();
 
   return (
     <View
       style={[
         styles.container,
-        { backgroundColor: dark ? COLORS.black : COLORS.white },
+        { backgroundColor: COLORS.white },
         // Adjust the width when in selection mode to prevent content from being cut off
         isSelectionMode && styles.containerWithSelection,
         // Optionally add a visual indication for selected items
@@ -49,10 +47,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           ]}
         >
           <Text
-            style={[
-              styles.name,
-              { color: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
+            style={[styles.name, { color: COLORS.greyscale900 }]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -100,11 +95,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
-  // Adjust width when in selection mode to account for the selection indicator
+
   containerWithSelection: {
-    width: SIZES.width - 60, // Adjusting width to account for the selection indicator (32px padding + ~44px for indicator)
+    width: SIZES.width - 60,
   },
-  // Optional: visual indication for selected items
+
   selectedContainer: {
     borderWidth: 1,
     borderColor: COLORS.primary,

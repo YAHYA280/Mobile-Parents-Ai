@@ -60,7 +60,7 @@ const existingObjective = {
 };
 
 const EditObjectiveScreen = () => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
 
@@ -234,29 +234,16 @@ const EditObjectiveScreen = () => {
           from={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "spring", damping: 15 }}
-          style={[
-            styles.modalContainer,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
+          style={[styles.modalContainer, { backgroundColor: COLORS.white }]}
         >
           <View style={styles.modalIconContainer}>
             <Ionicons name="warning" size={48} color="#FF9500" />
           </View>
 
-          <Text
-            style={[
-              styles.modalTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.modalTitle, { color: COLORS.black }]}>
             Abandonner les modifications
           </Text>
-          <Text
-            style={[
-              styles.modalMessage,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.modalMessage, { color: COLORS.black }]}>
             Vous avez des modifications non enregistrées. Voulez-vous vraiment
             quitter sans enregistrer ?
           </Text>
@@ -265,24 +252,15 @@ const EditObjectiveScreen = () => {
             <TouchableOpacity
               style={[
                 styles.modalCancelButton,
-                { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
+                { borderColor: COLORS.greyscale300 },
               ]}
               onPress={() => setShowDiscardModal(false)}
               activeOpacity={0.8}
             >
               <View style={styles.modalCancelContent}>
-                <Ionicons
-                  name="close-outline"
-                  size={18}
-                  color={dark ? COLORS.white : COLORS.black}
-                />
-                <Text
-                  style={[
-                    styles.modalCancelText,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
-                  Continuer l'édition
+                <Ionicons name="close-outline" size={18} color={COLORS.black} />
+                <Text style={[styles.modalCancelText, { color: COLORS.black }]}>
+                  Continuer l&apos;édition
                 </Text>
               </View>
             </TouchableOpacity>
@@ -349,12 +327,7 @@ const EditObjectiveScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelContainer}>
                     <Ionicons name="flag" size={18} color={COLORS.primary} />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Titre de l&apos;objectif
                     </Text>
                   </View>
@@ -362,15 +335,15 @@ const EditObjectiveScreen = () => {
                     style={[
                       styles.textInput,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={title}
                     onChangeText={setTitle}
                     placeholder="Entrez le titre de l'objectif"
-                    placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                    placeholderTextColor={COLORS.gray}
                   />
                 </View>
               </MotiView>
@@ -388,12 +361,7 @@ const EditObjectiveScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Description
                     </Text>
                   </View>
@@ -402,15 +370,15 @@ const EditObjectiveScreen = () => {
                       styles.textInput,
                       styles.textArea,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={description}
                     onChangeText={setDescription}
                     placeholder="Décrivez l'objectif"
-                    placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                    placeholderTextColor={COLORS.gray}
                     multiline
                     numberOfLines={4}
                     textAlignVertical="top"
@@ -427,12 +395,7 @@ const EditObjectiveScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelContainer}>
                     <Ionicons name="school" size={18} color={COLORS.primary} />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Matière
                     </Text>
                   </View>
@@ -440,8 +403,8 @@ const EditObjectiveScreen = () => {
                     style={[
                       styles.pickerContainer,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                   >
@@ -465,14 +428,14 @@ const EditObjectiveScreen = () => {
                           fontSize: 16,
                           paddingVertical: 12,
                           paddingHorizontal: 16,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         inputAndroid: {
                           fontSize: 16,
                           paddingHorizontal: 16,
                           paddingVertical: 12,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         iconContainer: {
@@ -485,7 +448,7 @@ const EditObjectiveScreen = () => {
                         <Ionicons
                           name="chevron-down"
                           size={20}
-                          color={dark ? COLORS.white : COLORS.black}
+                          color={COLORS.black}
                         />
                       )}
                     />
@@ -506,12 +469,7 @@ const EditObjectiveScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Priorité
                     </Text>
                   </View>
@@ -519,8 +477,8 @@ const EditObjectiveScreen = () => {
                     style={[
                       styles.pickerContainer,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                   >
@@ -544,14 +502,14 @@ const EditObjectiveScreen = () => {
                           fontSize: 16,
                           paddingVertical: 12,
                           paddingHorizontal: 16,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         inputAndroid: {
                           fontSize: 16,
                           paddingHorizontal: 16,
                           paddingVertical: 12,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         iconContainer: {
@@ -564,7 +522,7 @@ const EditObjectiveScreen = () => {
                         <Ionicons
                           name="chevron-down"
                           size={20}
-                          color={dark ? COLORS.white : COLORS.black}
+                          color={COLORS.black}
                         />
                       )}
                     />
@@ -581,12 +539,7 @@ const EditObjectiveScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelContainer}>
                     <Ionicons name="play" size={18} color={COLORS.primary} />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Date de début
                     </Text>
                   </View>
@@ -594,21 +547,17 @@ const EditObjectiveScreen = () => {
                     style={[
                       styles.dateButton,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     onPress={() => setShowStartDatePicker(true)}
                     activeOpacity={0.7}
                   >
-                    <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+                    <Text style={{ color: COLORS.black }}>
                       {formatDate(startDate)}
                     </Text>
-                    <Ionicons
-                      name="calendar"
-                      size={20}
-                      color={dark ? COLORS.white : COLORS.black}
-                    />
+                    <Ionicons name="calendar" size={20} color={COLORS.black} />
                   </TouchableOpacity>
                   {showStartDatePicker && (
                     <DateTimePicker
@@ -631,12 +580,7 @@ const EditObjectiveScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelContainer}>
                     <Ionicons name="stop" size={18} color={COLORS.primary} />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Date de fin
                     </Text>
                   </View>
@@ -644,21 +588,17 @@ const EditObjectiveScreen = () => {
                     style={[
                       styles.dateButton,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     onPress={() => setShowEndDatePicker(true)}
                     activeOpacity={0.7}
                   >
-                    <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+                    <Text style={{ color: COLORS.black }}>
                       {formatDate(endDate)}
                     </Text>
-                    <Ionicons
-                      name="calendar"
-                      size={20}
-                      color={dark ? COLORS.white : COLORS.black}
-                    />
+                    <Ionicons name="calendar" size={20} color={COLORS.black} />
                   </TouchableOpacity>
                   {showEndDatePicker && (
                     <DateTimePicker
@@ -686,12 +626,7 @@ const EditObjectiveScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Statut
                     </Text>
                   </View>
@@ -699,8 +634,8 @@ const EditObjectiveScreen = () => {
                     style={[
                       styles.pickerContainer,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                   >
@@ -724,14 +659,14 @@ const EditObjectiveScreen = () => {
                           fontSize: 16,
                           paddingVertical: 12,
                           paddingHorizontal: 16,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         inputAndroid: {
                           fontSize: 16,
                           paddingHorizontal: 16,
                           paddingVertical: 12,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                         },
                         iconContainer: {
@@ -744,7 +679,7 @@ const EditObjectiveScreen = () => {
                         <Ionicons
                           name="chevron-down"
                           size={20}
-                          color={dark ? COLORS.white : COLORS.black}
+                          color={COLORS.black}
                         />
                       )}
                     />
@@ -765,12 +700,7 @@ const EditObjectiveScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.label,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.label, { color: COLORS.black }]}>
                       Message pour l&apos;enfant (optionnel)
                     </Text>
                   </View>
@@ -779,15 +709,15 @@ const EditObjectiveScreen = () => {
                       styles.textInput,
                       styles.textArea,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={kidMessage}
                     onChangeText={setKidMessage}
                     placeholder="Félicitations ! Tu as ... (exemple)"
-                    placeholderTextColor={dark ? COLORS.gray3 : COLORS.gray}
+                    placeholderTextColor={COLORS.gray}
                     multiline
                     numberOfLines={3}
                     textAlignVertical="top"
@@ -827,25 +757,13 @@ const EditObjectiveScreen = () => {
         >
           {/* Enhanced Cancel Button */}
           <TouchableOpacity
-            style={[
-              styles.cancelButton,
-              { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
-            ]}
+            style={[styles.cancelButton, { borderColor: COLORS.greyscale300 }]}
             onPress={handleBack}
             activeOpacity={0.8}
           >
             <View style={styles.cancelButtonContent}>
-              <Ionicons
-                name="close-outline"
-                size={20}
-                color={dark ? COLORS.white : COLORS.black}
-              />
-              <Text
-                style={[
-                  styles.cancelButtonText,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Ionicons name="close-outline" size={20} color={COLORS.black} />
+              <Text style={[styles.cancelButtonText, { color: COLORS.black }]}>
                 Annuler
               </Text>
             </View>

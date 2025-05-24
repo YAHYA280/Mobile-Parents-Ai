@@ -8,7 +8,6 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 
 import NotificationItem from "./NotificationItem";
 // Mock data - in a real app, this would come from a context or API
@@ -37,7 +36,6 @@ const NotificationList: React.FC<NotificationListProps> = ({
   searchQuery,
   activeTab,
 }) => {
-  const { dark } = useTheme();
   const [selectedItem, setSelectedItem] = useState<Notification | null>(null);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [refreshing, setRefreshing] = useState(false);
@@ -107,12 +105,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
 
   const renderEmptyList = () => (
     <View style={styles.emptyContainer}>
-      <Text
-        style={[
-          styles.emptyText,
-          { color: dark ? COLORS.white : COLORS.greyscale900 },
-        ]}
-      >
+      <Text style={[styles.emptyText, { color: COLORS.greyscale900 }]}>
         Aucune notification trouvée
       </Text>
     </View>

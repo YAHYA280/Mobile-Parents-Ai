@@ -5,11 +5,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { Text, StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 
 const EmptyState: React.FC = () => {
-  const { dark } = useTheme();
-
   return (
     <MotiView
       from={{ opacity: 0, scale: 0.8 }}
@@ -18,19 +15,12 @@ const EmptyState: React.FC = () => {
       style={styles.container}
     >
       <Ionicons name="calendar-outline" size={64} color={COLORS.greyscale400} />
-      <Text
-        style={[styles.title, { color: dark ? COLORS.white : COLORS.black }]}
-      >
+      <Text style={[styles.title, { color: COLORS.black }]}>
         Aucune suggestion pour ce jour
       </Text>
-      <Text
-        style={[
-          styles.subtitle,
-          { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-        ]}
-      >
-        L'IA génère des recommandations basées sur les progrès et les besoins de
-        vos enfants
+      <Text style={[styles.subtitle, { color: COLORS.greyscale600 }]}>
+        L&apos;IA génère des recommandations basées sur les progrès et les
+        besoins de vos enfants
       </Text>
     </MotiView>
   );

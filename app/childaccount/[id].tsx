@@ -7,7 +7,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   SafeAreaView,
-  useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import {
   View,
@@ -20,7 +19,6 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  useWindowDimensions,
 } from "react-native";
 
 import Header from "@/components/ui/Header";
@@ -146,8 +144,6 @@ const ChildAccount = () => {
   const navigation = useNavigation();
   const router = useRouter();
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
 
   // 1. Call all Hooks at the top level, unconditionally:
   const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -537,7 +533,7 @@ const ChildAccount = () => {
           <View style={styles.sectionHeader}>
             <Ionicons name="flag" size={24} color={COLORS.primary} />
             <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
-              Objectifs d'apprentissage
+              Objectifs d&apos;apprentissage
             </Text>
           </View>
 

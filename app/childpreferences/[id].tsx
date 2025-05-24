@@ -81,7 +81,7 @@ const contentSections: {
 // ChildPreferencesScreen
 // --------------------------------------------------
 const ChildPreferencesScreen = () => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
 
@@ -249,28 +249,18 @@ const ChildPreferencesScreen = () => {
             transition={{ type: "timing", duration: 600 }}
             style={[
               styles.section,
-              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              { backgroundColor: COLORS.white },
               Platform.OS === "ios" && styles.iosShadow,
             ]}
           >
             <View style={styles.sectionHeader}>
               <Ionicons name="time" size={24} color={COLORS.primary} />
-              <Text
-                style={[
-                  styles.sectionTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
                 Temps d&apos;utilisation
               </Text>
             </View>
 
-            <Text
-              style={[
-                styles.label,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.label, { color: COLORS.black }]}>
               Temps maximum d&apos;utilisation par jour
             </Text>
 
@@ -282,11 +272,9 @@ const ChildPreferencesScreen = () => {
                     style={[
                       styles.timeInput,
                       {
-                        backgroundColor: dark
-                          ? COLORS.dark3
-                          : COLORS.greyscale100,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.greyscale100,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={maxHours}
@@ -295,12 +283,7 @@ const ChildPreferencesScreen = () => {
                     maxLength={2}
                   />
                 </View>
-                <Text
-                  style={[
-                    styles.timeLabel,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
+                <Text style={[styles.timeLabel, { color: COLORS.black }]}>
                   heures
                 </Text>
               </View>
@@ -312,11 +295,9 @@ const ChildPreferencesScreen = () => {
                     style={[
                       styles.timeInput,
                       {
-                        backgroundColor: dark
-                          ? COLORS.dark3
-                          : COLORS.greyscale100,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.greyscale100,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={maxMinutes}
@@ -325,12 +306,7 @@ const ChildPreferencesScreen = () => {
                     maxLength={2}
                   />
                 </View>
-                <Text
-                  style={[
-                    styles.timeLabel,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
+                <Text style={[styles.timeLabel, { color: COLORS.black }]}>
                   minutes
                 </Text>
               </View>
@@ -344,18 +320,13 @@ const ChildPreferencesScreen = () => {
             transition={{ type: "timing", duration: 600, delay: 200 }}
             style={[
               styles.section,
-              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              { backgroundColor: COLORS.white },
               Platform.OS === "ios" && styles.iosShadow,
             ]}
           >
             <View style={styles.sectionHeader}>
               <Ionicons name="alarm" size={24} color={COLORS.primary} />
-              <Text
-                style={[
-                  styles.sectionTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
                 Plages horaires autorisées
               </Text>
             </View>
@@ -365,10 +336,7 @@ const ChildPreferencesScreen = () => {
                 <View style={styles.timeRangeHeader}>
                   <Ionicons name="play" size={16} color={COLORS.primary} />
                   <Text
-                    style={[
-                      styles.timeRangeLabel,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
+                    style={[styles.timeRangeLabel, { color: COLORS.black }]}
                   >
                     De
                   </Text>
@@ -378,11 +346,9 @@ const ChildPreferencesScreen = () => {
                     style={[
                       styles.timeInput,
                       {
-                        backgroundColor: dark
-                          ? COLORS.dark3
-                          : COLORS.greyscale100,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.greyscale100,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={startHour}
@@ -390,23 +356,16 @@ const ChildPreferencesScreen = () => {
                     keyboardType="numeric"
                     maxLength={2}
                   />
-                  <Text
-                    style={[
-                      styles.timeSeparator,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
-                  >
+                  <Text style={[styles.timeSeparator, { color: COLORS.black }]}>
                     :
                   </Text>
                   <TextInput
                     style={[
                       styles.timeInput,
                       {
-                        backgroundColor: dark
-                          ? COLORS.dark3
-                          : COLORS.greyscale100,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.greyscale100,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={startMinute}
@@ -421,10 +380,7 @@ const ChildPreferencesScreen = () => {
                 <View style={styles.timeRangeHeader}>
                   <Ionicons name="stop" size={16} color={COLORS.primary} />
                   <Text
-                    style={[
-                      styles.timeRangeLabel,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
+                    style={[styles.timeRangeLabel, { color: COLORS.black }]}
                   >
                     À
                   </Text>
@@ -434,11 +390,9 @@ const ChildPreferencesScreen = () => {
                     style={[
                       styles.timeInput,
                       {
-                        backgroundColor: dark
-                          ? COLORS.dark3
-                          : COLORS.greyscale100,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.greyscale100,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={endHour}
@@ -446,23 +400,16 @@ const ChildPreferencesScreen = () => {
                     keyboardType="numeric"
                     maxLength={2}
                   />
-                  <Text
-                    style={[
-                      styles.timeSeparator,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
-                  >
+                  <Text style={[styles.timeSeparator, { color: COLORS.black }]}>
                     :
                   </Text>
                   <TextInput
                     style={[
                       styles.timeInput,
                       {
-                        backgroundColor: dark
-                          ? COLORS.dark3
-                          : COLORS.greyscale100,
-                        color: dark ? COLORS.white : COLORS.black,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.greyscale100,
+                        color: COLORS.black,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                     value={endMinute}
@@ -482,18 +429,13 @@ const ChildPreferencesScreen = () => {
             transition={{ type: "timing", duration: 600, delay: 400 }}
             style={[
               styles.section,
-              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              { backgroundColor: COLORS.white },
               Platform.OS === "ios" && styles.iosShadow,
             ]}
           >
             <View style={styles.sectionHeader}>
               <Ionicons name="calendar" size={24} color={COLORS.primary} />
-              <Text
-                style={[
-                  styles.sectionTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
                 Jours d&apos;accès autorisés
               </Text>
             </View>
@@ -516,9 +458,7 @@ const ChildPreferencesScreen = () => {
                       allowedDays[day.id]
                         ? { backgroundColor: COLORS.primary }
                         : {
-                            backgroundColor: dark
-                              ? COLORS.dark3
-                              : COLORS.greyscale300,
+                            backgroundColor: COLORS.greyscale300,
                           },
                     ]}
                     onPress={() => toggleDay(day.id)}
@@ -538,16 +478,9 @@ const ChildPreferencesScreen = () => {
                       </LinearGradient>
                     ) : (
                       <View style={styles.dayButtonContent}>
-                        <Ionicons
-                          name="close"
-                          size={16}
-                          color={dark ? COLORS.white : COLORS.black}
-                        />
+                        <Ionicons name="close" size={16} color={COLORS.black} />
                         <Text
-                          style={[
-                            styles.dayLabel,
-                            { color: dark ? COLORS.white : COLORS.black },
-                          ]}
+                          style={[styles.dayLabel, { color: COLORS.black }]}
                         >
                           {day.label}
                         </Text>
@@ -566,7 +499,7 @@ const ChildPreferencesScreen = () => {
             transition={{ type: "timing", duration: 600, delay: 600 }}
             style={[
               styles.section,
-              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              { backgroundColor: COLORS.white },
               Platform.OS === "ios" && styles.iosShadow,
             ]}
           >
@@ -576,21 +509,13 @@ const ChildPreferencesScreen = () => {
                 size={24}
                 color={COLORS.primary}
               />
-              <Text
-                style={[
-                  styles.sectionTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
                 Restrictions de contenu
               </Text>
             </View>
 
             <Text
-              style={[
-                styles.restrictionDescription,
-                { color: dark ? COLORS.greyscale300 : COLORS.gray },
-              ]}
+              style={[styles.restrictionDescription, { color: COLORS.gray }]}
             >
               Activez les restrictions pour empêcher l&apos;accès à certaines
               sections de l&apos;application.
@@ -620,7 +545,7 @@ const ChildPreferencesScreen = () => {
                       <Text
                         style={[
                           styles.restrictionLabel,
-                          { color: dark ? COLORS.white : COLORS.black },
+                          { color: COLORS.black },
                         ]}
                       >
                         {section.label}
@@ -628,7 +553,7 @@ const ChildPreferencesScreen = () => {
                       <Text
                         style={[
                           styles.restrictionSubtext,
-                          { color: dark ? COLORS.greyscale300 : COLORS.gray },
+                          { color: COLORS.gray },
                         ]}
                       >
                         {section.description}
@@ -639,13 +564,11 @@ const ChildPreferencesScreen = () => {
                     value={contentRestrictions[section.id]}
                     onValueChange={() => toggleContentRestriction(section.id)}
                     trackColor={{
-                      false: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      false: COLORS.greyscale300,
                       true: COLORS.primary,
                     }}
                     thumbColor={COLORS.white}
-                    ios_backgroundColor={
-                      dark ? COLORS.dark3 : COLORS.greyscale300
-                    }
+                    ios_backgroundColor={COLORS.greyscale300}
                   />
                 </View>
               </MotiView>
@@ -659,26 +582,18 @@ const ChildPreferencesScreen = () => {
             transition={{ type: "timing", duration: 600, delay: 800 }}
             style={[
               styles.section,
-              { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+              { backgroundColor: COLORS.white },
               Platform.OS === "ios" && styles.iosShadow,
             ]}
           >
             <View style={styles.sectionHeader}>
               <Ionicons name="eye-off" size={24} color={COLORS.primary} />
-              <Text
-                style={[
-                  styles.sectionTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.sectionTitle, { color: COLORS.black }]}>
                 Mots interdits
               </Text>
             </View>
             <Text
-              style={[
-                styles.restrictionDescription,
-                { color: dark ? COLORS.greyscale300 : COLORS.gray },
-              ]}
+              style={[styles.restrictionDescription, { color: COLORS.gray }]}
             >
               Saisissez les mots que vous souhaitez bloquer. Tapez le mot puis
               appuyez sur &quot;Ajouter&quot;.
@@ -693,17 +608,13 @@ const ChildPreferencesScreen = () => {
                   style={[
                     styles.restrictedWordInput,
                     {
-                      backgroundColor: dark
-                        ? COLORS.dark3
-                        : COLORS.greyscale100,
-                      color: dark ? COLORS.white : COLORS.black,
-                      borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                      backgroundColor: COLORS.greyscale100,
+                      color: COLORS.black,
+                      borderColor: COLORS.greyscale300,
                     },
                   ]}
                   placeholder="Ajouter un mot interdit..."
-                  placeholderTextColor={
-                    dark ? COLORS.greyscale300 : COLORS.gray
-                  }
+                  placeholderTextColor={COLORS.gray}
                   value={newRestrictedWord}
                   onChangeText={setNewRestrictedWord}
                   onSubmitEditing={handleAddRestrictedWord}
@@ -744,21 +655,14 @@ const ChildPreferencesScreen = () => {
                     style={[
                       styles.tag,
                       {
-                        backgroundColor: dark
-                          ? COLORS.dark3
-                          : COLORS.greyscale300,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale400,
+                        backgroundColor: COLORS.greyscale300,
+                        borderColor: COLORS.greyscale400,
                       },
                     ]}
                     onPress={() => handleRemoveRestrictedWord(index)}
                     activeOpacity={0.7}
                   >
-                    <Text
-                      style={[
-                        styles.tagText,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.tagText, { color: COLORS.black }]}>
                       {word}
                     </Text>
                     <Ionicons

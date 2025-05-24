@@ -28,7 +28,7 @@ type Nav = {
 
 const RegistrationStep5 = () => {
   const { navigate } = useNavigation<Nav>();
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -101,7 +101,7 @@ const RegistrationStep5 = () => {
             style={[
               styles.modalSubContainer,
               {
-                backgroundColor: dark ? COLORS.dark2 : COLORS.secondaryWhite,
+                backgroundColor: COLORS.secondaryWhite,
               },
             ]}
           >
@@ -115,7 +115,7 @@ const RegistrationStep5 = () => {
               style={[
                 styles.modalSubtitle,
                 {
-                  color: dark ? COLORS.greyscale300 : COLORS.greyscale600,
+                  color: COLORS.greyscale600,
                 },
               ]}
             >
@@ -248,7 +248,7 @@ const RegistrationStep5 = () => {
         <Button
           title="Précédent"
           style={styles.prevButton}
-          textColor={dark ? COLORS.white : COLORS.primary}
+          textColor={COLORS.primary}
           onPress={() => navigate("registrationStep4")}
         />
         <Button

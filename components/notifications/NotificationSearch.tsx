@@ -10,7 +10,6 @@ import {
 
 import { icons } from "@/constants";
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 import ConditionalComponent from "@/components/ConditionalComponent";
 
 interface NotificationSearchProps {
@@ -22,37 +21,30 @@ const NotificationSearch: React.FC<NotificationSearchProps> = ({
   value,
   onChangeText,
 }) => {
-  const { dark } = useTheme();
-
   return (
     <View style={styles.searchContainer}>
       <View
         style={[
           styles.searchInputContainer,
           {
-            backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale100,
-            borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+            backgroundColor: COLORS.greyscale100,
+            borderColor: COLORS.greyscale300,
           },
         ]}
       >
         <Feather
           name="search"
           size={20}
-          color={dark ? COLORS.greyscale500 : COLORS.greyscale600}
+          color={COLORS.greyscale600}
           style={styles.searchIcon}
         />
 
         <TextInput
-          style={[
-            styles.searchInput,
-            { color: dark ? COLORS.white : COLORS.greyscale900 },
-          ]}
+          style={[styles.searchInput, { color: COLORS.greyscale900 }]}
           value={value}
           onChangeText={onChangeText}
           placeholder="Rechercher dans les notifications"
-          placeholderTextColor={
-            dark ? COLORS.greyscale500 : COLORS.greyscale600
-          }
+          placeholderTextColor={COLORS.greyscale600}
         />
 
         <ConditionalComponent isValid={value.length > 0}>
@@ -62,10 +54,7 @@ const NotificationSearch: React.FC<NotificationSearchProps> = ({
           >
             <Image
               source={icons.cancelSquare}
-              style={[
-                styles.clearIcon,
-                { tintColor: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-              ]}
+              style={[styles.clearIcon, { tintColor: COLORS.greyscale600 }]}
               resizeMode="contain"
             />
           </TouchableOpacity>

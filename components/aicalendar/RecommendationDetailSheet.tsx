@@ -5,7 +5,6 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { View, Text, StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 
 import type { AIRecommendation } from "./RecommendationCard";
 
@@ -22,8 +21,6 @@ const RecommendationDetailSheet: React.FC<RecommendationDetailSheetProps> = ({
   getRecommendationIcon,
   getRecommendationColor,
 }) => {
-  const { dark } = useTheme();
-
   if (!selectedRecommendation) return null;
 
   return (
@@ -36,14 +33,14 @@ const RecommendationDetailSheet: React.FC<RecommendationDetailSheetProps> = ({
           backgroundColor: "rgba(0,0,0,0.5)",
         },
         draggableIcon: {
-          backgroundColor: dark ? COLORS.greyscale500 : COLORS.grayscale400,
+          backgroundColor: COLORS.grayscale400,
           width: 40,
           height: 5,
         },
         container: {
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
-          backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+          backgroundColor: COLORS.white,
           padding: 16,
           paddingBottom: 32,
         },
@@ -65,70 +62,35 @@ const RecommendationDetailSheet: React.FC<RecommendationDetailSheetProps> = ({
               color={getRecommendationColor(selectedRecommendation.type)}
             />
           </View>
-          <Text
-            style={[
-              styles.title,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.title, { color: COLORS.black }]}>
             {selectedRecommendation.title}
           </Text>
         </View>
 
         <View style={styles.details}>
           <View style={styles.detailRow}>
-            <Text
-              style={[
-                styles.detailLabel,
-                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-              ]}
-            >
+            <Text style={[styles.detailLabel, { color: COLORS.greyscale600 }]}>
               Enfant:
             </Text>
-            <Text
-              style={[
-                styles.detailValue,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.detailValue, { color: COLORS.black }]}>
               {selectedRecommendation.childName}
             </Text>
           </View>
 
           <View style={styles.detailRow}>
-            <Text
-              style={[
-                styles.detailLabel,
-                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-              ]}
-            >
+            <Text style={[styles.detailLabel, { color: COLORS.greyscale600 }]}>
               Heure:
             </Text>
-            <Text
-              style={[
-                styles.detailValue,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.detailValue, { color: COLORS.black }]}>
               {selectedRecommendation.timeSlot}
             </Text>
           </View>
 
           <View style={styles.detailRow}>
-            <Text
-              style={[
-                styles.detailLabel,
-                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-              ]}
-            >
+            <Text style={[styles.detailLabel, { color: COLORS.greyscale600 }]}>
               Durée:
             </Text>
-            <Text
-              style={[
-                styles.detailValue,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.detailValue, { color: COLORS.black }]}>
               {selectedRecommendation.duration}
             </Text>
           </View>
@@ -139,30 +101,20 @@ const RecommendationDetailSheet: React.FC<RecommendationDetailSheetProps> = ({
                 style={[
                   styles.detailLabel,
                   {
-                    color: dark ? COLORS.greyscale500 : COLORS.greyscale600,
+                    color: COLORS.greyscale600,
                   },
                 ]}
               >
                 Matière:
               </Text>
-              <Text
-                style={[
-                  styles.detailValue,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.detailValue, { color: COLORS.black }]}>
                 {selectedRecommendation.subject}
               </Text>
             </View>
           )}
         </View>
 
-        <Text
-          style={[
-            styles.description,
-            { color: dark ? COLORS.greyscale400 : COLORS.greyScale700 },
-          ]}
-        >
+        <Text style={[styles.description, { color: COLORS.greyScale700 }]}>
           {selectedRecommendation.description}
         </Text>
 

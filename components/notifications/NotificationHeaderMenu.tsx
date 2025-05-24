@@ -23,7 +23,7 @@ const NotificationHeaderMenu: React.FC<NotificationHeaderMenuProps> = ({
   onToggle,
   onClose,
 }) => {
-  const { dark, colors } = useTheme();
+  const { colors } = useTheme();
 
   const handleMarkAllAsRead = () => {
     // Logic to mark all as read
@@ -40,11 +40,7 @@ const NotificationHeaderMenu: React.FC<NotificationHeaderMenuProps> = ({
   return (
     <>
       <TouchableOpacity onPress={onToggle} style={styles.menuButton}>
-        <FontAwesome
-          name="ellipsis-v"
-          size={20}
-          color={dark ? COLORS.white : COLORS.black}
-        />
+        <FontAwesome name="ellipsis-v" size={20} color={COLORS.black} />
       </TouchableOpacity>
 
       <Modal
@@ -62,7 +58,7 @@ const NotificationHeaderMenu: React.FC<NotificationHeaderMenuProps> = ({
             styles.menuContainer,
             {
               backgroundColor: colors.background,
-              borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+              borderColor: COLORS.greyscale300,
             },
           ]}
         >
@@ -76,21 +72,13 @@ const NotificationHeaderMenu: React.FC<NotificationHeaderMenuProps> = ({
               style={styles.menuIcon}
               color={COLORS.primary}
             />
-            <Text
-              style={[
-                styles.menuText,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.menuText, { color: COLORS.black }]}>
               Tout marquer comme lu
             </Text>
           </TouchableOpacity>
 
           <View
-            style={[
-              styles.divider,
-              { backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
-            ]}
+            style={[styles.divider, { backgroundColor: COLORS.greyscale300 }]}
           />
 
           <TouchableOpacity onPress={handleDeleteAll} style={styles.menuItem}>

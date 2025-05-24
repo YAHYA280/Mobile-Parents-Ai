@@ -1,8 +1,10 @@
+/* eslint-disable react/prop-types */
 import { useReducer } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useCallback } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   View,
   Text,
@@ -22,12 +24,10 @@ type Nav = {
 };
 
 interface ChangePasswordSectionProps {
-  dark: boolean;
   isOpen: boolean;
 }
 
 const ChangePasswordSection: React.FC<ChangePasswordSectionProps> = ({
-  dark,
   isOpen,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -70,7 +70,7 @@ const ChangePasswordSection: React.FC<ChangePasswordSectionProps> = ({
               style={[
                 styles.modalContent,
                 {
-                  backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                  backgroundColor: COLORS.white,
                 },
               ]}
             >
@@ -92,7 +92,7 @@ const ChangePasswordSection: React.FC<ChangePasswordSectionProps> = ({
               <Text
                 style={[
                   styles.modalDescription,
-                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                  { color: COLORS.greyscale600 },
                 ]}
               >
                 Lors de la prochaine connexion, veuillez utiliser le nouveau mot
@@ -133,19 +133,9 @@ const ChangePasswordSection: React.FC<ChangePasswordSectionProps> = ({
 
   return (
     <View style={styles.sectionContent}>
-      <View
-        style={[
-          styles.formContainer,
-          { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
-        ]}
-      >
-        <Text
-          style={[
-            styles.formInstructions,
-            { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-          ]}
-        >
-          Vous pouvez modifier votre mot de passe ici. Assurez-vous qu'il
+      <View style={[styles.formContainer, { backgroundColor: "#FFFFFF" }]}>
+        <Text style={[styles.formInstructions, { color: COLORS.greyscale600 }]}>
+          Vous pouvez modifier votre mot de passe ici. Assurez-vous qu&apos;il
           contient au moins 8 caractères.
         </Text>
 
@@ -156,10 +146,14 @@ const ChangePasswordSection: React.FC<ChangePasswordSectionProps> = ({
             autoCapitalize="none"
             id="password"
             placeholder="Ancien mot de passe"
-            placeholderTextColor={
-              dark ? COLORS.greyscale500 : COLORS.grayscale400
+            placeholderTextColor={COLORS.grayscale400}
+            icon={
+              <FontAwesomeIcon
+                icon="lock"
+                size={18}
+                color={COLORS.grayscale400}
+              />
             }
-            icon={require("../../assets/icons/padlock.png")}
             secureTextEntry
             value={formState.inputValues.password}
           />
@@ -170,10 +164,14 @@ const ChangePasswordSection: React.FC<ChangePasswordSectionProps> = ({
             autoCapitalize="none"
             id="newPassword"
             placeholder="Nouveau mot de passe"
-            placeholderTextColor={
-              dark ? COLORS.greyscale500 : COLORS.grayscale400
+            placeholderTextColor={COLORS.grayscale400}
+            icon={
+              <FontAwesomeIcon
+                icon="lock"
+                size={18}
+                color={COLORS.grayscale400}
+              />
             }
-            icon={require("../../assets/icons/padlock.png")}
             secureTextEntry
             value={formState.inputValues.newPassword}
           />
@@ -184,10 +182,14 @@ const ChangePasswordSection: React.FC<ChangePasswordSectionProps> = ({
             autoCapitalize="none"
             id="confirmNewPassword"
             placeholder="Confirmer nouveau mot de passe"
-            placeholderTextColor={
-              dark ? COLORS.greyscale500 : COLORS.grayscale400
+            placeholderTextColor={COLORS.grayscale400}
+            icon={
+              <FontAwesomeIcon
+                icon="lock"
+                size={18}
+                color={COLORS.grayscale400}
+              />
             }
-            icon={require("../../assets/icons/padlock.png")}
             secureTextEntry
             value={formState.inputValues.confirmNewPassword}
           />

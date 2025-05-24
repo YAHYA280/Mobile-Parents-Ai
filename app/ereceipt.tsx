@@ -27,7 +27,7 @@ const EReceipt = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   const dropdownItems = [
     {
@@ -82,7 +82,7 @@ const EReceipt = () => {
               style={[
                 styles.backIcon,
                 {
-                  tintColor: dark ? COLORS.white : COLORS.black,
+                  tintColor: COLORS.black,
                 },
               ]}
             />
@@ -91,7 +91,7 @@ const EReceipt = () => {
             style={[
               styles.headerTitle,
               {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               },
             ]}
           >
@@ -105,7 +105,7 @@ const EReceipt = () => {
             style={[
               styles.moreIcon,
               {
-                tintColor: dark ? COLORS.secondaryWhite : COLORS.black,
+                tintColor: COLORS.black,
               },
             ]}
           />
@@ -134,11 +134,11 @@ const EReceipt = () => {
           height={72}
           style={{
             marginBottom: 40,
-            backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+            backgroundColor: COLORS.white,
           }}
-          lineColor={dark ? COLORS.white : COLORS.black}
+          lineColor={COLORS.black}
           textStyle={{
-            color: dark ? COLORS.white : COLORS.black,
+            color: COLORS.black,
           }}
           maxWidth={SIZES.width - 64}
         />
@@ -146,7 +146,7 @@ const EReceipt = () => {
           style={[
             styles.summaryContainer,
             {
-              backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+              backgroundColor: COLORS.white,
               borderRadius: 6,
             },
           ]}
@@ -157,7 +157,7 @@ const EReceipt = () => {
               style={[
                 styles.viewRight,
                 {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               ]}
             >
@@ -170,7 +170,7 @@ const EReceipt = () => {
               style={[
                 styles.viewRight,
                 {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               ]}
             >
@@ -183,7 +183,7 @@ const EReceipt = () => {
           style={[
             styles.summaryContainer,
             {
-              backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+              backgroundColor: COLORS.white,
               borderRadius: 6,
             },
           ]}
@@ -194,7 +194,7 @@ const EReceipt = () => {
               style={[
                 styles.viewRight,
                 {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               ]}
             >
@@ -207,7 +207,7 @@ const EReceipt = () => {
               style={[
                 styles.viewRight,
                 {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               ]}
             >
@@ -220,7 +220,7 @@ const EReceipt = () => {
               style={[
                 styles.viewRight,
                 {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               ]}
             >
@@ -233,7 +233,7 @@ const EReceipt = () => {
               style={[
                 styles.viewRight,
                 {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               ]}
             >
@@ -245,7 +245,7 @@ const EReceipt = () => {
           style={[
             styles.summaryContainer,
             {
-              backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+              backgroundColor: COLORS.white,
               borderRadius: 6,
             },
           ]}
@@ -256,7 +256,7 @@ const EReceipt = () => {
               style={[
                 styles.viewRight,
                 {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               ]}
             >
@@ -269,7 +269,7 @@ const EReceipt = () => {
               style={[
                 styles.viewRight,
                 {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               ]}
             >
@@ -282,7 +282,7 @@ const EReceipt = () => {
               style={[
                 styles.viewRight,
                 {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               ]}
             >
@@ -320,10 +320,7 @@ const EReceipt = () => {
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         {renderHeader()}
         <ScrollView
-          style={[
-            styles.scrollView,
-            { backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite },
-          ]}
+          style={[styles.scrollView, { backgroundColor: COLORS.tertiaryWhite }]}
           showsVerticalScrollIndicator={false}
         >
           {renderContent()}
@@ -337,7 +334,7 @@ const EReceipt = () => {
               style={{
                 width: 202,
                 padding: 16,
-                backgroundColor: dark ? COLORS.dark2 : COLORS.tertiaryWhite,
+                backgroundColor: COLORS.tertiaryWhite,
                 borderRadius: 8,
               }}
             >
@@ -360,14 +357,14 @@ const EReceipt = () => {
                         width: 20,
                         height: 20,
                         marginRight: 16,
-                        tintColor: dark ? COLORS.white : COLORS.black,
+                        tintColor: COLORS.black,
                       }}
                     />
                     <Text
                       style={{
                         fontSize: 14,
                         fontFamily: "semiBold",
-                        color: dark ? COLORS.white : COLORS.black,
+                        color: COLORS.black,
                       }}
                     >
                       {item.label}

@@ -3,7 +3,6 @@ import { MotiView } from "moti";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet } from "react-native";
 
-import { useTheme } from "@/theme/ThemeProvider";
 import { COLORS, COLOORS, TYPOGRAPHY } from "@/constants/theme";
 
 interface FeatureItemProps {
@@ -21,8 +20,7 @@ const FeatureItem: React.FC<FeatureItemProps> = ({
   animated = true,
   delay = 100,
 }) => {
-  const { dark } = useTheme();
-  const textColor = dark ? COLORS.white : COLORS.black;
+  const textColor = COLORS.black;
 
   const baseComponent = (
     <>

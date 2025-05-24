@@ -9,7 +9,6 @@ import {
   FlatList,
   Animated,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
 } from "react-native";
 
@@ -20,14 +19,11 @@ import Card from "@/components/ui/Card";
 import Alert from "@/components/ui/Alert";
 import { COLORS } from "@/constants/theme";
 import Header from "@/components/ui/Header";
-import { useTheme } from "@/theme/ThemeProvider";
-import CalendarModal from "@/components/CalendarModal"; // Import the new CalendarModal component
+import CalendarModal from "@/components/CalendarModal";
 import {
   TRANSACTION_STATUS_OPTIONS,
   transactions as initialTransactions,
 } from "@/data/_mock/_transaction";
-
-const { width } = Dimensions.get("window");
 
 // Filter types
 type FilterType = "status" | "date";
@@ -44,7 +40,6 @@ const DATE_FILTER_OPTIONS = {
 
 const Transactions = () => {
   const navigation = useNavigation();
-  const { dark, colors } = useTheme();
 
   // State
   const [transactions, setTransactions] =
@@ -245,9 +240,11 @@ const Transactions = () => {
   const getDateRangeDisplayText = () => {
     if (dateRange.startDate && dateRange.endDate) {
       return `${formatDateDisplay(dateRange.startDate)} - ${formatDateDisplay(dateRange.endDate)}`;
-    } if (dateRange.startDate) {
+    }
+    if (dateRange.startDate) {
       return `À partir du ${formatDateDisplay(dateRange.startDate)}`;
-    } if (dateRange.endDate) {
+    }
+    if (dateRange.endDate) {
       return `Jusqu'au ${formatDateDisplay(dateRange.endDate)}`;
     }
     return "Période personnalisée";
@@ -299,11 +296,8 @@ const Transactions = () => {
             styles.filterTypeButton,
             activeFilter === "status" && styles.activeFilterTypeButton,
             {
-              backgroundColor: dark
-                ? activeFilter === "status"
-                  ? "rgba(255, 142, 105, 0.2)"
-                  : "rgba(255, 255, 255, 0.05)"
-                : activeFilter === "status"
+              backgroundColor:
+                activeFilter === "status"
                   ? "rgba(255, 142, 105, 0.1)"
                   : "rgba(0, 0, 0, 0.03)",
             },
@@ -313,24 +307,14 @@ const Transactions = () => {
           <Ionicons
             name="options-outline"
             size={18}
-            color={
-              activeFilter === "status"
-                ? COLORS.primary
-                : dark
-                  ? COLORS.gray2
-                  : COLORS.gray3
-            }
+            color={activeFilter === "status" ? COLORS.primary : COLORS.gray3}
           />
           <Text
             style={[
               styles.filterTypeButtonText,
               {
                 color:
-                  activeFilter === "status"
-                    ? COLORS.primary
-                    : dark
-                      ? COLORS.gray2
-                      : COLORS.gray3,
+                  activeFilter === "status" ? COLORS.primary : COLORS.gray3,
               },
             ]}
           >
@@ -343,11 +327,8 @@ const Transactions = () => {
             styles.filterTypeButton,
             activeFilter === "date" && styles.activeFilterTypeButton,
             {
-              backgroundColor: dark
-                ? activeFilter === "date"
-                  ? "rgba(255, 142, 105, 0.2)"
-                  : "rgba(255, 255, 255, 0.05)"
-                : activeFilter === "date"
+              backgroundColor:
+                activeFilter === "date"
                   ? "rgba(255, 142, 105, 0.1)"
                   : "rgba(0, 0, 0, 0.03)",
             },
@@ -357,24 +338,13 @@ const Transactions = () => {
           <Ionicons
             name="calendar-outline"
             size={18}
-            color={
-              activeFilter === "date"
-                ? COLORS.primary
-                : dark
-                  ? COLORS.gray2
-                  : COLORS.gray3
-            }
+            color={activeFilter === "date" ? COLORS.primary : COLORS.gray3}
           />
           <Text
             style={[
               styles.filterTypeButtonText,
               {
-                color:
-                  activeFilter === "date"
-                    ? COLORS.primary
-                    : dark
-                      ? COLORS.gray2
-                      : COLORS.gray3,
+                color: activeFilter === "date" ? COLORS.primary : COLORS.gray3,
               },
             ]}
           >
@@ -392,9 +362,7 @@ const Transactions = () => {
               style={[
                 styles.dateRangeButton,
                 {
-                  backgroundColor: dark
-                    ? "rgba(255, 255, 255, 0.1)"
-                    : "rgba(0, 0, 0, 0.05)",
+                  backgroundColor: "rgba(0, 0, 0, 0.05)",
                 },
               ]}
               onPress={showCalendar}
@@ -446,9 +414,7 @@ const Transactions = () => {
                   {
                     backgroundColor: isActive
                       ? "rgba(255, 142, 105, 0.1)"
-                      : dark
-                        ? "rgba(255, 255, 255, 0.05)"
-                        : "rgba(0, 0, 0, 0.03)",
+                      : "rgba(0, 0, 0, 0.03)",
                     borderColor: isActive ? COLORS.primary : "transparent",
                   },
                 ]}
@@ -467,11 +433,7 @@ const Transactions = () => {
                   style={[
                     styles.filterOptionText,
                     {
-                      color: isActive
-                        ? COLORS.primary
-                        : dark
-                          ? COLORS.gray2
-                          : COLORS.gray3,
+                      color: isActive ? COLORS.primary : COLORS.gray3,
                     },
                   ]}
                 >
@@ -516,10 +478,7 @@ const Transactions = () => {
               <View style={styles.transactionHeader}>
                 <View style={styles.transactionInfo}>
                   <Text
-                    style={[
-                      styles.transactionName,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
+                    style={[styles.transactionName, { color: COLORS.black }]}
                   >
                     {item.name}
                   </Text>
@@ -575,7 +534,7 @@ const Transactions = () => {
                     <Ionicons
                       name="receipt-outline"
                       size={16}
-                      color={dark ? COLORS.white : COLORS.black}
+                      color={COLORS.black}
                     />
                   </TouchableOpacity>
 
@@ -609,34 +568,18 @@ const Transactions = () => {
         style={[
           styles.emptyIconContainer,
           {
-            backgroundColor: dark
-              ? "rgba(255,255,255,0.05)"
-              : "rgba(0,0,0,0.03)",
+            backgroundColor: "rgba(0,0,0,0.03)",
           },
         ]}
       >
-        <Ionicons
-          name="receipt-outline"
-          size={64}
-          color={dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.2)"}
-        />
+        <Ionicons name="receipt-outline" size={64} color="rgba(0,0,0,0.2)" />
       </View>
 
-      <Text
-        style={[
-          styles.emptyTitle,
-          { color: dark ? COLORS.white : COLORS.black },
-        ]}
-      >
+      <Text style={[styles.emptyTitle, { color: COLORS.black }]}>
         Aucune transaction
       </Text>
 
-      <Text
-        style={[
-          styles.emptyDescription,
-          { color: dark ? COLORS.gray2 : COLORS.gray3 },
-        ]}
-      >
+      <Text style={[styles.emptyDescription, { color: COLORS.gray3 }]}>
         Les transactions apparaîtront ici lorsque vous en effectuerez
       </Text>
     </MotiView>
@@ -648,7 +591,7 @@ const Transactions = () => {
         styles.undoNotification,
         {
           opacity: undoNotificationOpacity,
-          backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+          backgroundColor: COLORS.white,
           transform: [
             {
               translateY: undoNotificationOpacity.interpolate({
@@ -668,10 +611,7 @@ const Transactions = () => {
           style={styles.undoNotificationIcon}
         />
         <Text
-          style={[
-            styles.undoNotificationText,
-            { color: dark ? COLORS.white : COLORS.greyscale900 },
-          ]}
+          style={[styles.undoNotificationText, { color: COLORS.greyscale900 }]}
         >
           Transaction supprimée
         </Text>
@@ -684,12 +624,7 @@ const Transactions = () => {
   );
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark1 : "#F8F9FA" },
-      ]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: "#F8F9FA" }]}>
       <Header
         title="Transactions"
         subtitle={`${filteredTransactions.length} transactions`}
@@ -733,7 +668,7 @@ const Transactions = () => {
         visible={isCalendarVisible}
         onClose={() => setIsCalendarVisible(false)}
         onSelectDateRange={handleDateRangeSelect}
-        dark={dark}
+        dark={false}
       />
 
       {showUndoNotification && renderUndoNotification()}

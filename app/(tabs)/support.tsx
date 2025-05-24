@@ -13,7 +13,7 @@ import { SIZES, icons, COLORS } from "@/constants";
 
 const Support = () => {
   const refRBSheet = useRef<any>(null);
-  const { dark, colors } = useTheme();
+  const { colors } = useTheme();
   const navigation = useNavigation<NavigationProp<any>>();
 
   const renderHeader = () => (
@@ -23,10 +23,7 @@ const Support = () => {
           <Image
             source={icons.notificationBell2}
             resizeMode="contain"
-            style={[
-              styles.bellIcon,
-              { tintColor: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
+            style={[styles.bellIcon, { tintColor: COLORS.greyscale900 }]}
           />
         </TouchableOpacity>
       </View>
@@ -47,14 +44,14 @@ const Support = () => {
             backgroundColor: "rgba(0,0,0,0.5)",
           },
           draggableIcon: {
-            backgroundColor: dark ? COLORS.gray2 : COLORS.grayscale200,
+            backgroundColor: COLORS.grayscale200,
             height: 4,
           },
           container: {
             borderTopRightRadius: 32,
             borderTopLeftRadius: 32,
             height: 240,
-            backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+            backgroundColor: COLORS.white,
           },
         }}
       >
@@ -63,7 +60,7 @@ const Support = () => {
           style={[
             styles.separateLine,
             {
-              backgroundColor: dark ? COLORS.greyScale800 : COLORS.grayscale200,
+              backgroundColor: COLORS.grayscale200,
             },
           ]}
         />
@@ -71,7 +68,7 @@ const Support = () => {
           style={[
             styles.bottomSubtitle,
             {
-              color: dark ? COLORS.white : COLORS.black,
+              color: COLORS.black,
             },
           ]}
         >
@@ -82,11 +79,11 @@ const Support = () => {
             title="Cancel"
             style={{
               width: (SIZES.width - 32) / 2 - 8,
-              backgroundColor: dark ? COLORS.dark3 : COLORS.tansparentPrimary,
+              backgroundColor: COLORS.tansparentPrimary,
               borderRadius: 32,
-              borderColor: dark ? COLORS.dark3 : COLORS.tansparentPrimary,
+              borderColor: COLORS.tansparentPrimary,
             }}
-            textColor={dark ? COLORS.white : COLORS.primary}
+            textColor={COLORS.primary}
             onPress={() => refRBSheet.current.close()}
           />
           <Button

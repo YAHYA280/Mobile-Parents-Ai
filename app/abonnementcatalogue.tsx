@@ -76,14 +76,15 @@ const AbonnementCatalogue: React.FC = () => {
             setActiveSlide(currentPlanIndex);
           }
         }
-      } catch (error) {
-        console.log("No active subscription found");
+      } catch (subscriptionError) {
+        console.log("No active subscription found", subscriptionError);
       }
 
       setCatalogues(data);
       setError(null);
-    } catch (err) {
+    } catch (fetchError) {
       setError("Échec du chargement des plans. Veuillez réessayer plus tard.");
+      console.error("Error fetching catalogues:", fetchError);
     } finally {
       setLoading(false);
     }
@@ -285,8 +286,8 @@ const AbonnementCatalogue: React.FC = () => {
             </View>
             <Text style={styles.headerTitle}>Choisissez votre plan</Text>
             <Text style={styles.headerSubtitle}>
-              Sélectionnez le meilleur plan d'assistance aux devoirs pour votre
-              enfant
+              Sélectionnez le meilleur plan d&apos;assistance aux devoirs pour
+              votre enfant
             </Text>
           </MotiView>
 

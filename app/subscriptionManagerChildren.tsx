@@ -26,7 +26,6 @@ import {
 } from "react-native";
 
 import { COLORS } from "../constants/theme";
-import { useTheme } from "../theme/ThemeProvider";
 
 // Structure pour une matière
 export type ISubject = {
@@ -75,7 +74,6 @@ interface SubscriptionManagerProps {
 }
 
 const SubscriptionManagerChildren: React.FC<SubscriptionManagerProps> = () => {
-  const { dark } = useTheme();
   const navigation = useNavigation<NavigationProp<any>>();
   const [subscription] = useState(MOCK_SUBSCRIPTION);
   const [children, setChildren] = useState<IChild[]>(MOCK_CHILDREN);
@@ -244,12 +242,7 @@ const SubscriptionManagerChildren: React.FC<SubscriptionManagerProps> = () => {
   }, [remainingSubjectsToAllocate, performSave]);
 
   return (
-    <SafeAreaView
-      style={[
-        styles.area,
-        { backgroundColor: dark ? COLORS.black : COLORS.white },
-      ]}
-    >
+    <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -261,20 +254,10 @@ const SubscriptionManagerChildren: React.FC<SubscriptionManagerProps> = () => {
             </View>
 
             <View style={styles.infoRow}>
-              <Text
-                style={[
-                  styles.infoText,
-                  { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-                ]}
-              >
+              <Text style={[styles.infoText, { color: COLORS.gray }]}>
                 Enfants: {children.length}/{subscription.nbr_children_access}
               </Text>
-              <Text
-                style={[
-                  styles.infoText,
-                  { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-                ]}
-              >
+              <Text style={[styles.infoText, { color: COLORS.gray }]}>
                 Matières: {totalSubjectsSelected}/{subscription.nbr_subjects}
               </Text>
               {remainingSubjectsToAllocate > 0 && (
@@ -284,12 +267,7 @@ const SubscriptionManagerChildren: React.FC<SubscriptionManagerProps> = () => {
               )}
             </View>
 
-            <Text
-              style={[
-                styles.childrenTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.childrenTitle, { color: COLORS.black }]}>
               Mes enfants
             </Text>
 
@@ -347,33 +325,23 @@ const SubscriptionManagerChildren: React.FC<SubscriptionManagerProps> = () => {
                 <View
                   style={[
                     styles.modalContent,
-                    { backgroundColor: dark ? COLORS.dark1 : COLORS.white },
+                    { backgroundColor: COLORS.white },
                   ]}
                 >
                   <View style={styles.modalHeader}>
-                    <Text
-                      style={[
-                        styles.modalTitle,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.modalTitle, { color: COLORS.black }]}>
                       Matières de {currentChild?.name}
                     </Text>
                     <TouchableOpacity onPress={() => setModalVisible(false)}>
                       <FontAwesomeIcon
                         icon={faTimes}
                         size={20}
-                        color={dark ? COLORS.white : COLORS.black}
+                        color={COLORS.black}
                       />
                     </TouchableOpacity>
                   </View>
 
-                  <Text
-                    style={[
-                      styles.modalSubtitle,
-                      { color: dark ? COLORS.secondaryWhite : COLORS.gray },
-                    ]}
-                  >
+                  <Text style={[styles.modalSubtitle, { color: COLORS.gray }]}>
                     Sélectionnez des matières pour {currentChild?.name}
                     {remainingSubjectsToAllocate > 0 && (
                       <Text style={{ color: "#FFA500" }}>
@@ -394,9 +362,7 @@ const SubscriptionManagerChildren: React.FC<SubscriptionManagerProps> = () => {
                           {
                             backgroundColor: item.isSelected
                               ? "rgba(36, 210, 109, 0.1)"
-                              : dark
-                                ? COLORS.dark2
-                                : COLORS.greyScale100,
+                              : COLORS.greyScale100,
                             borderColor: item.isSelected
                               ? "#24D26D"
                               : "transparent",
@@ -408,18 +374,12 @@ const SubscriptionManagerChildren: React.FC<SubscriptionManagerProps> = () => {
                           <FontAwesomeIcon
                             icon={faBook}
                             size={16}
-                            color={
-                              item.isSelected
-                                ? "#24D26D"
-                                : dark
-                                  ? COLORS.white
-                                  : COLORS.gray
-                            }
+                            color={item.isSelected ? "#24D26D" : COLORS.gray}
                           />
                           <Text
                             style={[
                               styles.subjectItemText,
-                              { color: dark ? COLORS.white : COLORS.black },
+                              { color: COLORS.black },
                             ]}
                           >
                             {item.name}
@@ -443,9 +403,7 @@ const SubscriptionManagerChildren: React.FC<SubscriptionManagerProps> = () => {
                       style={[
                         styles.cancelButton,
                         {
-                          borderColor: dark
-                            ? "rgba(255,255,255,0.2)"
-                            : "rgba(0,0,0,0.1)",
+                          borderColor: "rgba(0,0,0,0.1)",
                         },
                       ]}
                       onPress={() => setModalVisible(false)}
@@ -453,7 +411,7 @@ const SubscriptionManagerChildren: React.FC<SubscriptionManagerProps> = () => {
                       <Text
                         style={[
                           styles.cancelButtonText,
-                          { color: dark ? COLORS.white : COLORS.black },
+                          { color: COLORS.black },
                         ]}
                       >
                         Annuler

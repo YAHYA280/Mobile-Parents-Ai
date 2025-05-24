@@ -10,7 +10,6 @@ import {
   StatusBar,
   StyleSheet,
   ScrollView,
-  Dimensions,
 } from "react-native";
 
 import type { CalendarDay } from "@/components/aicalendar/CalendarGrid";
@@ -29,11 +28,9 @@ import MonthNavigation from "@/components/aicalendar/MonthNavigation";
 import RecommendationCard from "@/components/aicalendar/RecommendationCard";
 import RecommendationDetailSheet from "@/components/aicalendar/RecommendationDetailSheet";
 
-const { width } = Dimensions.get("window");
-
 const AICalendar = () => {
   const navigation = useNavigation();
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const [selectedDate, setSelectedDate] = useState<number>(
     new Date().getDate()
   );
@@ -156,8 +153,7 @@ const AICalendar = () => {
 
     const days: CalendarDay[] = [];
 
-    // Add empty cells for days before month starts
-    for (let i = 0; i < firstDayOfMonth; i++) {
+    for (let i = 0; i < firstDayOfMonth; i += 1) {
       days.push({
         date: 0,
         isToday: false,
@@ -168,7 +164,7 @@ const AICalendar = () => {
     }
 
     // Add actual days
-    for (let date = 1; date <= daysInMonth; date++) {
+    for (let date = 1; date <= daysInMonth; date += 1) {
       const recommendations = generateAIRecommendations(date);
       days.push({
         date,
@@ -181,7 +177,6 @@ const AICalendar = () => {
         recommendations,
       });
     }
-
     return days;
   };
 
@@ -231,7 +226,7 @@ const AICalendar = () => {
   return (
     <>
       <StatusBar
-        barStyle={dark ? "light-content" : "dark-content"}
+        barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
@@ -290,7 +285,7 @@ const AICalendar = () => {
                   <Text
                     style={[
                       styles.recommendationsTitle,
-                      { color: dark ? COLORS.white : COLORS.black },
+                      { color: COLORS.black },
                     ]}
                   >
                     Suggestions IA pour le {selectedDate}{" "}

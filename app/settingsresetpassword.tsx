@@ -47,7 +47,7 @@ const CreateNewPassword = () => {
   const [error, setError] = useState(null);
   const [isChecked, setChecked] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
@@ -81,7 +81,7 @@ const CreateNewPassword = () => {
             style={[
               styles.modalContent,
               {
-                backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+                backgroundColor: COLORS.white,
               },
             ]}
           >
@@ -104,7 +104,7 @@ const CreateNewPassword = () => {
               style={[
                 styles.modalDescription,
                 {
-                  color: dark ? COLORS.greyscale500 : COLORS.greyscale600,
+                  color: COLORS.greyscale600,
                 },
               ]}
             >
@@ -156,28 +156,18 @@ const CreateNewPassword = () => {
         <View style={styles.contentContainer}>
           <View style={styles.illustrationContainer}>
             <Image
-              source={dark ? illustrations.successDark : illustrations.success}
+              source={illustrations.success}
               style={styles.illustration}
               resizeMode="contain"
             />
           </View>
 
           <View style={styles.formContainer}>
-            <Text
-              style={[
-                styles.title,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.title, { color: COLORS.black }]}>
               Créez votre nouveau mot de passe
             </Text>
 
-            <Text
-              style={[
-                styles.subtitle,
-                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-              ]}
-            >
+            <Text style={[styles.subtitle, { color: COLORS.greyscale600 }]}>
               Votre mot de passe doit contenir au moins 8 caractères, incluant
               des majuscules et des chiffres
             </Text>
@@ -189,9 +179,7 @@ const CreateNewPassword = () => {
                 autoCapitalize="none"
                 id="newPassword"
                 placeholder="Nouveau mot de passe"
-                placeholderTextColor={
-                  dark ? COLORS.grayTie : COLORS.grayscale400
-                }
+                placeholderTextColor={COLORS.grayscale400}
                 icon={icons.padlock}
                 secureTextEntry
               />
@@ -202,9 +190,7 @@ const CreateNewPassword = () => {
                 autoCapitalize="none"
                 id="confirmNewPassword"
                 placeholder="Confirmer le nouveau mot de passe"
-                placeholderTextColor={
-                  dark ? COLORS.grayTie : COLORS.grayscale400
-                }
+                placeholderTextColor={COLORS.grayscale400}
                 icon={icons.padlock}
                 secureTextEntry
               />
@@ -222,21 +208,14 @@ const CreateNewPassword = () => {
                     {
                       borderColor: isChecked
                         ? COLORS.primary
-                        : dark
-                          ? COLORS.greyscale500
-                          : COLORS.grayscale400,
+                        : COLORS.grayscale400,
                     },
                   ]}
                   value={isChecked}
                   color={isChecked ? COLORS.primary : undefined}
                   onValueChange={setChecked}
                 />
-                <Text
-                  style={[
-                    styles.checkboxLabel,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
+                <Text style={[styles.checkboxLabel, { color: COLORS.black }]}>
                   Se souvenir de moi
                 </Text>
               </TouchableOpacity>
@@ -253,7 +232,7 @@ const CreateNewPassword = () => {
                 color={COLORS.primary}
                 style={styles.helpIcon}
               />
-              <Text style={styles.helpLink}>Besoin d'aide?</Text>
+              <Text style={styles.helpLink}>Besoin d&apos;aide?</Text>
             </TouchableOpacity>
           </View>
         </View>

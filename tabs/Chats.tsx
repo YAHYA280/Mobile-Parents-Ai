@@ -14,7 +14,6 @@ import {
 
 import { messsagesData } from "../data";
 import { SIZES, COLORS } from "../constants";
-import { useTheme } from "../theme/ThemeProvider";
 
 // Define the type for message item
 interface MessageItem {
@@ -32,7 +31,6 @@ type NavigationProp = NativeStackNavigationProp<any, any>;
 
 const Chats: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { colors, dark } = useTheme();
 
   const renderItem = ({
     item,
@@ -51,13 +49,13 @@ const Chats: React.FC = () => {
       style={[
         styles.userContainer,
         {
-          borderBottomWidth: dark ? 0 : 1,
+          borderBottomWidth: 1,
         },
         index % 2 !== 0
           ? {
-              backgroundColor: dark ? COLORS.dark1 : COLORS.tertiaryWhite,
-              borderBottomWidth: dark ? 0 : 1,
-              borderTopWidth: dark ? 0 : 0,
+              backgroundColor: COLORS.tertiaryWhite,
+              borderBottomWidth: 1,
+              borderTopWidth: 0,
             }
           : null,
       ]}
@@ -79,7 +77,7 @@ const Chats: React.FC = () => {
             style={[
               styles.userName,
               {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               },
             ]}
           >
@@ -98,7 +96,7 @@ const Chats: React.FC = () => {
             style={[
               styles.lastMessageTime,
               {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               },
             ]}
           >

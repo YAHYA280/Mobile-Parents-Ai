@@ -1,7 +1,4 @@
-import type {
-  ViewStyle,
-  TextStyle,
-  ColorValue} from "react-native";
+import type { ViewStyle, TextStyle, ColorValue } from "react-native";
 
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,15 +7,10 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 
-import {
-  RADIUS,
-  SHADOWS,
-  COLOORS,
-  TYPOGRAPHY,
-} from "@/constants/theme";
+import { RADIUS, SHADOWS, COLOORS, TYPOGRAPHY } from "@/constants/theme";
 
 type GradientTuple = readonly [ColorValue, ColorValue, ...ColorValue[]];
 

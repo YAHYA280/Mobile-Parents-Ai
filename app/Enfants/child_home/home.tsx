@@ -14,7 +14,6 @@ import {
 import type { Child } from "../../../data/Enfants/CHILDREN_DATA";
 
 import { COLORS } from "../../../constants/theme";
-import { useTheme } from "../../../theme/ThemeProvider";
 import { useActivityFilters } from "./activityFilters1";
 import enfantsStyles from "../../../styles/EnfantsStyles";
 import CHILDREN_DATA, {
@@ -48,8 +47,6 @@ const ChildHome = () => {
   const [childData, setChildData] = useState<Child | null>(null);
   const [showDashboard, setShowDashboard] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
-  const [activeFilter, setActiveFilter] = useState("semaine");
-  const { dark, colors } = useTheme();
 
   const [dateRange, setDateRange] = useState<DateRange>({
     startDate: null,
@@ -270,10 +267,7 @@ const ChildHome = () => {
               style={{ marginRight: 8 }}
             />
             <Text
-              style={[
-                enfantsStyles.childName,
-                { color: dark ? COLORS.secondaryWhite : COLORS.greyscale900 },
-              ]}
+              style={[enfantsStyles.childName, { color: COLORS.greyscale900 }]}
             >
               {childData.name}
             </Text>

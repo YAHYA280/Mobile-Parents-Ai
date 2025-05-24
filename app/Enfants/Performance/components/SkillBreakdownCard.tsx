@@ -20,8 +20,7 @@ interface SkillData {
 const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
   childData,
 }) => {
-  const [skills, setSkills] = useState<SkillData[]>([]);
-  const [animation] = useState(new Animated.Value(0));
+  const [skillsData, setSkillsData] = useState<SkillData[]>([]); // Renamed to avoid shadowing
   const animatedScale = useRef(new Animated.Value(0)).current;
 
   const windowWidth = Dimensions.get("window").width;
@@ -40,7 +39,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
       { name: "Créativité", value: 83, color: "#E91E63" },
     ];
 
-    setSkills(mockSkills);
+    setSkillsData(mockSkills);
 
     // Start animation
     Animated.timing(animatedScale, {
@@ -48,7 +47,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
       duration: 1000,
       useNativeDriver: true,
     }).start();
-  }, []); // Remove childData dependency to ensure data is always shown
+  }, [animatedScale]); // Include animatedScale in dependencies
 
   // Calculate points for the radar chart
   const getPolygonPoints = (skills: SkillData[]): string => {
@@ -68,10 +67,14 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
   // Generate grid lines for the radar background
   const generateGridLines = () => {
     const levels = 4;
-    const result = [];
+    const result: React.JSX.Element[] = [];
 
-    // Add concentric circles
-    for (let i = 1; i <= levels; i++) {
+    // Add concentric circles - Fixed: Replace for loop with Array.from
+    const levelIndices = Array.from(
+      { length: levels },
+      (_, index) => index + 1
+    );
+    levelIndices.forEach((i) => {
       const levelRadius = (radius * i) / levels;
       result.push(
         <Circle
@@ -84,12 +87,16 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
           strokeWidth={1}
         />
       );
-    }
+    });
 
-    // Add lines from center to each skill point
-    if (skills.length > 0) {
-      for (let i = 0; i < skills.length; i++) {
-        const angle = (Math.PI * 2 * i) / skills.length - Math.PI / 2;
+    // Add lines from center to each skill point - Fixed: Replace for loop with Array.from
+    if (skillsData.length > 0) {
+      const skillIndices = Array.from(
+        { length: skillsData.length },
+        (_, index) => index
+      );
+      skillIndices.forEach((i) => {
+        const angle = (Math.PI * 2 * i) / skillsData.length - Math.PI / 2;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
 
@@ -106,7 +113,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
         );
 
         // Add labels
-        const skill = skills[i];
+        const skill = skillsData[i];
         const labelRadius = radius + 20;
         const labelX = centerX + labelRadius * Math.cos(angle);
         const labelY = centerY + labelRadius * Math.sin(angle);
@@ -129,7 +136,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
             {skill.name}
           </SvgText>
         );
-      }
+      });
     }
 
     return result;
@@ -154,7 +161,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
           {generateGridLines()}
 
           {/* Data polygon */}
-          {skills.length > 0 && (
+          {skillsData.length > 0 && (
             <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
               <Svg
                 width={chartSize}
@@ -163,7 +170,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
                 style={{ position: "absolute" }}
               >
                 <Polygon
-                  points={getPolygonPoints(skills)}
+                  points={getPolygonPoints(skillsData)}
                   fill="rgba(156, 39, 176, 0.3)"
                   stroke="#9C27B0"
                   strokeWidth={2}
@@ -175,7 +182,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
       </View>
 
       <View style={styles.skillLegend}>
-        {skills.map((skill, index) => (
+        {skillsData.map((skill, index) => (
           <View key={index} style={styles.skillItem}>
             <View style={[styles.colorDot, { backgroundColor: skill.color }]} />
             <Text style={styles.skillName}>{skill.name}</Text>
@@ -186,7 +193,7 @@ const SkillBreakdownCard: React.FC<SkillBreakdownCardProps> = ({
 
       <View style={styles.strengthsContainer}>
         <Text style={styles.strengthsTitle}>Points forts:</Text>
-        {skills
+        {skillsData
           .filter((skill) => skill.value >= 80)
           .map((skill, index) => (
             <View key={index} style={styles.strengthItem}>

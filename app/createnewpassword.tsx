@@ -45,7 +45,7 @@ const CreateNewPassword = () => {
   const [error, setError] = useState(null);
   const [isChecked, setChecked] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
@@ -74,7 +74,7 @@ const CreateNewPassword = () => {
             style={[
               styles.modalSubContainer,
               {
-                backgroundColor: dark ? COLORS.dark2 : COLORS.secondaryWhite,
+                backgroundColor: COLORS.secondaryWhite,
               },
             ]}
           >
@@ -88,7 +88,7 @@ const CreateNewPassword = () => {
               style={[
                 styles.modalSubtitle,
                 {
-                  color: dark ? COLORS.greyscale300 : COLORS.greyscale600,
+                  color: COLORS.greyscale600,
                 },
               ]}
             >
@@ -119,17 +119,12 @@ const CreateNewPassword = () => {
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.logoContainer}>
             <Image
-              source={dark ? illustrations.successDark : illustrations.success}
+              source={illustrations.success}
               resizeMode="contain"
               style={styles.success}
             />
           </View>
-          <Text
-            style={[
-              styles.title,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.title, { color: COLORS.black }]}>
             Créez votre nouveau mot de passe
           </Text>
           <Input
@@ -138,7 +133,7 @@ const CreateNewPassword = () => {
             autoCapitalize="none"
             id="newPassword"
             placeholder="Nouveau mot de passe"
-            placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
+            placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry
           />
@@ -148,7 +143,7 @@ const CreateNewPassword = () => {
             autoCapitalize="none"
             id="confirmNewPassword"
             placeholder="Confirmer le nouveau mot de passe"
-            placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
+            placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry
           />
@@ -157,9 +152,7 @@ const CreateNewPassword = () => {
               <Checkbox
                 style={styles.checkbox}
                 value={isChecked}
-                color={
-                  isChecked ? COLORS.primary : dark ? COLORS.primary : "gray"
-                }
+                color={isChecked ? COLORS.primary : "gray"}
                 onValueChange={setChecked}
               />
               <View style={{ flex: 1 }}>
@@ -167,7 +160,7 @@ const CreateNewPassword = () => {
                   style={[
                     styles.privacy,
                     {
-                      color: dark ? COLORS.white : COLORS.black,
+                      color: COLORS.black,
                     },
                   ]}
                 >

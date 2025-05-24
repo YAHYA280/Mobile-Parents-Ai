@@ -8,13 +8,11 @@ import type { Device } from "../../types/security";
 import { COLORS } from "../../constants";
 
 interface ConnectedDevicesSectionProps {
-  dark: boolean;
   isOpen: boolean;
   devices?: Device[];
 }
 
 const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
-  dark,
   isOpen,
   devices = [],
 }) => {
@@ -69,10 +67,7 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
       {devices.map((device) => (
         <TouchableOpacity
           key={device.id}
-          style={[
-            styles.deviceItem,
-            { backgroundColor: dark ? COLORS.dark3 : "#F8F9FA" },
-          ]}
+          style={[styles.deviceItem, { backgroundColor: "#F8F9FA" }]}
           onPress={() => handleDevicePress(device)}
           activeOpacity={0.7}
         >
@@ -90,20 +85,10 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
               />
             </View>
             <View style={styles.deviceInfo}>
-              <Text
-                style={[
-                  styles.deviceName,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.deviceName, { color: COLORS.black }]}>
                 {device.name}
               </Text>
-              <Text
-                style={[
-                  styles.deviceDate,
-                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-                ]}
-              >
+              <Text style={[styles.deviceDate, { color: COLORS.greyscale600 }]}>
                 {device.connectionDate}
               </Text>
             </View>
@@ -113,11 +98,7 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
             style={[
               styles.deviceStatus,
               {
-                backgroundColor: device.isActive
-                  ? "#4CAF5020"
-                  : dark
-                    ? COLORS.dark2
-                    : "#EEEEEE",
+                backgroundColor: device.isActive ? "#4CAF5020" : "#EEEEEE",
               },
             ]}
           >
@@ -125,11 +106,7 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
               style={[
                 styles.deviceStatusText,
                 {
-                  color: device.isActive
-                    ? "#4CAF50"
-                    : dark
-                      ? COLORS.greyscale500
-                      : COLORS.greyscale600,
+                  color: device.isActive ? "#4CAF50" : COLORS.greyscale600,
                 },
               ]}
             >
@@ -149,14 +126,14 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
             backgroundColor: "rgba(0,0,0,0.5)",
           },
           draggableIcon: {
-            backgroundColor: dark ? COLORS.greyscale500 : COLORS.grayscale400,
+            backgroundColor: COLORS.grayscale400,
             width: 40,
             height: 5,
           },
           container: {
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
-            backgroundColor: dark ? COLORS.dark1 : COLORS.white,
+            backgroundColor: COLORS.white,
             padding: 16,
             paddingBottom: 32,
           },
@@ -180,19 +157,14 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
                 />
               </View>
 
-              <Text
-                style={[
-                  styles.deviceSheetTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.deviceSheetTitle, { color: COLORS.black }]}>
                 {selectedDevice.name}
               </Text>
 
               <Text
                 style={[
                   styles.deviceSheetSubtitle,
-                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                  { color: COLORS.greyscale600 },
                 ]}
               >
                 Dernière activité: {selectedDevice.lastActivity}
@@ -204,16 +176,13 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
                 <Text
                   style={[
                     styles.deviceDetailLabel,
-                    { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                    { color: COLORS.greyscale600 },
                   ]}
                 >
                   Date de connexion
                 </Text>
                 <Text
-                  style={[
-                    styles.deviceDetailValue,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
+                  style={[styles.deviceDetailValue, { color: COLORS.black }]}
                 >
                   {selectedDevice.connectionDate}
                 </Text>
@@ -223,17 +192,14 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
                 <Text
                   style={[
                     styles.deviceDetailLabel,
-                    { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                    { color: COLORS.greyscale600 },
                   ]}
                 >
                   Statut
                 </Text>
                 <View style={styles.deviceStatusToggle}>
                   <Text
-                    style={[
-                      styles.deviceStatusLabel,
-                      { color: dark ? COLORS.white : COLORS.black },
-                    ]}
+                    style={[styles.deviceStatusLabel, { color: COLORS.black }]}
                   >
                     {selectedDevice.isActive ? "Actif" : "Inactif"}
                   </Text>
@@ -243,7 +209,7 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
                       console.log(`Device status changed to: ${value}`)
                     }
                     trackColor={{
-                      false: dark ? COLORS.dark3 : "#EEEEEE",
+                      false: "#EEEEEE",
                       true: COLORS.primary,
                     }}
                     thumbColor={COLORS.white}
@@ -254,10 +220,7 @@ const ConnectedDevicesSection: React.FC<ConnectedDevicesSectionProps> = ({
 
             <View style={styles.actionButtonContainer}>
               <TouchableOpacity
-                style={[
-                  styles.logoutButton,
-                  { backgroundColor: dark ? COLORS.dark3 : "#FFE5E5" },
-                ]}
+                style={[styles.logoutButton, { backgroundColor: "#FFE5E5" }]}
                 onPress={() => handleLogout(selectedDevice.id)}
                 activeOpacity={0.7}
               >

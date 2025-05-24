@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import { useTheme } from "@/theme/ThemeProvider";
 import {
   COLORS,
   RADIUS,
@@ -44,30 +43,30 @@ const Alert: React.FC<AlertProps> = ({
   buttons,
   onDismiss,
 }) => {
-  const { dark } = useTheme();
-
   const getAlertIcon = () => {
     if (title.toLowerCase().includes("erreur")) {
       return "alert-circle";
-    } if (title.toLowerCase().includes("annuler")) {
+    }
+    if (title.toLowerCase().includes("annuler")) {
       return "help-circle";
-    } if (title.toLowerCase().includes("succès")) {
+    }
+    if (title.toLowerCase().includes("succès")) {
       return "checkmark-circle";
-    } 
-      return "information-circle";
-    
+    }
+    return "information-circle";
   };
 
   const getAlertIconColor = () => {
     if (title.toLowerCase().includes("erreur")) {
       return COLOORS.status.expired.main;
-    } if (title.toLowerCase().includes("annuler")) {
+    }
+    if (title.toLowerCase().includes("annuler")) {
       return COLOORS.status.suspended.main;
-    } if (title.toLowerCase().includes("succès")) {
+    }
+    if (title.toLowerCase().includes("succès")) {
       return COLOORS.status.active.main;
-    } 
-      return COLOORS.primary.main;
-    
+    }
+    return COLOORS.primary.main;
   };
 
   const getButtonStyle = (buttonStyle?: AlertButtonStyle) => {
@@ -75,18 +74,16 @@ const Alert: React.FC<AlertProps> = ({
       case "destructive":
         return {
           container: {
-            backgroundColor: dark ? "#2A1215" : COLOORS.status.expired.light,
+            backgroundColor: COLOORS.status.expired.light,
           },
           text: { color: COLOORS.status.expired.main },
         };
       case "cancel":
         return {
           container: {
-            backgroundColor: dark
-              ? COLOORS.dark3
-              : COLOORS.surfaceVariant.light,
+            backgroundColor: COLOORS.surfaceVariant.light,
           },
-          text: { color: dark ? COLOORS.white : COLOORS.gray3 },
+          text: { color: COLOORS.gray3 },
         };
       default:
         return {
@@ -110,7 +107,7 @@ const Alert: React.FC<AlertProps> = ({
           style={[
             styles.alertContainer,
             {
-              backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+              backgroundColor: COLORS.white,
             },
           ]}
           from={{ opacity: 0, scale: 0.9 }}
@@ -125,21 +122,11 @@ const Alert: React.FC<AlertProps> = ({
             />
           </View>
 
-          <Text
-            style={[
-              styles.alertTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.alertTitle, { color: COLORS.black }]}>
             {title}
           </Text>
 
-          <Text
-            style={[
-              styles.alertMessage,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.alertMessage, { color: COLORS.black }]}>
             {message}
           </Text>
 

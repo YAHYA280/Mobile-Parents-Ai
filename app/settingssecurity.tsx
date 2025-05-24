@@ -90,7 +90,7 @@ type SectionType =
 
 // Main component
 const SettingsSecurity = () => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const navigation = useNavigation();
 
   const [openSections, setOpenSections] = useState<
@@ -139,18 +139,13 @@ const SettingsSecurity = () => {
             <Ionicons name="shield-checkmark" size={24} color="#FFFFFF" />
           </LinearGradient>
           <View style={styles.pageHeaderTextContainer}>
-            <Text
-              style={[
-                styles.pageHeaderTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.pageHeaderTitle, { color: COLORS.black }]}>
               Paramètres de sécurité
             </Text>
             <Text
               style={[
                 styles.pageHeaderSubtitle,
-                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                { color: COLORS.greyscale600 },
               ]}
             >
               Gérez les appareils, mots de passe et moyens de paiement
@@ -163,12 +158,10 @@ const SettingsSecurity = () => {
           <SecuritySectionCard
             title="Appareils connectés"
             icon="hardware-chip"
-            dark={dark}
             isOpen={openSections.devices}
             onToggle={() => toggleSection("devices")}
           />
           <ConnectedDevicesSection
-            dark={dark}
             isOpen={openSections.devices}
             devices={mockDevices}
           />
@@ -177,38 +170,28 @@ const SettingsSecurity = () => {
           <SecuritySectionCard
             title="Modifier mot de passe"
             icon="key"
-            dark={dark}
             isOpen={openSections.changePassword}
             onToggle={() => toggleSection("changePassword")}
           />
-          <ChangePasswordSection
-            dark={dark}
-            isOpen={openSections.changePassword}
-          />
+          <ChangePasswordSection isOpen={openSections.changePassword} />
 
           {/* Reset Password Section */}
           <SecuritySectionCard
             title="Réinitialiser mot de passe"
             icon="refresh-circle"
-            dark={dark}
             isOpen={openSections.resetPassword}
             onToggle={() => toggleSection("resetPassword")}
           />
-          <ResetPasswordSection
-            dark={dark}
-            isOpen={openSections.resetPassword}
-          />
+          <ResetPasswordSection isOpen={openSections.resetPassword} />
 
           {/* Payment Methods Section */}
           <SecuritySectionCard
             title="Mes cartes"
             icon="card"
-            dark={dark}
             isOpen={openSections.paymentMode}
             onToggle={() => toggleSection("paymentMode")}
           />
           <PaymentMethodsSection
-            dark={dark}
             isOpen={openSections.paymentMode}
             paymentMethods={mockPaymentMethods}
           />
@@ -221,24 +204,16 @@ const SettingsSecurity = () => {
               size={20}
               color={COLORS.primary}
             />
-            <Text
-              style={[
-                styles.securityTipTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.securityTipTitle, { color: COLORS.black }]}>
               Astuce sécurité
             </Text>
           </View>
           <Text
-            style={[
-              styles.securityTipText,
-              { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-            ]}
+            style={[styles.securityTipText, { color: COLORS.greyscale600 }]}
           >
             Pour une meilleure sécurité, changez votre mot de passe
-            régulièrement et utilisez l'authentification à deux facteurs lorsque
-            disponible.
+            régulièrement et utilisez l&apos;authentification à deux facteurs
+            lorsque disponible.
           </Text>
         </View>
       </ScrollView>

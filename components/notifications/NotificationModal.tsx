@@ -28,7 +28,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
   visible,
   onClose,
 }) => {
-  const { dark, colors } = useTheme();
+  const { colors } = useTheme();
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [headerMenuVisible, setHeaderMenuVisible] = useState(false);
@@ -46,18 +46,9 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <TouchableOpacity style={styles.backButton} onPress={onClose}>
-              <Feather
-                name="arrow-left"
-                size={24}
-                color={dark ? COLORS.white : COLORS.black}
-              />
+              <Feather name="arrow-left" size={24} color={COLORS.black} />
             </TouchableOpacity>
-            <Text
-              style={[
-                styles.headerTitle,
-                { color: dark ? COLORS.white : COLORS.black },
-              ]}
-            >
+            <Text style={[styles.headerTitle, { color: COLORS.black }]}>
               Notifications
             </Text>
           </View>

@@ -4,7 +4,6 @@ import { useRouter } from "expo-router"; // Import useRouter instead of useNavig
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
-import { useTheme } from "@/theme/ThemeProvider";
 import {
   RADIUS,
   COLOORS,
@@ -30,7 +29,6 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
     { icon: "shield-outline", title: "Annulation simple" },
   ],
 }) => {
-  const { dark } = useTheme();
   const router = useRouter(); // Use router instead of navigation
 
   const handleComparePlans = () => {
@@ -43,16 +41,14 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
       style={[
         styles.container,
         {
-          backgroundColor: dark ? COLOORS.surface.dark : COLOORS.surface.light,
+          backgroundColor: COLOORS.surface.light,
         },
       ]}
       from={{ opacity: 0, translateY: 20 }}
       animate={{ opacity: 1, translateY: 0 }}
       transition={{ type: "timing", duration: 600, delay: 300 }}
     >
-      <Text
-        style={[styles.title, { color: dark ? COLOORS.white : COLOORS.black }]}
-      >
+      <Text style={[styles.title, { color: COLOORS.black }]}>
         Tous les plans incluent
       </Text>
 
@@ -76,12 +72,7 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
                 color={COLOORS.primary.main}
               />
             </View>
-            <Text
-              style={[
-                styles.benefitText,
-                { color: dark ? COLOORS.white : "#444" },
-              ]}
-            >
+            <Text style={[styles.benefitText, { color: "#444" }]}>
               {benefit.title}
             </Text>
           </MotiView>

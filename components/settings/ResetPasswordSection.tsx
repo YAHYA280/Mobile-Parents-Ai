@@ -17,12 +17,10 @@ type Nav = {
 };
 
 interface ResetPasswordSectionProps {
-  dark: boolean;
   isOpen: boolean;
 }
 
 const ResetPasswordSection: React.FC<ResetPasswordSectionProps> = ({
-  dark,
   isOpen,
 }) => {
   const { navigate } = useNavigation<Nav>();
@@ -41,12 +39,7 @@ const ResetPasswordSection: React.FC<ResetPasswordSectionProps> = ({
 
   return (
     <View style={styles.sectionContent}>
-      <View
-        style={[
-          styles.formContainer,
-          { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
-        ]}
-      >
+      <View style={[styles.formContainer, { backgroundColor: "#FFFFFF" }]}>
         <View style={styles.illustrationContainer}>
           <Ionicons
             name="mail"
@@ -56,18 +49,11 @@ const ResetPasswordSection: React.FC<ResetPasswordSectionProps> = ({
           />
         </View>
 
-        <Text
-          style={[styles.title, { color: dark ? COLORS.white : COLORS.black }]}
-        >
+        <Text style={[styles.title, { color: COLORS.black }]}>
           Réinitialiser votre mot de passe
         </Text>
 
-        <Text
-          style={[
-            styles.formInstructions,
-            { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-          ]}
-        >
+        <Text style={[styles.formInstructions, { color: COLORS.greyscale600 }]}>
           Nous enverrons un code de vérification à votre adresse e-mail
           enregistrée. Utilisez ce code pour réinitialiser votre mot de passe.
         </Text>

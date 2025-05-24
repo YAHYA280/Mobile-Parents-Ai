@@ -11,10 +11,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import { useTheme } from "@/theme/ThemeProvider";
 import { lightenColor } from "@/utils/colorUtils";
 import { formatDuration } from "@/utils/formatUtils";
-import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY } from "@/constants/theme";
+import { RADIUS, SHADOWS, TYPOGRAPHY } from "@/constants/theme";
 
 import FeatureItem from "./FeatureItem";
 
@@ -56,7 +55,6 @@ const PricingCard: React.FC<PricingCardProps> = ({
   features = [],
   loading = false,
 }) => {
-  const { dark } = useTheme();
   const RIBBON_COLOR = "#E53935";
 
   // Make sure we have a valid color to lighten
@@ -147,7 +145,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
           style={[
             styles.planBodySection,
             {
-              backgroundColor: dark ? COLORS.dark2 : "#FFFFFF",
+              backgroundColor: "#FFFFFF",
             },
           ]}
         >

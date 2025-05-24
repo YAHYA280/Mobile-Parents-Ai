@@ -2,7 +2,6 @@ import React from "react";
 import { Image } from "expo-image";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
-import { useTheme } from "../theme/ThemeProvider";
 import { SIZES, icons, COLORS } from "../constants";
 
 interface SettingsItemProps {
@@ -18,8 +17,6 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
   onPress,
   hasArrowRight = true,
 }) => {
-  const { dark } = useTheme();
-
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <View style={styles.leftContainer}>
@@ -29,7 +26,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
           style={[
             styles.icon,
             {
-              tintColor: dark ? COLORS.white : COLORS.greyscale900,
+              tintColor: COLORS.greyscale900,
             },
           ]}
         />
@@ -37,7 +34,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
           style={[
             styles.name,
             {
-              color: dark ? COLORS.white : COLORS.greyscale900,
+              color: COLORS.greyscale900,
             },
           ]}
         >
@@ -51,7 +48,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
           style={[
             styles.arrowRight,
             {
-              tintColor: dark ? COLORS.white : COLORS.greyscale900,
+              tintColor: COLORS.greyscale900,
             },
           ]}
         />

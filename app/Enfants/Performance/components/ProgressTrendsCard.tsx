@@ -101,9 +101,12 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
     const maxScore = Math.max(...data.map((d) => d.score));
     const minScore = Math.min(...data.map((d) => d.score));
     const steps = 4;
-    const labels = [];
+    const labels: React.JSX.Element[] = [];
 
-    for (let i = 0; i <= steps; i++) {
+    // Fixed: Replace for loop with Array.from to avoid unary operator
+    const stepIndices = Array.from({ length: steps + 1 }, (_, index) => index);
+
+    stepIndices.forEach((i) => {
       const value = minScore + (i / steps) * (maxScore - minScore);
       const y = chartHeight - paddingVertical - (i / steps) * innerHeight;
 
@@ -128,7 +131,7 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
           </SvgText>
         </G>
       );
-    }
+    });
 
     return labels;
   };
@@ -184,15 +187,17 @@ const ProgressTrendsCard: React.FC<ProgressTrendsCardProps> = ({
 
     if (growth >= 20) {
       return "Progression exceptionnelle ! Continuez dans cette direction.";
-    } if (growth >= 10) {
+    }
+    if (growth >= 10) {
       return "Bonne progression sur la période. Les efforts portent leurs fruits.";
-    } if (growth >= 0) {
+    }
+    if (growth >= 0) {
       return "Progression stable. Continuez à pratiquer régulièrement.";
-    } if (growth >= -10) {
+    }
+    if (growth >= -10) {
       return "Légère baisse des performances. Un peu plus de pratique pourrait aider.";
-    } 
-      return "Baisse significative. Un soutien supplémentaire pourrait être nécessaire.";
-    
+    }
+    return "Baisse significative. Un soutien supplémentaire pourrait être nécessaire.";
   };
 
   return (

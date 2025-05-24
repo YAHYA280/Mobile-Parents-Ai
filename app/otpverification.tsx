@@ -24,7 +24,7 @@ type Nav = {
 const OTPVerification = () => {
   const { navigate } = useNavigation<Nav>();
   const [time, setTime] = useState(50);
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const [otp, setOtp] = useState("");
   const [isTimerActive, setIsTimerActive] = useState(true);
 
@@ -76,7 +76,7 @@ const OTPVerification = () => {
             style={[
               styles.title,
               {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               },
             ]}
           >
@@ -90,15 +90,15 @@ const OTPVerification = () => {
             onFilled={(text) => console.log(`OTP is ${text}`)}
             theme={{
               pinCodeContainerStyle: {
-                backgroundColor: dark ? COLORS.dark2 : COLORS.secondaryWhite,
-                borderColor: dark ? COLORS.gray : COLORS.secondaryWhite,
+                backgroundColor: COLORS.secondaryWhite,
+                borderColor: COLORS.secondaryWhite,
                 borderWidth: 0.4,
                 borderRadius: 10,
                 height: 58,
                 width: 58,
               },
               pinCodeTextStyle: {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               },
             }}
           />
@@ -109,7 +109,7 @@ const OTPVerification = () => {
                 style={[
                   styles.code,
                   {
-                    color: dark ? COLORS.white : COLORS.greyscale900,
+                    color: COLORS.greyscale900,
                   },
                 ]}
               >
@@ -120,7 +120,7 @@ const OTPVerification = () => {
                 style={[
                   styles.code,
                   {
-                    color: dark ? COLORS.white : COLORS.greyscale900,
+                    color: COLORS.greyscale900,
                   },
                 ]}
               >

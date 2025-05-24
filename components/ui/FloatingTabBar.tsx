@@ -1,3 +1,4 @@
+// FloatingTabBar.tsx
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
 import { MotiView } from "moti";
@@ -14,24 +15,114 @@ import Animated, {
 
 import { COLORS } from "@/constants";
 import { Paths } from "@/navigation";
-import { useTheme } from "@/theme/ThemeProvider";
+
+type TabButtonProps = {
+  routeName: string;
+  label: string;
+  isFocused: boolean;
+  onPress: () => void;
+  activeColor: string;
+  inactiveColor: string;
+};
+
+const TabButton: React.FC<TabButtonProps> = ({
+  routeName,
+  label,
+  isFocused,
+  onPress,
+  activeColor,
+  inactiveColor,
+}) => {
+  let iconName: keyof typeof Ionicons.glyphMap = "home-outline";
+  let iconSize = 24;
+
+  if (routeName === Paths.Index || routeName.includes("index")) {
+    iconName = isFocused ? "home" : "home-outline";
+  } else if (routeName === "Enfants") {
+    iconName = isFocused ? "people" : "people-outline";
+  } else if (routeName.includes("Support")) {
+    iconName = isFocused ? "chatbubble" : "chatbubble-outline";
+    iconSize = 22;
+  } else if (routeName.includes("Profil")) {
+    iconName = isFocused ? "person" : "person-outline";
+  }
+
+  const scale = useSharedValue(isFocused ? 1 : 0);
+
+  useEffect(() => {
+    scale.value = withSpring(isFocused ? 1 : 0, {
+      damping: 12,
+      stiffness: 120,
+    });
+  }, [isFocused, scale]);
+
+  const animatedIconStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: interpolate(scale.value, [0, 1], [1, 1.3]),
+      },
+    ],
+    top: interpolate(scale.value, [0, 1], [0, -10]),
+  }));
+
+  const animatedCircleStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: scale.value,
+  }));
+
+  const textStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scale.value, [0, 1], [1, 0]),
+  }));
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={styles.tabButton}
+      activeOpacity={0.7}
+    >
+      <Animated.View style={[styles.iconBackground, animatedCircleStyle]}>
+        <View
+          style={[styles.iconCircle, { backgroundColor: `${activeColor}15` }]}
+        />
+      </Animated.View>
+
+      <Animated.View style={[animatedIconStyle, { zIndex: 1 }]}>
+        <Ionicons
+          name={iconName}
+          size={iconSize}
+          color={isFocused ? activeColor : inactiveColor}
+        />
+      </Animated.View>
+
+      <Animated.Text
+        style={[
+          {
+            color: isFocused ? activeColor : inactiveColor,
+            fontSize: 11,
+            fontFamily: "medium",
+            marginTop: 4,
+          },
+          textStyle,
+        ]}
+      >
+        {label}
+      </Animated.Text>
+    </TouchableOpacity>
+  );
+};
 
 const FloatingTabBar: React.FC<BottomTabBarProps> = ({
   state,
   descriptors,
   navigation,
 }) => {
-  const { dark } = useTheme();
   const insets = useSafeAreaInsets();
 
-  // Colors based on theme
-  const backgroundColor = dark ? COLORS.dark1 : COLORS.white;
+  const backgroundColor = COLORS.white;
   const activeColor = COLORS.primary;
-  const inactiveColor = dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)";
-  const shadowColor = dark ? "#000" : COLORS.primary;
-  const borderColor = dark
-    ? "rgba(255, 255, 255, 0.08)"
-    : "rgba(0, 0, 0, 0.08)";
+  const inactiveColor = "rgba(0,0,0,0.4)";
+  const shadowColor = COLORS.primary;
+  const borderColor = "rgba(0, 0, 0, 0.08)";
 
   return (
     <MotiView
@@ -51,12 +142,7 @@ const FloatingTabBar: React.FC<BottomTabBarProps> = ({
     >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-              ? options.title
-              : route.name;
+        const label = options.tabBarLabel ?? options.title ?? route.name;
 
         const isFocused = state.index === index;
 
@@ -66,106 +152,21 @@ const FloatingTabBar: React.FC<BottomTabBarProps> = ({
             target: route.key,
             canPreventDefault: true,
           });
-
           if (!isFocused && !event.defaultPrevented) {
             navigation.navigate(route.name);
           }
         };
 
-        // Get icons and sizes exactly as they were used in the original code
-        let iconName;
-        let iconSize = 24; // Default size for most icons
-
-        if (route.name === Paths.Index || route.name.includes("index")) {
-          iconName = isFocused ? "home" : "home-outline";
-          iconSize = 24;
-        } else if (route.name === "Enfants") {
-          iconName = isFocused ? "people" : "people-outline";
-          iconSize = 24;
-        } else if (route.name.includes("Support")) {
-          iconName = isFocused ? "chatbubble" : "chatbubble-outline";
-          iconSize = 22; // Support icon was specifically 22px in original code
-        } else if (route.name.includes("Profil")) {
-          iconName = isFocused ? "person" : "person-outline";
-          iconSize = 24;
-        } else {
-          // Fallback
-          iconName = isFocused ? "home" : "home-outline";
-          iconSize = 24;
-        }
-
-        // Animation values
-        const scale = useSharedValue(0);
-
-        useEffect(() => {
-          scale.value = withSpring(isFocused ? 1 : 0, {
-            damping: 12,
-            stiffness: 120,
-          });
-        }, [isFocused]);
-
-        const animatedIconStyle = useAnimatedStyle(() => {
-          return {
-            transform: [
-              {
-                scale: interpolate(scale.value, [0, 1], [1, 1.3]),
-              },
-            ],
-            top: interpolate(scale.value, [0, 1], [0, -10]),
-          };
-        });
-
-        const animatedCircleStyle = useAnimatedStyle(() => {
-          return {
-            transform: [{ scale: scale.value }],
-            opacity: scale.value,
-          };
-        });
-
-        const textStyle = useAnimatedStyle(() => {
-          return {
-            opacity: interpolate(scale.value, [0, 1], [1, 0]),
-          };
-        });
-
         return (
-          <TouchableOpacity
+          <TabButton
             key={route.key}
+            routeName={route.name}
+            label={typeof label === "string" ? label : ""}
+            isFocused={isFocused}
             onPress={onPress}
-            activeOpacity={0.7}
-            style={styles.tabButton}
-          >
-            <Animated.View style={[styles.iconBackground, animatedCircleStyle]}>
-              <View
-                style={[
-                  styles.iconCircle,
-                  { backgroundColor: `${activeColor}15` },
-                ]}
-              />
-            </Animated.View>
-
-            <Animated.View style={[animatedIconStyle, { zIndex: 1 }]}>
-              <Ionicons
-                name={iconName as any}
-                size={iconSize}
-                color={isFocused ? activeColor : inactiveColor}
-              />
-            </Animated.View>
-
-            <Animated.Text
-              style={[
-                {
-                  color: isFocused ? activeColor : inactiveColor,
-                  fontSize: 11,
-                  fontFamily: "medium",
-                  marginTop: 4,
-                },
-                textStyle,
-              ]}
-            >
-              {typeof label === "string" ? label : ""}
-            </Animated.Text>
-          </TouchableOpacity>
+            activeColor={activeColor}
+            inactiveColor={inactiveColor}
+          />
         );
       })}
     </MotiView>

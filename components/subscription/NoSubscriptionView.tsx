@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet } from "react-native";
 
 import Button from "@/components/ui/Button";
-import { useTheme } from "@/theme/ThemeProvider";
 import { RADIUS, COLOORS, SHADOWS, TYPOGRAPHY } from "@/constants/theme";
 
 interface NoSubscriptionViewProps {
@@ -14,14 +13,12 @@ interface NoSubscriptionViewProps {
 const NoSubscriptionView: React.FC<NoSubscriptionViewProps> = ({
   onChoosePlan,
 }) => {
-  const { dark } = useTheme();
-
   return (
     <MotiView
       style={[
         styles.container,
         {
-          backgroundColor: dark ? COLOORS.surface.dark : COLOORS.surface.light,
+          backgroundColor: COLOORS.surface.light,
         },
       ]}
       from={{ opacity: 0, scale: 0.9 }}
@@ -36,18 +33,11 @@ const NoSubscriptionView: React.FC<NoSubscriptionViewProps> = ({
         />
       </View>
 
-      <Text
-        style={[styles.title, { color: dark ? COLOORS.white : COLOORS.black }]}
-      >
+      <Text style={[styles.title, { color: COLOORS.black }]}>
         Aucun abonnement actif
       </Text>
 
-      <Text
-        style={[
-          styles.description,
-          { color: dark ? COLOORS.gray2 : COLOORS.gray3 },
-        ]}
-      >
+      <Text style={[styles.description, { color: COLOORS.gray3 }]}>
         Vous n&apos;avez actuellement aucun abonnement actif. Choisissez un plan
         pour commencer à profiter de nos services.
       </Text>

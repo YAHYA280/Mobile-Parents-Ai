@@ -1,25 +1,27 @@
-// components/enfants/historique/filtres/FilterModal.tsx
+import type { DateData } from "react-native-calendars";
+
 import React, { useEffect } from "react";
-import { Calendar, DateData } from "react-native-calendars";
+import { Calendar } from "react-native-calendars";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  View,
-  Text,
-  Modal,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  Animated,
-  Dimensions,
-  StyleSheet,
-} from "react-native";
 import {
   faSearch,
   faCalendar,
   faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  View,
+  Text,
+  Modal,
+  Animated,
+  TextInput,
+  ScrollView,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 import { COLORS } from "@/constants/theme";
+
 import AssistantTypeFilters from "./AssistantTypeFilters";
 
 interface FilterModalProps {

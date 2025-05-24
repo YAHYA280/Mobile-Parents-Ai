@@ -20,7 +20,7 @@ const SettingsCodeVerification = () => {
   const [time, setTime] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState("");
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -73,19 +73,12 @@ const SettingsCodeVerification = () => {
           </LinearGradient>
         </View>
 
-        <Text
-          style={[styles.title, { color: dark ? COLORS.white : COLORS.black }]}
-        >
+        <Text style={[styles.title, { color: COLORS.black }]}>
           Code de Vérification
         </Text>
 
-        <Text
-          style={[
-            styles.subtitle,
-            { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-          ]}
-        >
-          Le code a été envoyé à l'email{" "}
+        <Text style={[styles.subtitle, { color: COLORS.greyscale600 }]}>
+          Le code a été envoyé à l&apos;email{" "}
           <Text style={styles.email}>jack_Duboix@gmail.com</Text>
         </Text>
 
@@ -98,8 +91,8 @@ const SettingsCodeVerification = () => {
             onFilled={(text) => setOtp(text)}
             theme={{
               pinCodeContainerStyle: {
-                backgroundColor: dark ? COLORS.dark2 : "#F8F9FA",
-                borderColor: dark ? COLORS.gray : "#E8E8E8",
+                backgroundColor: "#F8F9FA",
+                borderColor: "#E8E8E8",
                 borderWidth: 1,
                 borderRadius: 12,
                 height: 64,
@@ -108,7 +101,7 @@ const SettingsCodeVerification = () => {
                 ...styles.otpDigitContainer,
               },
               pinCodeTextStyle: {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
                 fontSize: 24,
                 fontFamily: "medium",
               },
@@ -119,12 +112,7 @@ const SettingsCodeVerification = () => {
         <View style={styles.timerContainer}>
           {time > 0 ? (
             <>
-              <Text
-                style={[
-                  styles.timerText,
-                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-                ]}
-              >
+              <Text style={[styles.timerText, { color: COLORS.greyscale600 }]}>
                 Renvoyer le code dans{" "}
               </Text>
               <View style={styles.timerBadge}>
@@ -132,13 +120,8 @@ const SettingsCodeVerification = () => {
               </View>
             </>
           ) : (
-            <Text
-              style={[
-                styles.timerText,
-                { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-              ]}
-            >
-              Vous n'avez pas reçu le code?
+            <Text style={[styles.timerText, { color: COLORS.greyscale600 }]}>
+              Vous n&apos;avez pas reçu le code?
             </Text>
           )}
         </View>

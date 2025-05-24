@@ -91,7 +91,7 @@ const gradeOptions = [
 // --------------------------------------------------
 const EditChildScreen = () => {
   // 1) Always call Hooks unconditionally, at the top:
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
   const insets = useSafeAreaInsets();
@@ -234,7 +234,7 @@ const EditChildScreen = () => {
       >
         <Header title="Enfant introuvable" onBackPress={handleBack} />
         <View style={{ padding: 16 }}>
-          <Text style={{ color: dark ? COLORS.white : COLORS.black }}>
+          <Text style={{ color: COLORS.black }}>
             Désolé, aucune donnée trouvée pour cet enfant.
           </Text>
         </View>
@@ -257,29 +257,16 @@ const EditChildScreen = () => {
           from={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "spring", damping: 15 }}
-          style={[
-            styles.modalContainer,
-            { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-          ]}
+          style={[styles.modalContainer, { backgroundColor: COLORS.white }]}
         >
           <View style={styles.modalIconContainer}>
             <Ionicons name="warning" size={48} color="#FF9500" />
           </View>
 
-          <Text
-            style={[
-              styles.modalTitle,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.modalTitle, { color: COLORS.black }]}>
             Annuler les modifications
           </Text>
-          <Text
-            style={[
-              styles.modalMessage,
-              { color: dark ? COLORS.white : COLORS.black },
-            ]}
-          >
+          <Text style={[styles.modalMessage, { color: COLORS.black }]}>
             Vous avez des modifications non enregistrées. Voulez-vous vraiment
             quitter sans enregistrer ?
           </Text>
@@ -288,23 +275,14 @@ const EditChildScreen = () => {
             <TouchableOpacity
               style={[
                 styles.modalCancelButton,
-                { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
+                { borderColor: COLORS.greyscale300 },
               ]}
               onPress={() => setShowDiscardModal(false)}
               activeOpacity={0.8}
             >
               <View style={styles.modalCancelContent}>
-                <Ionicons
-                  name="close-outline"
-                  size={18}
-                  color={dark ? COLORS.white : COLORS.black}
-                />
-                <Text
-                  style={[
-                    styles.modalCancelText,
-                    { color: dark ? COLORS.white : COLORS.black },
-                  ]}
-                >
+                <Ionicons name="close-outline" size={18} color={COLORS.black} />
+                <Text style={[styles.modalCancelText, { color: COLORS.black }]}>
                   Continuer
                 </Text>
               </View>
@@ -404,12 +382,7 @@ const EditChildScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.fieldLabel,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.fieldLabel, { color: COLORS.black }]}>
                       Nom complet
                     </Text>
                   </View>
@@ -418,7 +391,7 @@ const EditChildScreen = () => {
                     onInputChanged={inputChangedHandler}
                     errorText={formState.inputValidities.fullName}
                     placeholder="Nom et prénom de l'enfant"
-                    placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
+                    placeholderTextColor={COLORS.black}
                     value={formState.inputValues.fullName}
                   />
                 </View>
@@ -436,12 +409,7 @@ const EditChildScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.fieldLabel,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.fieldLabel, { color: COLORS.black }]}>
                       Âge
                     </Text>
                   </View>
@@ -450,7 +418,7 @@ const EditChildScreen = () => {
                     onInputChanged={inputChangedHandler}
                     errorText={formState.inputValidities.age}
                     placeholder="Âge de l'enfant"
-                    placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
+                    placeholderTextColor={COLORS.black}
                     keyboardType="numeric"
                     value={formState.inputValues.age}
                   />
@@ -469,12 +437,7 @@ const EditChildScreen = () => {
                       size={18}
                       color={COLORS.primary}
                     />
-                    <Text
-                      style={[
-                        styles.fieldLabel,
-                        { color: dark ? COLORS.white : COLORS.black },
-                      ]}
-                    >
+                    <Text style={[styles.fieldLabel, { color: COLORS.black }]}>
                       Niveau scolaire
                     </Text>
                   </View>
@@ -484,8 +447,8 @@ const EditChildScreen = () => {
                     style={[
                       styles.pickerContainer,
                       {
-                        backgroundColor: dark ? COLORS.dark2 : COLORS.white,
-                        borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+                        backgroundColor: COLORS.white,
+                        borderColor: COLORS.greyscale300,
                       },
                     ]}
                   >
@@ -502,7 +465,7 @@ const EditChildScreen = () => {
                       placeholder={{
                         label: "Sélectionner le niveau",
                         value: null,
-                        color: dark ? COLORS.grayTie : COLORS.gray,
+                        color: COLORS.gray,
                       }}
                       items={gradeOptions}
                       onValueChange={handleGradeChange}
@@ -512,7 +475,7 @@ const EditChildScreen = () => {
                           fontSize: 16,
                           paddingVertical: 12,
                           paddingHorizontal: 16,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                           width: "100%",
                           height: "100%",
@@ -521,13 +484,13 @@ const EditChildScreen = () => {
                           fontSize: 16,
                           paddingHorizontal: 16,
                           paddingVertical: 12,
-                          color: dark ? COLORS.white : COLORS.black,
+                          color: COLORS.black,
                           paddingRight: 50,
                           width: "100%",
                           height: "100%",
                         },
                         placeholder: {
-                          color: dark ? COLORS.grayTie : COLORS.gray,
+                          color: COLORS.gray,
                           fontSize: 16,
                         },
                         iconContainer: {
@@ -546,7 +509,7 @@ const EditChildScreen = () => {
                             <Ionicons
                               name="chevron-down"
                               size={20}
-                              color={dark ? COLORS.white : COLORS.black}
+                              color={COLORS.black}
                             />
                           </View>
                         );
@@ -586,25 +549,13 @@ const EditChildScreen = () => {
         >
           {/* Enhanced Cancel Button */}
           <TouchableOpacity
-            style={[
-              styles.cancelButton,
-              { borderColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
-            ]}
+            style={[styles.cancelButton, { borderColor: COLORS.greyscale300 }]}
             onPress={handleBack}
             activeOpacity={0.8}
           >
             <View style={styles.cancelButtonContent}>
-              <Ionicons
-                name="close-outline"
-                size={20}
-                color={dark ? COLORS.white : COLORS.black}
-              />
-              <Text
-                style={[
-                  styles.cancelButtonText,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Ionicons name="close-outline" size={20} color={COLORS.black} />
+              <Text style={[styles.cancelButtonText, { color: COLORS.black }]}>
                 Annuler
               </Text>
             </View>

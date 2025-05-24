@@ -42,7 +42,7 @@ const ForgotPasswordEmail = () => {
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
   const [error, setError] = useState(null);
   const [isChecked, setChecked] = useState(false);
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
@@ -81,7 +81,7 @@ const ForgotPasswordEmail = () => {
             style={[
               styles.title,
               {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               },
             ]}
           >
@@ -92,7 +92,7 @@ const ForgotPasswordEmail = () => {
             onInputChanged={inputChangedHandler}
             errorText={formState.inputValidities.email}
             placeholder="Email"
-            placeholderTextColor={dark ? COLORS.grayTie : COLORS.black}
+            placeholderTextColor={COLORS.black}
             icon={icons.email}
             keyboardType="email-address"
           />
@@ -101,9 +101,7 @@ const ForgotPasswordEmail = () => {
               <Checkbox
                 style={styles.checkbox}
                 value={isChecked}
-                color={
-                  isChecked ? COLORS.primary : dark ? COLORS.primary : "gray"
-                }
+                color={isChecked ? COLORS.primary : "gray"}
                 onValueChange={setChecked}
               />
               <View style={{ flex: 1 }}>
@@ -111,7 +109,7 @@ const ForgotPasswordEmail = () => {
                   style={[
                     styles.privacy,
                     {
-                      color: dark ? COLORS.white : COLORS.black,
+                      color: COLORS.black,
                     },
                   ]}
                 >
@@ -138,7 +136,7 @@ const ForgotPasswordEmail = () => {
             style={[
               styles.bottomLeft,
               {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               },
             ]}
           >

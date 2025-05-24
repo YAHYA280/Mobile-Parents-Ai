@@ -60,7 +60,7 @@ const SubjectsCard: React.FC<SubjectsCardProps> = ({
       transition={{ type: "spring", delay: 1200, damping: 15 }}
     >
       <View style={styles.header}>
-        <Text style={styles.title}>Domaines d'Apprentissage</Text>
+        <Text style={styles.title}>Domaines d&apos;Apprentissage</Text>
         <View style={styles.iconContainer}>
           <FontAwesomeIcon
             icon={faGraduationCap}

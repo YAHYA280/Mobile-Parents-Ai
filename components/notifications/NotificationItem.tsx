@@ -5,7 +5,6 @@ import { Feather } from "@expo/vector-icons";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 
 interface Notification {
   id: string;
@@ -52,7 +51,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   formatTimeAgo,
   onMenuPress,
 }) => {
-  const { dark } = useTheme();
   const { icon, color } = getNotificationTypeInfo(notification.type);
 
   const handleMenuPress = (event: GestureResponderEvent) => {
@@ -62,12 +60,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: COLORS.white }]}>
       {/* Left side - Icon and indicator */}
       <View style={styles.leftContainer}>
         <View style={[styles.iconContainer, { backgroundColor: `${color}20` }]}>
@@ -83,7 +76,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           style={[
             styles.subject,
             {
-              color: dark ? COLORS.white : COLORS.greyscale900,
+              color: COLORS.greyscale900,
               fontWeight: notification.read ? "normal" : "bold",
             },
           ]}
@@ -93,10 +86,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         </Text>
 
         <Text
-          style={[
-            styles.message,
-            { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-          ]}
+          style={[styles.message, { color: COLORS.greyscale600 }]}
           numberOfLines={2}
         >
           {notification.message}
@@ -107,11 +97,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
       {/* Right side - Menu */}
       <TouchableOpacity style={styles.menuButton} onPress={handleMenuPress}>
-        <Feather
-          name="more-vertical"
-          size={20}
-          color={dark ? COLORS.greyscale500 : COLORS.greyscale600}
-        />
+        <Feather name="more-vertical" size={20} color={COLORS.greyscale600} />
       </TouchableOpacity>
 
       {/* Status indicators */}

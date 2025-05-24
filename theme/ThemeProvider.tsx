@@ -5,15 +5,11 @@ import React, { useMemo, useContext, createContext } from "react";
 import { lightColors } from "./colors";
 
 interface ThemeContextType {
-  dark: boolean;
   colors: typeof lightColors;
-  setScheme: (scheme: "light" | "dark") => void;
 }
 
 const defaultThemeContext: ThemeContextType = {
-  dark: false,
   colors: lightColors,
-  setScheme: () => {},
 };
 
 export const ThemeContext =
@@ -24,13 +20,9 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const isDark = false;
-
   const theme = useMemo(
     () => ({
-      dark: isDark,
       colors: lightColors,
-      setScheme: () => {},
     }),
     []
   );

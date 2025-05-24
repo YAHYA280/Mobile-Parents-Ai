@@ -5,17 +5,15 @@ import { View, Platform, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Paths } from "@/navigation";
-import { useTheme } from "@/theme/ThemeProvider";
 
 import { COLORS } from "../../constants";
 
 const TabLayout = () => {
-  const { dark } = useTheme();
   const insets = useSafeAreaInsets();
 
-  const tabBarBackground = dark ? COLORS.dark1 : COLORS.white;
+  const tabBarBackground = COLORS.white;
   const activeIconColor = COLORS.primary;
-  const inactiveIconColor = dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)";
+  const inactiveIconColor = "rgba(0,0,0,0.4)";
 
   const bottomMargin =
     Platform.OS === "ios"
@@ -40,10 +38,10 @@ const TabLayout = () => {
           borderRadius: 30,
           borderTopWidth: 0,
           borderWidth: 1,
-          borderColor: dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
+          borderColor: "rgba(0,0,0,0.08)",
 
           elevation: 10,
-          shadowColor: dark ? "#000" : COLORS.primary,
+          shadowColor: COLORS.primary,
           shadowOpacity: 0.2,
           shadowOffset: { height: 8, width: 0 },
           shadowRadius: 14,

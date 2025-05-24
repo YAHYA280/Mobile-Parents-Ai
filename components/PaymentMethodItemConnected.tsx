@@ -11,7 +11,6 @@ import {
 } from "react-native";
 
 import { COLORS } from "../constants";
-import { useTheme } from "../theme/ThemeProvider";
 
 interface PaymentMethodItemConnectedProps {
   onPress: (event: GestureResponderEvent) => void;
@@ -28,15 +27,13 @@ const PaymentMethodItemConnected: React.FC<PaymentMethodItemConnectedProps> = ({
   expiryDate,
   tintColor,
 }) => {
-  const { dark } = useTheme();
-
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[
         styles.container,
         Platform.OS === "android" ? styles.androidShadow : styles.iosShadow,
-        { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
+        { backgroundColor: COLORS.white },
       ]}
     >
       <View style={styles.rightContainer}>
@@ -55,7 +52,7 @@ const PaymentMethodItemConnected: React.FC<PaymentMethodItemConnectedProps> = ({
             style={[
               styles.title,
               {
-                color: dark ? COLORS.white : COLORS.greyscale900,
+                color: COLORS.greyscale900,
               },
             ]}
           >
@@ -66,7 +63,7 @@ const PaymentMethodItemConnected: React.FC<PaymentMethodItemConnectedProps> = ({
               style={[
                 styles.expiryDate,
                 {
-                  color: dark ? COLORS.secondaryWhite : COLORS.primary,
+                  color: COLORS.primary,
                 },
               ]}
             >

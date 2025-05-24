@@ -1,8 +1,8 @@
 import type { ViewStyle } from "react-native";
 
-// Fixed CircularProgress.tsx
-import React, { useRef, useEffect } from "react";
 import Svg, { G, Circle } from "react-native-svg";
+// Fixed CircularProgress.tsx
+import React, { useRef, useEffect, useCallback } from "react";
 import { View, Easing, Animated, StyleSheet } from "react-native";
 
 // Create an animated version of the Circle component
@@ -34,19 +34,23 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   const halfCircle = radius + strokeWidth;
   const circleCircumference = 2 * Math.PI * radius;
 
-  const animation = (toValue: number) => {
-    return Animated.timing(animatedValue, {
-      toValue,
-      duration,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    });
-  };
+  // Move animation function inside useCallback to fix dependencies
+  const animation = useCallback(
+    (toValue: number) => {
+      return Animated.timing(animatedValue, {
+        toValue,
+        duration,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      });
+    },
+    [animatedValue, duration]
+  );
 
   useEffect(() => {
     // FIX: Ensure percentage is a valid number
     const safePercentage =
-      typeof percentage === "number" && !isNaN(percentage)
+      typeof percentage === "number" && !Number.isNaN(percentage)
         ? Math.min(Math.max(percentage, 0), 100)
         : 0;
 

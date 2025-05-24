@@ -20,7 +20,7 @@ import { SIZES, COLORS, illustrations } from "../constants";
 
 const ConfirmPayment = () => {
   const navigation = useNavigation<NavigationProp<any>>();
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const handleAddCard = () => {
     setModalVisible(true);
@@ -34,7 +34,7 @@ const ConfirmPayment = () => {
               style={[
                 styles.modalSubContainer,
                 {
-                  backgroundColor: dark ? COLORS.dark2 : COLORS.secondaryWhite,
+                  backgroundColor: COLORS.secondaryWhite,
                 },
               ]}
             >
@@ -76,7 +76,7 @@ const ConfirmPayment = () => {
             style={[
               styles.title,
               {
-                color: dark ? COLORS.secondaryWhite : COLORS.greyscale900,
+                color: COLORS.greyscale900,
               },
             ]}
           >
@@ -92,15 +92,15 @@ const ConfirmPayment = () => {
               onFilled={(text) => console.log(`OTP is ${text}`)}
               theme={{
                 pinCodeContainerStyle: {
-                  backgroundColor: dark ? COLORS.dark2 : COLORS.secondaryWhite,
-                  borderColor: dark ? COLORS.gray3 : COLORS.secondaryWhite,
-                  borderWidth: dark ? 0.4 : 1,
+                  backgroundColor: COLORS.secondaryWhite,
+                  borderColor: COLORS.secondaryWhite,
+                  borderWidth: 1,
                   borderRadius: 10,
                   height: 58,
                   width: 58,
                 },
                 pinCodeTextStyle: {
-                  color: dark ? COLORS.white : COLORS.black,
+                  color: COLORS.black,
                 },
               }}
             />

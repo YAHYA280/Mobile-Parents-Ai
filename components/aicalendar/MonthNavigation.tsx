@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 
 interface MonthNavigationProps {
   selectedMonth: number;
@@ -20,8 +19,6 @@ const MonthNavigation: React.FC<MonthNavigationProps> = ({
   monthNames,
   onMonthChange,
 }) => {
-  const { dark } = useTheme();
-
   const handlePreviousMonth = () => {
     if (selectedMonth === 0) {
       onMonthChange(11, selectedYear - 1);
@@ -49,12 +46,7 @@ const MonthNavigation: React.FC<MonthNavigationProps> = ({
         <Ionicons name="chevron-back" size={20} color={COLORS.primary} />
       </TouchableOpacity>
 
-      <Text
-        style={[
-          styles.monthTitle,
-          { color: dark ? COLORS.white : COLORS.black },
-        ]}
-      >
+      <Text style={[styles.monthTitle, { color: COLORS.black }]}>
         {monthNames[selectedMonth]} {selectedYear}
       </Text>
 

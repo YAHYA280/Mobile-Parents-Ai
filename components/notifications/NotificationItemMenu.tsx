@@ -39,7 +39,7 @@ const NotificationItemMenu: React.FC<NotificationItemMenuProps> = ({
   position,
   onClose,
 }) => {
-  const { dark, colors } = useTheme();
+  const { colors } = useTheme();
 
   if (!notification) return null;
 
@@ -85,7 +85,7 @@ const NotificationItemMenu: React.FC<NotificationItemMenuProps> = ({
           styles.menuContainer,
           {
             backgroundColor: colors.background,
-            borderColor: dark ? COLORS.dark3 : COLORS.greyscale300,
+            borderColor: COLORS.greyscale300,
             top: position.y,
             left: clampedLeft,
           },
@@ -98,12 +98,7 @@ const NotificationItemMenu: React.FC<NotificationItemMenuProps> = ({
             style={styles.menuIcon}
             color={COLORS.primary}
           />
-          <Text
-            style={[
-              styles.menuText,
-              { color: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
-          >
+          <Text style={[styles.menuText, { color: COLORS.greyscale900 }]}>
             {notification.read ? "Marquer non lu" : "Marquer lu"}
           </Text>
         </TouchableOpacity>
@@ -118,12 +113,7 @@ const NotificationItemMenu: React.FC<NotificationItemMenuProps> = ({
             style={styles.menuIcon}
             color={notification.favorite ? COLORS.greyscale500 : COLORS.primary}
           />
-          <Text
-            style={[
-              styles.menuText,
-              { color: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
-          >
+          <Text style={[styles.menuText, { color: COLORS.greyscale900 }]}>
             {notification.favorite ? "Retirer favori" : "Ajouter favori"}
           </Text>
         </TouchableOpacity>
@@ -135,21 +125,13 @@ const NotificationItemMenu: React.FC<NotificationItemMenuProps> = ({
             style={styles.menuIcon}
             color={COLORS.primary}
           />
-          <Text
-            style={[
-              styles.menuText,
-              { color: dark ? COLORS.white : COLORS.greyscale900 },
-            ]}
-          >
+          <Text style={[styles.menuText, { color: COLORS.greyscale900 }]}>
             {notification.archived ? "Désarchiver" : "Archiver"}
           </Text>
         </TouchableOpacity>
 
         <View
-          style={[
-            styles.divider,
-            { backgroundColor: dark ? COLORS.dark3 : COLORS.greyscale300 },
-          ]}
+          style={[styles.divider, { backgroundColor: COLORS.greyscale300 }]}
         />
 
         <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>

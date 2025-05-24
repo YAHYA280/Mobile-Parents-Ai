@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { View, Text, Image, StyleSheet } from "react-native";
 
-import { useTheme } from "@/theme/ThemeProvider";
 import {
   RADIUS,
   COLOORS,
@@ -30,8 +29,6 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
   rating = 5,
   delay = 800,
 }) => {
-  const { dark } = useTheme();
-
   return (
     <MotiView
       style={styles.cardShadowContainer}
@@ -68,12 +65,12 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
         {/* Quote Section */}
         <View style={styles.quoteContainer}>
           {/* Left quotation mark */}
-          <Text style={styles.quoteMarkLeft}>"</Text>
+          <Text style={styles.quoteMarkLeft}>&quot;</Text>
 
           <Text style={styles.quote}>{quote}</Text>
 
           {/* Right quotation mark */}
-          <Text style={styles.quoteMarkRight}>"</Text>
+          <Text style={styles.quoteMarkRight}>&quot;</Text>
         </View>
 
         {/* Rating Stars */}

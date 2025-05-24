@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
 import { Ionicons } from "@expo/vector-icons";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -33,7 +34,7 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
   // Animation for notification pulse
   React.useEffect(() => {
     if (unreadCount > 0) {
-      Animated.loop(
+      const animation = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, {
             toValue: 1.2,
@@ -46,27 +47,29 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
             useNativeDriver: true,
           }),
         ])
-      ).start();
-    } else {
-      pulseAnim.setValue(1);
+      );
+      animation.start();
+
+      return () => {
+        animation.stop();
+      };
     }
 
-    return () => {
-      pulseAnim.stopAnimation();
-    };
-  }, [unreadCount]);
+    pulseAnim.setValue(1);
+    return () => {}; // Return cleanup function even when no animation
+  }, [unreadCount, pulseAnim]);
 
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
     if (onPress) {
       onPress();
     } else {
       setModalVisible(true);
     }
-  };
+  }, [onPress]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setModalVisible(false);
-  };
+  }, []);
 
   const badgeScale = unreadCount > 0 ? pulseAnim : 1;
 

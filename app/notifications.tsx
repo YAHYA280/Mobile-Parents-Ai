@@ -2,12 +2,7 @@ import React, { useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { FONTS, COLORS } from "@/constants";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -24,7 +19,7 @@ type Nav = { navigate: (value: string) => void };
 
 export default function Notifications() {
   const navigation = useNavigation();
-  const { dark, colors } = useTheme();
+  const { colors } = useTheme();
   const { navigate } = useNavigation<Nav>();
 
   const [activeTab, setActiveTab] = useState<TabKey>("all");
@@ -58,18 +53,9 @@ export default function Notifications() {
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Feather
-            name="arrow-left"
-            size={24}
-            color={dark ? COLORS.white : COLORS.black}
-          />
+          <Feather name="arrow-left" size={24} color={COLORS.black} />
         </TouchableOpacity>
-        <Text
-          style={[
-            styles.headerTitle,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
+        <Text style={[styles.headerTitle, { color: COLORS.black }]}>
           Notifications
         </Text>
       </View>

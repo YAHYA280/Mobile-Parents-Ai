@@ -13,7 +13,7 @@ type Nav = {
 
 const Welcome = () => {
   const { navigate } = useNavigation<Nav>();
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: colors.background }]}>
@@ -22,20 +22,13 @@ const Welcome = () => {
         <Text style={[styles.title, { color: colors.text }]}>
           Bienvenue, Parents !
         </Text>
-        <Text
-          style={[styles.subtitle, { color: dark ? COLORS.white : "black" }]}
-        >
+        <Text style={[styles.subtitle, { color: "black" }]}>
           Suivez facilement l&apos;apprentissage de votre enfant et
           accompagnez-le vers la réussite.
         </Text>
 
         <View style={{ flexDirection: "row", marginTop: 7 }}>
-          <Text
-            style={[
-              styles.loginTitle,
-              { color: dark ? COLORS.white : "black" },
-            ]}
-          >
+          <Text style={[styles.loginTitle, { color: "black" }]}>
             Vous avez déjà un compte ?
           </Text>
           <TouchableOpacity onPress={() => navigate("login")}>
@@ -44,12 +37,7 @@ const Welcome = () => {
         </View>
 
         <View style={{ flexDirection: "row", marginTop: 8 }}>
-          <Text
-            style={[
-              styles.loginTitle,
-              { color: dark ? COLORS.white : "black" },
-            ]}
-          >
+          <Text style={[styles.loginTitle, { color: "black" }]}>
             Nouvel utilisateur ?
           </Text>
           <TouchableOpacity onPress={() => navigate("registrationStep1")}>
@@ -58,12 +46,7 @@ const Welcome = () => {
         </View>
       </View>
       <View style={styles.bottomContainer}>
-        <Text
-          style={[
-            styles.bottomTitle,
-            { color: dark ? COLORS.white : COLORS.black },
-          ]}
-        >
+        <Text style={[styles.bottomTitle, { color: COLORS.black }]}>
           En continuant, vous acceptez les Conditions d&apos;utilisation et
         </Text>
         <TouchableOpacity onPress={() => navigate("login")}>
@@ -71,7 +54,7 @@ const Welcome = () => {
             style={[
               styles.bottomSubtitle,
               {
-                color: dark ? COLORS.white : COLORS.black,
+                color: COLORS.black,
               },
             ]}
           >

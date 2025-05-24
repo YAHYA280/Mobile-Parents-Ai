@@ -108,14 +108,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
-  settingsButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.05)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
 });
 
 export default EnhancedHeader;

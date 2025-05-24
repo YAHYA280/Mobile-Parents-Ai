@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
-import { useTheme } from "../theme/ThemeProvider";
 import { SIZES, icons, COLORS } from "../constants";
 
 interface CourseCardProps {
@@ -31,7 +30,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
   onPress,
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const {dark } = useTheme();
 
   return (
     <TouchableOpacity
@@ -39,7 +37,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
       style={[
         styles.container,
         {
-          backgroundColor: dark ? COLORS.dark2 : COLORS.white,
+          backgroundColor: COLORS.white,
         },
       ]}
     >
@@ -66,7 +64,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           style={[
             styles.name,
             {
-              color: dark ? COLORS.white : COLORS.greyscale900,
+              color: COLORS.greyscale900,
             },
           ]}
         >

@@ -1,22 +1,10 @@
-import type {
-  ViewStyle,
-  ViewProps,
-  StyleProp,
-  ColorValue} from "react-native";
+import type { ViewStyle, ViewProps, StyleProp, ColorValue } from "react-native";
 
 import React from "react";
+import { View, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  View,
-  StyleSheet
-} from "react-native";
 
-import { useTheme } from "@/theme/ThemeProvider";
 import { RADIUS, COLOORS, SHADOWS } from "@/constants/theme";
-
-/* ------------------------------------------------------------------ */
-/* Types                                                              */
-/* ------------------------------------------------------------------ */
 
 type GradientTuple = readonly [ColorValue, ColorValue, ...ColorValue[]];
 
@@ -28,10 +16,6 @@ interface CardProps extends ViewProps {
   elevated?: boolean;
   shadowLevel?: "small" | "medium" | "large";
 }
-
-/* ------------------------------------------------------------------ */
-/* Component                                                          */
-/* ------------------------------------------------------------------ */
 
 const Card: React.FC<CardProps> = ({
   children,
@@ -45,12 +29,10 @@ const Card: React.FC<CardProps> = ({
   shadowLevel = "medium",
   ...props
 }) => {
-  const { dark } = useTheme();
-
   const cardStyle = [
     styles.card,
     elevated && SHADOWS[shadowLevel],
-    { backgroundColor: dark ? COLOORS.surface.dark : COLOORS.surface.light },
+    { backgroundColor: COLOORS.surface.light },
     style,
   ];
 

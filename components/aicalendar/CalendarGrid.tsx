@@ -4,7 +4,6 @@ import { MotiView } from "moti";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { COLORS } from "@/constants";
-import { useTheme } from "@/theme/ThemeProvider";
 
 export interface CalendarDay {
   date: number;
@@ -23,27 +22,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   calendarDays,
   onDaySelect,
 }) => {
-  const { dark } = useTheme();
-
   return (
     <MotiView
       from={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ type: "spring", damping: 18, delay: 400 }}
-      style={[
-        styles.container,
-        { backgroundColor: dark ? COLORS.dark2 : COLORS.white },
-      ]}
+      style={[styles.container, { backgroundColor: COLORS.white }]}
     >
       {/* Day headers */}
       <View style={styles.dayHeadersRow}>
         {["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"].map((day) => (
           <Text
             key={day}
-            style={[
-              styles.dayHeader,
-              { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-            ]}
+            style={[styles.dayHeader, { color: COLORS.greyscale600 }]}
           >
             {day}
           </Text>
@@ -72,12 +63,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     day.isToday && styles.todayText,
                     day.isSelected && styles.selectedText,
                     {
-                      color:
-                        day.date === 0
-                          ? "transparent"
-                          : dark
-                            ? COLORS.white
-                            : COLORS.black,
+                      color: day.date === 0 ? "transparent" : COLORS.black,
                     },
                   ]}
                 >

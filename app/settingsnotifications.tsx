@@ -3,13 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView } from "react-native-virtualized-view";
-import {
-  View,
-  Text,
-  Switch,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, Switch, StyleSheet, TouchableOpacity } from "react-native";
 
 import { COLORS } from "../constants";
 import Header from "../components/ui/Header"; // Updated import path
@@ -18,25 +12,21 @@ import { useTheme } from "../theme/ThemeProvider";
 // Component props
 interface SectionHeaderProps {
   title: string;
-  dark: boolean;
   isOpen: boolean;
   onToggle: () => void;
 }
 
 // Section Header Component
 const SectionHeader: React.FC<SectionHeaderProps> = React.memo(
-  ({ title, dark, isOpen, onToggle }) => (
+  // eslint-disable-next-line react/prop-types
+  ({ title, isOpen, onToggle }) => (
     <TouchableOpacity
       onPress={onToggle}
       style={[
         styles.accordionHeader,
         isOpen ? styles.accordionHeaderActive : {},
         {
-          backgroundColor: isOpen
-            ? COLORS.primary
-            : dark
-              ? COLORS.dark2
-              : "#F8F9FA",
+          backgroundColor: isOpen ? COLORS.primary : "#F8F9FA",
         },
       ]}
       activeOpacity={0.8}
@@ -62,7 +52,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = React.memo(
           style={[
             styles.accordionTitle,
             {
-              color: isOpen ? "#FFFFFF" : dark ? COLORS.white : COLORS.black,
+              color: isOpen ? "#FFFFFF" : COLORS.black,
             },
           ]}
         >
@@ -73,35 +63,34 @@ const SectionHeader: React.FC<SectionHeaderProps> = React.memo(
         style={[
           styles.accordionArrow,
           {
-            backgroundColor: isOpen
-              ? "rgba(255,255,255,0.2)"
-              : dark
-                ? COLORS.dark3
-                : "#EEEEEE",
+            backgroundColor: isOpen ? "rgba(255,255,255,0.2)" : "#EEEEEE",
           },
         ]}
       >
         <Ionicons
           name={isOpen ? "chevron-down" : "chevron-forward"}
           size={16}
-          color={isOpen ? "#FFFFFF" : dark ? COLORS.white : COLORS.greyscale900}
+          color={isOpen ? "#FFFFFF" : COLORS.greyscale900}
         />
       </View>
     </TouchableOpacity>
   )
 );
 
+// Disable prop-types validation for TypeScript components
+/* eslint-disable react/prop-types */
+SectionHeader.displayName = "SectionHeader";
+
 // Notification Toggle Component
 interface NotificationToggleProps {
   label: string;
   value: boolean;
   onValueChange: (value: boolean) => void;
-  dark: boolean;
   icon?: string;
 }
 
 const NotificationToggle: React.FC<NotificationToggleProps> = React.memo(
-  ({ label, value, onValueChange, dark, icon }) => (
+  ({ label, value, onValueChange, icon }) => (
     <View style={styles.toggleContainer}>
       <View style={styles.toggleLabelContainer}>
         {icon && (
@@ -109,33 +98,18 @@ const NotificationToggle: React.FC<NotificationToggleProps> = React.memo(
             style={[
               styles.toggleIconContainer,
               {
-                backgroundColor: value
-                  ? `${COLORS.primary}15`
-                  : dark
-                    ? COLORS.dark3
-                    : "#EEEEEE",
+                backgroundColor: value ? `${COLORS.primary}15` : "#EEEEEE",
               },
             ]}
           >
             <Ionicons
               name={icon as any}
               size={16}
-              color={
-                value
-                  ? COLORS.primary
-                  : dark
-                    ? COLORS.greyscale500
-                    : COLORS.greyscale600
-              }
+              color={value ? COLORS.primary : COLORS.greyscale600}
             />
           </View>
         )}
-        <Text
-          style={[
-            styles.toggleLabel,
-            { color: dark ? COLORS.white : COLORS.greyscale900 },
-          ]}
-        >
+        <Text style={[styles.toggleLabel, { color: COLORS.greyscale900 }]}>
           {label}
         </Text>
       </View>
@@ -143,20 +117,23 @@ const NotificationToggle: React.FC<NotificationToggleProps> = React.memo(
         value={value}
         onValueChange={onValueChange}
         trackColor={{
-          false: dark ? COLORS.dark3 : "#EEEEEE",
+          false: "#EEEEEE",
           true: COLORS.primary,
         }}
         thumbColor={COLORS.white}
-        ios_backgroundColor={dark ? COLORS.dark3 : "#EEEEEE"}
+        ios_backgroundColor="#EEEEEE"
         style={styles.toggle}
       />
     </View>
   )
 );
 
+NotificationToggle.displayName = "NotificationToggle";
+/* eslint-enable react/prop-types */
+
 // Main component
 const SettingsNotifications = () => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const navigation = useNavigation();
 
   const [mainNotificationsEnabled, setMainNotificationsEnabled] =
@@ -199,12 +176,7 @@ const SettingsNotifications = () => {
     if (!isOpen) return null;
 
     return (
-      <View
-        style={[
-          styles.sectionContent,
-          { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
-        ]}
-      >
+      <View style={[styles.sectionContent, { backgroundColor: "#FFFFFF" }]}>
         {children}
       </View>
     );
@@ -223,12 +195,7 @@ const SettingsNotifications = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View
-          style={[
-            styles.mainToggleCard,
-            { backgroundColor: dark ? COLORS.dark2 : "#FFFFFF" },
-          ]}
-        >
+        <View style={[styles.mainToggleCard, { backgroundColor: "#FFFFFF" }]}>
           <View style={styles.mainToggleHeaderContainer}>
             <View style={styles.mainToggleIconContainer}>
               <LinearGradient
@@ -241,18 +208,13 @@ const SettingsNotifications = () => {
               </LinearGradient>
             </View>
             <View style={styles.mainToggleTextContainer}>
-              <Text
-                style={[
-                  styles.mainToggleTitle,
-                  { color: dark ? COLORS.white : COLORS.black },
-                ]}
-              >
+              <Text style={[styles.mainToggleTitle, { color: COLORS.black }]}>
                 Notifications
               </Text>
               <Text
                 style={[
                   styles.mainToggleSubtitle,
-                  { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
+                  { color: COLORS.greyscale600 },
                 ]}
               >
                 {mainNotificationsEnabled
@@ -264,11 +226,11 @@ const SettingsNotifications = () => {
               value={mainNotificationsEnabled}
               onValueChange={(value) => setMainNotificationsEnabled(value)}
               trackColor={{
-                false: dark ? COLORS.dark3 : "#EEEEEE",
+                false: "#EEEEEE",
                 true: COLORS.primary,
               }}
               thumbColor={COLORS.white}
-              ios_backgroundColor={dark ? COLORS.dark3 : "#EEEEEE"}
+              ios_backgroundColor="#EEEEEE"
             />
           </View>
         </View>
@@ -278,7 +240,6 @@ const SettingsNotifications = () => {
             <View style={styles.sectionContainer}>
               <SectionHeader
                 title="Types de notifications"
-                dark={dark}
                 isOpen={openSections.notificationTypes}
                 onToggle={toggleNotificationTypesSection}
               />
@@ -290,7 +251,6 @@ const SettingsNotifications = () => {
                     label="Progrès de l'enfant"
                     value={notificationSettings.childProgress}
                     onValueChange={() => handleToggleChange("childProgress")}
-                    dark={dark}
                     icon="trending-up"
                   />
                   <NotificationToggle
@@ -299,14 +259,12 @@ const SettingsNotifications = () => {
                     onValueChange={() =>
                       handleToggleChange("objectiveReminders")
                     }
-                    dark={dark}
                     icon="flag"
                   />
                   <NotificationToggle
                     label="Mises à jour de l'application"
                     value={notificationSettings.appUpdates}
                     onValueChange={() => handleToggleChange("appUpdates")}
-                    dark={dark}
                     icon="refresh-circle"
                   />
                 </>
@@ -316,7 +274,6 @@ const SettingsNotifications = () => {
             <View style={styles.sectionContainer}>
               <SectionHeader
                 title="Préférences de communication"
-                dark={dark}
                 isOpen={openSections.communicationPrefs}
                 onToggle={toggleCommunicationSection}
               />
@@ -328,14 +285,12 @@ const SettingsNotifications = () => {
                     label="Messages et alertes"
                     value={notificationSettings.messages}
                     onValueChange={() => handleToggleChange("messages")}
-                    dark={dark}
                     icon="chatbubble"
                   />
                   <NotificationToggle
                     label="Newsletter et offres"
                     value={notificationSettings.newsletter}
                     onValueChange={() => handleToggleChange("newsletter")}
-                    dark={dark}
                     icon="mail"
                   />
                 </>
@@ -345,15 +300,10 @@ const SettingsNotifications = () => {
         )}
 
         <View style={styles.footerContainer}>
-          <Text
-            style={[
-              styles.footerText,
-              { color: dark ? COLORS.greyscale500 : COLORS.greyscale600 },
-            ]}
-          >
+          <Text style={[styles.footerText, { color: COLORS.greyscale600 }]}>
             Les paramètres de notification vous permettent de contrôler comment
-            et quand vous recevez des alertes concernant l'activité de vos
-            enfants et les mises à jour de l'application.
+            et quand vous recevez des alertes concernant l&apos;activité de vos
+            enfants et les mises à jour de l&apos;application.
           </Text>
         </View>
       </ScrollView>

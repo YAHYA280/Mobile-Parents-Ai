@@ -23,7 +23,7 @@ type Nav = {
 
 const RegistrationStep3 = () => {
   const { navigate } = useNavigation<Nav>();
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const [code, setCode] = useState<string[]>(Array(6).fill(""));
   const [remainingTime, setRemainingTime] = useState(60);
   const [canResend, setCanResend] = useState(false);
@@ -169,7 +169,7 @@ const RegistrationStep3 = () => {
         <Button
           title="Précédent"
           style={styles.prevButton}
-          textColor={dark ? COLORS.white : COLORS.primary}
+          textColor={COLORS.primary}
           onPress={() => navigate("registrationStep2")}
         />
       </View>

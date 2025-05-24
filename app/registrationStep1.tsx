@@ -108,7 +108,7 @@ const RegistrationStep1 = () => {
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
@@ -185,8 +185,8 @@ const RegistrationStep1 = () => {
               style={[
                 styles.inputContainer,
                 {
-                  backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale500,
-                  borderColor: dark ? COLORS.dark2 : COLORS.greyscale500,
+                  backgroundColor: COLORS.greyscale500,
+                  borderColor: COLORS.greyscale500,
                 },
               ]}
             >
@@ -203,7 +203,7 @@ const RegistrationStep1 = () => {
                     />
                     <Text
                       style={{
-                        color: dark ? COLORS.white : "#111",
+                        color: "#111",
                         marginLeft: 10,
                       }}
                     >
@@ -226,8 +226,8 @@ const RegistrationStep1 = () => {
               style={[
                 styles.inputContainer,
                 {
-                  backgroundColor: dark ? COLORS.dark2 : COLORS.greyscale500,
-                  borderColor: dark ? COLORS.dark2 : COLORS.greyscale500,
+                  backgroundColor: COLORS.greyscale500,
+                  borderColor: COLORS.greyscale500,
                 },
               ]}
             >
@@ -245,7 +245,7 @@ const RegistrationStep1 = () => {
                 <View style={{ justifyContent: "center", marginLeft: 5 }}>
                   <Text
                     style={{
-                      color: dark ? COLORS.white : "#111",
+                      color: "#111",
                       fontSize: 12,
                     }}
                   >
